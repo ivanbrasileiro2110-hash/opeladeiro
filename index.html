@@ -53,7 +53,7 @@ body.sp-futebol{
 }
 body.sp-quadras .app{max-width:1080px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 body{background:var(--bg) radial-gradient(120% 60% at 50% -10%,var(--glow) 0%,rgba(var(--bg-rgb),0) 60%) no-repeat;color:var(--text);font-family:var(--font);font-size:16px;line-height:1.35;letter-spacing:-.01em;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-block:0 calc(170px + env(safe-area-inset-bottom,0px));-webkit-font-smoothing:antialiased;min-height:100%}
@@ -778,8 +778,14 @@ const COL_ORDER=["profiles","peladas","camps","quadras"];
 const docStr=(col,it)=>stableStr(COLS[col].row(it).doc);
 function setMe(P){if(!P||!P.state)return;const mp=P.state.players.find(p=>p.uid===Cloud.uid);P.state.me=mp?mp.id:P.state.ownerId;}
 /* coloca no aparelho a versão que veio do servidor */
+/* atualiza o objeto que já está na tela sem trocar a referência (o que estava aberto continua funcionando) */
+const isPO=v=>v&&typeof v==="object"&&!Array.isArray(v);
+function patchArr(t,s){if(!s.every(x=>isPO(x)&&x.id!=null))return s;const m=new Map();t.forEach(x=>{if(isPO(x)&&x.id!=null)m.set(x.id,x);});
+  return s.map(x=>{const o=m.get(x.id);if(o){patchObj(o,x);return o;}return x;});}
+function patchObj(t,s){Object.keys(t).forEach(k=>{if(!(k in s))delete t[k];});
+  Object.keys(s).forEach(k=>{const a=t[k],b=s[k];if(isPO(a)&&isPO(b))patchObj(a,b);else if(Array.isArray(a)&&Array.isArray(b))t[k]=patchArr(a,b);else t[k]=b;});return t;}
 function cloudPut(col,r){const C=COLS[col],list=C.list(),i=list.findIndex(x=>C.id(x)===r.id),fresh=C.fromRow(r);
-  if(col==="peladas"){setMe(fresh);if(i>=0){const P=list[i],cur=curP===P;Object.keys(P).forEach(k=>delete P[k]);Object.assign(P,fresh);if(cur){S=P.state;}}else list.push(fresh);}
+  if(col==="peladas"){setMe(fresh);if(i>=0){const P=list[i],cur=curP===P,me=P.state&&P.state.me;patchObj(P,fresh);if(cur){S=P.state;if(me&&S.players.some(p=>p.id===me))S.me=me;}}else list.push(fresh);}
   else if(i>=0)list[i]=fresh;else list.push(fresh);
   Cloud.base[col+":"+r.id]={v:r.version,s:docStr(col,fresh)};}
 function cloudDrop(col,id){const C=COLS[col],list=C.list(),i=list.findIndex(x=>C.id(x)===id);delete Cloud.base[col+":"+id];
@@ -811,8 +817,9 @@ async function flushCol(col){const C=COLS[col],seen=new Set();
     const {data,error}=await sb.from(col).update(upd).eq("id",id).select();
     if(error){if(/version_conflict/.test(error.message||"")||error.code==="40001"){const d=await fetchRow(col,id);if(!d){cloudDrop(col,id);continue;}Cloud.base[key].v=Math.min(b.v,d.version-1);cloudIngest(col,d);continue;}throw error;}
     if(!data||!data.length){const d=await fetchRow(col,id);if(d)cloudPut(col,d);else cloudDrop(col,id);renderSoon();continue;}
-    if(docStr(col,it)===s){cloudPut(col,data[0]);if(stableStr(C.row(C.fromRow(data[0])).doc)!==s)renderSoon();}
-    else Cloud.base[key]={v:data[0].version,s:stableStr(C.row(C.fromRow(data[0])).doc)};}
+    const srv=stableStr(C.row(C.fromRow(data[0])).doc);
+    if(srv===s||docStr(col,it)!==s)Cloud.base[key]={v:data[0].version,s:srv};
+    else{cloudPut(col,data[0]);renderSoon();}}
   for(const key of Object.keys(Cloud.base)){if(!key.startsWith(col+":"))continue;const id=key.slice(col.length+1);if(seen.has(id))continue;
     delete Cloud.base[key];if(col==="profiles")continue;const {error}=await sb.from(col).delete().eq("id",id);if(error)console.warn(error);}}
 async function flushCfg(){const b=Cloud.base["cfg"],s=stableStr(G.cfg);if(!b||b.s===s)return;
@@ -3086,8 +3093,11 @@ async function analyzeUniform(){
   }catch(e){const m={not_granted:"Uso da IA não autorizado nesta página.",rate_limited:"Muitas tentativas. Tente mais tarde.",image_rejected:"Não consegui abrir a foto. Tente outra."};if($("uStatus"))$("uStatus").textContent=m[e&&e.code]||"Não deu certo agora. Tente de novo.";}
 }
 
+const COMMIT_ACTS=new Set(["finConfirm","gAssist","pickWin","drawBoth","nextIn","endGame","startLive","saveVote","subDo","doCreate","doJoin","undoGoal","applySession","authSubmit","liveToggle"]);let tapGuard=0;
 document.addEventListener("click",e=>{
   const el=e.target.closest("[data-act]");if(!el||el.disabled)return;const a=el.dataset.act,id=el.dataset.id,v=el.dataset.v;
+  /* toque duplo: ignora o 2º toque logo depois de uma ação que grava (evita gol/jogo contado em dobro) */
+  if(Date.now()<tapGuard&&a!=="closeSheet")return;if(COMMIT_ACTS.has(a)||(a==="gScorer"&&(id==="og"||id==="none")))tapGuard=Date.now()+350;
   switch(a){
     case "tab":setTab(el.dataset.tab);break;
     case "goAuth":authMode=v;authErr="";screen="auth";render();window.scrollTo(0,0);break;
