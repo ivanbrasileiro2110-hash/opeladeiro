@@ -1069,7 +1069,7 @@ const showSeg=(u,act)=>`<div class="seg" role="group" aria-label="Aparecer como"
 const myQuadra=()=>{const u=meU();return u?G.quadras.find(q=>q.ownerUid===u.id)||null:null;};
 function modesOf(){const m=["peladas"];if(myQuadra())m.push("quadras");if(isCreator())m.push("creator");return m;}
 const MODE_L={peladas:"Peladas",quadras:"Quadras",creator:"Criador do app"};
-let screen="welcome",authMode="signup",authErr="",authVals={name:"",email:""},pendingCode="",joinFound=null,joinDraft=null,joinErr="",crSeg="geral",crQ="",createDraft=null,obDraft=null,
+let screen="welcome",authMode="signup",authErr="",authVals={name:"",email:""},pendingCode="",pendingClaim="",joinFound=null,joinDraft=null,joinErr="",joinStep="new",joinClaim=null,joinQ="",crSeg="geral",crQ="",createDraft=null,obDraft=null,
   qtab="agenda",qDay=new Date().getDay(),qMonth=null,qQ="",qsDraft=null;
 const canEdit=p=>isOwner()||p.id===S.me;
 const canPhoto=p=>p.id===S.me||(!p.uid&&isOwner());
@@ -1090,7 +1090,18 @@ function ownerReminder(){const c=lc(),C=cx(),mk=curMK(),t=today();
     if(t>vc){const d=dayDiff(vc,t);if(d<=7||(d-7)%3===0)return [`Aluguel da quadra atrasado há ${d} ${d===1?"dia":"dias"}`,`${brl(num(C.aluguel.valor))}. Marque como pago na Caixinha quando acertar.`];}
     if(t===mk+"-01")return ["Aluguel da quadra",`O aluguel de ${mLabel(mk).toLowerCase()} (${brl(num(C.aluguel.valor))}) vence dia ${dBR(vc)}.`];}
   return null;}
-function startJoin(P){const u=meU();joinFound=P.code;joinErr="";joinDraft={name:dispName(u),pos:u.pos||"AUTO"};}
+function startJoin(P){const u=meU();joinFound=P.code;joinErr="";joinQ="";joinDraft={name:dispName(u),pos:u.pos||"AUTO"};
+  const free=freeCards(P),pc=pendingClaim&&free.find(x=>x.id===pendingClaim);pendingClaim="";
+  if(pc){joinClaim=pc.id;joinStep="confirm";}else{joinClaim=null;joinStep=free.length?"pick":"new";}}
+/* cards sem conta da pelada (para o "Sou eu") */
+const freeCards=P=>((P&&P.state&&P.state.players)||[]).filter(x=>x&&x.id&&!x.uid&&x.name);
+function nameHit(card,u){const k=nameKey(card.name||""),ws=[u.nick,u.name,(u.name||"").split(" ")[0],(u.name||"").split(" ").slice(-1)[0]].filter(Boolean).map(nameKey);
+  return !!k&&ws.some(w=>w&&(w===k||(w.length>=4&&k.length>=4&&(w.startsWith(k)||k.startsWith(w)))));}
+function claimRow(x,hit){return `<button class="cell av" data-act="pickClaim" data-id="${esc(x.id)}"><span class="ava sm">${esc(initials(x.name))}</span><span class="grow"><b>${esc(x.name)}</b>${x.pos&&x.pos!=="AUTO"?` <span class="sf" style="padding:0">· ${esc(x.pos)}</span>`:""}</span>${hit?`<span class="pill gold">É você?</span>`:""}${CHEV}</button>`;}
+function claimList(P){const u=meU(),q=normTxt(joinQ||""),free=freeCards(P).filter(x=>!q||normTxt(x.name).includes(q));
+  const hits=free.filter(x=>nameHit(x,u)),rest=free.filter(x=>!hits.includes(x)).sort((a,b)=>a.name.localeCompare(b.name,"pt-BR"));
+  return (hits.length?`<div class="group">${hits.map(x=>claimRow(x,true)).join("")}</div><div style="height:12px"></div>`:"")+
+    (rest.length?`<div class="group">${rest.map(x=>claimRow(x,false)).join("")}</div>`:(hits.length?"":`<div class="empty">Nenhum nome encontrado.</div>`));}
 function goHome(mode){closeSheet();curP=null;S=null;const u=meU();if(!u){screen="welcome";render();return;}
   mode=mode||G.sess.mode||"peladas";if(mode!=="qsetup"&&!modesOf().includes(mode))mode="peladas";G.sess.code=null;
   if(mode==="creator"){screen="creator";G.sess.mode="creator";}
@@ -1099,7 +1110,7 @@ function goHome(mode){closeSheet();curP=null;S=null;const u=meU();if(!u){screen=
   else{G.sess.mode="peladas";screen="home";const P=pendingCode&&pByCode(pendingCode);if(P){startJoin(P);screen="join";}else if(pendingCode&&CLOUD){const pc=pendingCode;setTimeout(()=>openJoinCloud(pc),0);}}
   save();render();window.scrollTo(0,0);}
 function doLogin(u,isNew){G.sess={uid:u.id,mode:"peladas",code:null};u.lastLogin=Date.now();authErr="";
-  if(isNew){obDraft={full:u.name,name:"",pos:u.pos||"AUTO",show:"nick"};screen="onboard";save();render();window.scrollTo(0,0);return;}
+  if(isNew){obDraft={full:u.name,name:u.nick||"",pos:u.pos||"AUTO",show:"nick"};screen="onboard";save();render();window.scrollTo(0,0);return;}
   if(u.email===CREATOR&&!pendingCode){screen="creatorPick";save();render();window.scrollTo(0,0);return;}
   goHome("peladas");}
 function logout(){if(CLOUD)cloudLogout();G.sess=null;closeSheet();curP=null;S=null;screen="welcome";authErr="";save();render();window.scrollTo(0,0);}
@@ -1989,7 +2000,19 @@ function viewJoin(){const u=meU(),back=`<button class="back" data-act="joinBack"
     <p class="sf" style="text-align:center">Recebeu o link ou o QR code? Abra por ele e a pelada já vem preenchida.</p>`;
   const P=pByCode(joinFound),st=P.state,ow=G.users.find(x=>x.id===P.ownerUid),already=st.players.some(x=>x.uid===u.id),ph=img(u.photo),d=joinDraft;
   return `${back}<div class="hero" style="padding-top:6px"><div class="eyebrow">Convite · ${P.code}</div><h1>${esc(st.pelada.name)}</h1><p class="sub">${[ow?"Dono de Pelada: "+ow.name:"",agendaOf(st),st.players.length+(st.players.length===1?" peladeiro":" peladeiros")].filter(Boolean).map(esc).join(" · ")}</p></div>
-  ${already?`<div class="section"><div class="box"><div class="note"><b>Você já está nessa pelada.</b></div></div></div><div class="section"><button class="btn" data-act="openPelada" data-v="${P.code}">Abrir pelada</button></div>`:`
+  ${already?`<div class="section"><div class="box"><div class="note"><b>Você já está nessa pelada.</b></div></div></div><div class="section"><button class="btn" data-act="openPelada" data-v="${P.code}">Abrir pelada</button></div>`:joinStep==="confirm"&&joinClaim?(()=>{const c=freeCards(P).find(x=>x.id===joinClaim);if(!c)return `<div class="section"><div class="box"><div class="note">Esse card já foi assumido por outra conta. Escolha outro nome ou fale com o Dono de Pelada.</div></div></div><button class="btn" data-act="claimBack">Ver a lista</button>`;
+    return `<div class="section"><div class="sh"><span>ENTRAR COMO</span></div><div class="group"><div class="cell av"><span class="ava">${esc(initials(c.name))}</span><span class="grow"><b style="font-size:20px">${esc(c.name)}</b>${c.pos&&c.pos!=="AUTO"?`<br><span class="sf" style="padding:0">${esc(c.pos)}</span>`:""}</span></div></div>
+    <p class="sf">Esse card passa a ser seu: os gols, as presenças e o nível que o Dono de Pelada já registrou continuam com você.</p></div>
+    <div class="err" role="alert">${esc(joinErr)}</div>
+    <button class="btn" data-act="doClaim" ${authBusy?"disabled":""}>${authBusy?"Entrando…":"Sou eu, entrar"}</button>
+    <button class="btn ghost" data-act="claimBack" style="margin-top:10px">Não sou eu</button>`;})():joinStep==="pick"?`
+  <div class="section"><div class="sh"><span>VOCÊ JÁ JOGA AQUI?</span></div>
+    <p class="sf" style="padding-top:0">Se o Dono de Pelada já te cadastrou, toque no seu nome. Assim seus gols, nível e presenças continuam com você.</p>
+    <input class="inl" id="jSearch" data-input="jsearch" placeholder="Buscar seu nome" value="${esc(joinQ)}" autocomplete="off" aria-label="Buscar seu nome" style="margin-bottom:12px">
+    <div id="jList">${claimList(P)}</div></div>
+  <div class="err" role="alert">${esc(joinErr)}</div>
+  <button class="btn ghost" data-act="joinNew">Não estou na lista · sou novo aqui</button>`:`
+  ${freeCards(P).length?`<button class="back" data-act="claimBack" style="margin-bottom:6px">‹ Já estou na lista</button>`:""}
   <div class="section"><div class="sh"><span>SEUS DADOS NESTA PELADA</span></div>
     <label class="pava">${ph?`<img src="${ph}" alt="">`:esc(initials(d.name||u.name))}<span class="cam">${ph?"Trocar foto":"Adicionar foto"}</span><input class="hidden-file" type="file" accept="image/*" data-file="uphoto"></label>
     <div class="group" style="margin-top:16px"><div class="cell"><span class="lbl">Na lista</span><span class="grow" style="text-align:right;font-weight:700">${esc(dispName(u))}</span></div></div>
@@ -2802,6 +2825,7 @@ function renderSheet(){
   else if(t==="paste")E.innerHTML=sheetPaste();
   else if(t==="dup")E.innerHTML=sheetDup();
   else if(t==="goal")E.innerHTML=sheetGoal();
+  else if(t==="merge")E.innerHTML=sheetMerge();
   else if(t==="finish")E.innerHTML=sheetFinish();
   else if(t==="pick")E.innerHTML=sheetPick();
   else if(t==="fill")E.innerHTML=sheetFill();
@@ -2842,6 +2866,24 @@ function renderSheet(){
   else if(t==="sub")E.innerHTML=sheetSub();
   else if(t==="rstory")E.innerHTML=`${bar("Retrospectiva")}<div class="section" id="storyBox"><div class="empty">Gerando o card…</div></div><div class="section choice"><button class="btn" data-act="storyShare">Compartilhar</button><p class="sf" style="text-align:center">Se o compartilhamento não abrir, toque e segure a imagem para salvar.</p></div>`;
 }
+function sheetMerge(){const B=byId(sheet.src);if(!B){closeSheet();return"";}const A=sheet.target&&byId(sheet.target);
+  const free=S.players.filter(x=>x!==B&&!x.uid).sort((a,b)=>a.name.localeCompare(b.name,"pt-BR"));
+  return `${bar("Juntar cards","Cancelar")}<p class="sf" style="padding-top:8px">Escolha o card antigo de ${esc(B.name)}. A conta passa para ele, os números dos dois são somados e o card ${esc(B.name)} sai do elenco.</p>
+  <div class="section"><div class="group">${free.map(x=>`<button class="cell av" data-act="mergePick" data-id="${x.id}" aria-pressed="${A===x}">${ava(x)}${nameBlockL(x)}${A===x?`<span class="pill gold">escolhido</span>`:""}</button>`).join("")||`<div class="empty">Não há cards sem conta.</div>`}</div></div>
+  ${A?`<button class="btn" data-act="mergeDo">Juntar em ${esc(A.name)}</button>`:""}`;}
+function mergeCards(A,B){A.uid=B.uid;if(!A.photo&&B.photo)A.photo=B.photo;["goals","assists","games","mvp"].forEach(k=>{if(B[k])A[k]=(A[k]||0)+B[k];});
+  const sw=a=>Array.isArray(a)?[...new Set(a.map(x=>x===B.id?A.id:x))]:a,L=S.lst;
+  if(L){["in","esp","nao"].forEach(k=>{if(L[k])L[k]=sw(L[k]);});if(L.at&&L.at[B.id]!=null){if(L.at[A.id]==null)L.at[A.id]=L.at[B.id];delete L.at[B.id];}}
+  if(S.session&&S.session.ids)S.session.ids=sw(S.session.ids);if(S.tempAdminId===B.id)S.tempAdminId=A.id;if(S.me===B.id)S.me=A.id;
+  S.players=S.players.filter(x=>x!==B);save();}
+function claimCard(){const u=meU(),P=pByCode(joinFound);if(!u||!P||!joinClaim||authBusy)return;const c=freeCards(P).find(x=>x.id===joinClaim);if(!c){render();return;}
+  if(!CLOUD){const p=P.state.players.find(x=>x.id===joinClaim);p.uid=u.id;if(!p.photo&&u.photo)p.photo=u.photo;save();pendingCode="";joinFound=null;enterPelada(P.code);hud("Bem-vindo, "+p.name+"!");return;}
+  authBusy=true;joinErr="";render();
+  sb.rpc("claim_card",{p_code:P.code,p_card:joinClaim}).then(({data,error})=>{authBusy=false;
+    if(error||!data){joinErr=error&&/card_taken/.test(error.message||"")?"Esse card acabou de ser assumido por outra conta. Escolha outro nome ou fale com o Dono de Pelada.":"Não deu para entrar agora. Confira a internet e tente de novo.";
+      if(error&&/card_taken/.test(error.message||""))cloudPreview(P.code).then(()=>{joinStep="pick";render();},()=>render());else render();return;}
+    cloudPut("peladas",data);joinPrev=null;pendingCode="";try{history.replaceState(null,"","/");}catch(e){}lsCache();enterPelada(data.code);hud("Bem-vindo, "+c.name+"!");},
+    ()=>{authBusy=false;joinErr="Sem conexão. Confira a internet e tente de novo.";render();});}
 function sheetPlayer(){
   const p=byId(sheet.id);if(!p){closeSheet();return"";}
   const hist=S.rounds.filter(r=>r.changes.some(c=>c.id===p.id)).slice(0,isPro()?20:3);
@@ -2853,6 +2895,13 @@ function sheetPlayer(){
     <button class="cell action" data-act="startChar"><span class="grow">${p.art?"Personagem 3D criado":"Criar personagem 3D com IA"}</span>${isPro()?"":`<span class="pro">PRO</span>`}${CHEV}</button>
     <label class="cell action" style="cursor:pointer"><span class="grow">${p.photo?"Trocar foto de perfil":"Adicionar foto de perfil"}</span>${CHEV}<input class="hidden-file" type="file" accept="image/*" data-file="photo" data-id="${p.id}"></label>
   </div></div>`:(p.uid?`<p class="sf">A foto e o personagem 3D só o próprio peladeiro troca.</p>`:"")}
+  ${isAdmin()&&p.uid!==curP.ownerUid?`<div class="section"><div class="sh"><span>CONTA NO APP</span></div><div class="group">
+    ${p.uid?`<div class="cell"><span class="grow">Ligado à conta de ${esc((G.users.find(x=>x.id===p.uid)||{}).name||p.name)}</span><span class="pill">com conta</span></div>
+      <button class="cell action" data-act="mergeCard" data-id="${p.id}"><span class="grow">Juntar com outro card<br><span class="sf" style="padding:0">Para quando a pessoa entrou como nova e já tinha um card</span></span>${CHEV}</button>
+      <button class="cell action" data-act="unlinkCard" data-id="${p.id}" style="color:var(--down)"><span class="grow">Desligar conta</span></button>`
+    :`<div class="cell"><span class="grow">Ainda sem conta no app</span></div>
+      <button class="cell action" data-act="invCard" data-id="${p.id}"><span class="grow">Convidar pelo WhatsApp<br><span class="sf" style="padding:0">Manda um link só dele: ao abrir, ele já entra como ${esc(p.name)}</span></span>${CHEV}</button>`}
+  </div></div>`:""}
   <div class="section"><div class="sh"><span>EVOLUÇÃO</span>${isPro()?"":`<span class="pro">PRO</span>`}</div><div class="group">
     ${hist.map(r=>{const c=r.changes.find(c=>c.id===p.id);const da=c.a1-c.a0,dd=c.d1-c.d0,dg=(c.gk1??0)-(c.gk0??0);return `<div class="cell"><span class="grow">${dateBR(r.date)}${r.mvp===p.id?' <span class="pill gold">Craque</span>':""}</span>${c.gk0!=null?`<span class="delta ${cls(dg)}">GOL ${arrow(dg)}${f1(Math.abs(dg))}</span>`:`<span class="delta ${cls(da)}">ATQ ${arrow(da)}${f1(Math.abs(da))}</span><span class="delta ${cls(dd)}">DEF ${arrow(dd)}${f1(Math.abs(dd))}</span>`}</div>`}).join("")||`<div class="empty">Ainda sem peladas avaliadas.</div>`}
   </div></div>`;
@@ -3093,7 +3142,7 @@ async function analyzeUniform(){
   }catch(e){const m={not_granted:"Uso da IA não autorizado nesta página.",rate_limited:"Muitas tentativas. Tente mais tarde.",image_rejected:"Não consegui abrir a foto. Tente outra."};if($("uStatus"))$("uStatus").textContent=m[e&&e.code]||"Não deu certo agora. Tente de novo.";}
 }
 
-const COMMIT_ACTS=new Set(["finConfirm","gAssist","pickWin","drawBoth","nextIn","endGame","startLive","saveVote","subDo","doCreate","doJoin","undoGoal","applySession","authSubmit","liveToggle"]);let tapGuard=0;
+const COMMIT_ACTS=new Set(["finConfirm","gAssist","pickWin","drawBoth","nextIn","endGame","startLive","saveVote","subDo","undoGoal","applySession","liveToggle","mergeDo","unlinkCard"]);let tapGuard=0;
 document.addEventListener("click",e=>{
   const el=e.target.closest("[data-act]");if(!el||el.disabled)return;const a=el.dataset.act,id=el.dataset.id,v=el.dataset.v;
   /* toque duplo: ignora o 2º toque logo depois de uma ação que grava (evita gol/jogo contado em dobro) */
@@ -3189,6 +3238,19 @@ document.addEventListener("click",e=>{
     case "jPos":joinDraft.pos=v;render();break;
     case "jshow":{const u=meU();u.show=v;syncUserName(u);save();render();break;}
     case "doJoin":joinPelada();break;
+    case "pickClaim":joinClaim=id;joinStep="confirm";joinErr="";render();window.scrollTo(0,0);break;
+    case "claimBack":joinClaim=null;joinStep=freeCards(pByCode(joinFound)).length?"pick":"new";joinErr="";render();window.scrollTo(0,0);break;
+    case "joinNew":joinStep="new";joinErr="";render();window.scrollTo(0,0);break;
+    case "doClaim":claimCard();break;
+    case "invCard":{const p=byId(id);if(!p||!isAdmin())break;const url=inviteURL()+"?eu="+encodeURIComponent(p.id);
+      const txt=`Bora jogar com a gente no SemPanela! Entra na ${S.pelada.name} por este link e toca em "Sou eu, entrar": ${url}`;
+      try{window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank");}catch(e){}
+      try{navigator.clipboard&&navigator.clipboard.writeText(url);}catch(e){}hud("Link do "+p.name+" copiado");break;}
+    case "unlinkCard":{const p=byId(id);if(!p||!isAdmin()||!p.uid||p.uid===curP.ownerUid)break;if(!el.dataset.ok){openSheet({type:"confirm",title:"Desligar conta",head:"Desligar a conta do card “"+esc(p.name)+"”?",text:"O card continua no elenco com a história dele, mas fica sem dono. A pessoa sai da pelada até entrar de novo pelo convite.",btn:"Desligar conta",act:"unlinkCard"});sheet.pid=id;break;}
+      const q=byId(sheet&&sheet.pid);closeSheet();if(!q)break;q.uid=null;save();render();hud("Conta desligada de "+q.name);break;}
+    case "mergeCard":{const p=byId(id);if(!p||!isAdmin()||!p.uid)break;openSheet({type:"merge",src:id,target:null});break;}
+    case "mergePick":sheet.target=id;renderSheet();break;
+    case "mergeDo":{const B=byId(sheet&&sheet.src),A=byId(sheet&&sheet.target);if(!A||!B||A===B||A.uid)break;mergeCards(A,B);closeSheet();render();hud("Cards juntados em "+A.name);break;}
     case "joinReset":joinFound=null;joinDraft=null;joinErr="";pendingCode="";render();break;
     case "notifyMe":hud("Combinado! Avisamos quando abrir");break;
     case "crSeg":crSeg=v;render();break;
@@ -3513,6 +3575,7 @@ document.addEventListener("input",e=>{
   const k=e.target.dataset.input;if(!k)return;const val=e.target.value;
   if(k==="pname"){S.pelada.name=val.trim()||"Minha pelada";save();}
   else if(k==="aname")authVals.name=val;
+  else if(k==="jsearch"){joinQ=val;const L=$("jList"),P=pByCode(joinFound);if(L&&P)L.innerHTML=claimList(P);}
   else if(k==="obname"||k==="obfull"){if(k==="obname")obDraft.name=val;else obDraft.full=val;const x=$("obShow");if(x){const u=meU();x.innerHTML=`<div class="sh"><span>NA CARTA E NA LISTA, APARECER COMO</span></div>`+showSeg({name:obDraft.full||u.name,nick:obDraft.name,show:obDraft.show},"obshow");}}
   else if(k==="qsname")qsDraft.name=val;
   else if(k==="qsbairro")qsDraft.bairro=val;
@@ -3580,7 +3643,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();
   if(e.key==="Enter"){const t=e.target.id;if(["aName","aEmail","aPass"].includes(t)){e.preventDefault();document.querySelector('[data-act="authSubmit"]').click();}else if(t==="jCode"){e.preventDefault();document.querySelector('[data-act="findPelada"]').click();}}});
 setInterval(()=>{if(S&&screen==="app"&&S.session&&!sheet&&(tab==="avaliar"||Date.now()>=S.session.closesAt))render();},30000);
 setInterval(()=>{if(!S||!S.live)return;if(checkCap()){hud("Tempo esgotado!");try{navigator.vibrate&&navigator.vibrate([300,150,300]);}catch(e){}if(screen==="app"&&tab==="jogo"&&jogoSeg==="aovivo"&&!sheet)render();else fsRender();return;}const el=$("liveClock");if(el)el.textContent=mmss(liveElapsed());const e2=$("fsClock");if(e2&&!$("fs").hidden)e2.textContent=mmss(liveElapsed());},500);
-(async function boot(){const m=(location.pathname+" "+location.hash).match(/convite\/?(SP\d{4,6})/i);if(m)pendingCode=m[1].toUpperCase();applyTheme();
+(async function boot(){const m=(location.pathname+" "+location.hash).match(/convite\/?(SP\d{4,6})/i);if(m)pendingCode=m[1].toUpperCase();try{pendingClaim=new URLSearchParams(location.search).get("eu")||"";}catch(e){}applyTheme();
   if(CLOUD){try{await cloudStart();}catch(e){return;}if(screen==="offline"||screen==="newpass")return;}
   const u=meU();
   if(u&&pendingCode){goHome("peladas");return;}

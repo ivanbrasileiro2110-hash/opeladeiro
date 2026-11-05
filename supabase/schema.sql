@@ -488,3 +488,70 @@ begin
    where not courtesy and email in (select lower(jsonb_array_elements_text(coalesce(new.doc->'proEmails', '[]'))));
   return null;
 end $$;
+
+-- ---------- "Sou eu": jogador assume um card que o Dono de Pelada já cadastrou ----------
+create or replace function public.sp_new_user() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare pro text[]; vip boolean; nick text; em text := lower(new.email);
+begin
+  select array(select lower(jsonb_array_elements_text(doc->'proEmails'))) into pro from app_config where id = 1;
+  vip := em = 'ivanbrasileiro2110@gmail.com' or em = any(coalesce(pro, '{}'));
+  select x->>'name' into nick from peladas, jsonb_array_elements(coalesce(doc->'state'->'players','[]')) x
+   where lower(x->>'claimEmail') = em and coalesce(x->>'uid','') = '' limit 1;
+  insert into profiles (id, email, plan, courtesy, doc) values (
+    new.id, em, case when vip then 'pro' else 'free' end, vip,
+    jsonb_build_object(
+      'id', new.id::text, 'email', em,
+      'name', coalesce(nullif(new.raw_user_meta_data->>'name', ''), split_part(new.email, '@', 1)),
+      'pos', 'AUTO', 'photo', null, 'roles', '[]'::jsonb,
+      'createdAt', (extract(epoch from now()) * 1000)::bigint)
+      || case when nick is not null then jsonb_build_object('nick', nick) else '{}'::jsonb end)
+  on conflict (id) do nothing;
+  update peladas set version = version + 1,
+    doc = jsonb_set(doc, '{state,players}', (
+      select jsonb_agg(case when lower(x->>'claimEmail') = em and coalesce(x->>'uid','') = ''
+                            then (x - 'claimEmail') || jsonb_build_object('uid', new.id::text) else x end order by o)
+        from jsonb_array_elements(doc->'state'->'players') with ordinality t(x, o)))
+   where exists (select 1 from jsonb_array_elements(coalesce(doc->'state'->'players','[]')) x
+                  where lower(x->>'claimEmail') = em and coalesce(x->>'uid','') = '');
+  return new;
+end $$;
+
+create or replace function public.find_pelada(p_code text) returns jsonb
+language sql stable security definer set search_path = public as $$
+  select jsonb_build_object(
+    'id', p.id, 'code', p.code, 'ownerUid', p.owner::text,
+    'ownerName', coalesce(pr.doc->>'nick', pr.doc->>'name', ''),
+    'state', jsonb_build_object(
+      'pelada', jsonb_build_object(
+        'name', p.doc->'state'->'pelada'->'name', 'plan', p.doc->'state'->'pelada'->'plan',
+        'weekday', p.doc->'state'->'pelada'->'weekday', 'time', p.doc->'state'->'pelada'->'time',
+        'base', p.doc->'state'->'pelada'->'base'),
+      'players', (select coalesce(jsonb_agg(jsonb_build_object('id', x->'id', 'name', x->'name', 'pos', x->'pos', 'uid', x->'uid')), '[]'::jsonb)
+                    from jsonb_array_elements(coalesce(p.doc->'state'->'players', '[]')) x)))
+  from peladas p left join profiles pr on pr.id = p.owner
+  where p.code = upper(trim(p_code)) and auth.uid() is not null
+$$;
+
+create or replace function public.claim_card(p_code text, p_card text) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare r peladas; c jsonb;
+begin
+  if auth.uid() is null then raise exception 'auth_required'; end if;
+  select * into r from peladas where code = upper(trim(p_code)) for update;
+  if not found then return null; end if;
+  if not exists (select 1 from jsonb_array_elements(coalesce(r.doc->'state'->'players','[]')) x where x->>'uid' = auth.uid()::text) then
+    select x into c from jsonb_array_elements(coalesce(r.doc->'state'->'players','[]')) x where x->>'id' = p_card;
+    if c is null then raise exception 'card_not_found'; end if;
+    if coalesce(c->>'uid','') <> '' then raise exception 'card_taken'; end if;
+    update peladas set version = version + 1,
+      doc = jsonb_set(doc, '{state,players}', (
+        select jsonb_agg(case when x->>'id' = p_card then (x - 'claimEmail') || jsonb_build_object('uid', auth.uid()::text) else x end order by o)
+          from jsonb_array_elements(doc->'state'->'players') with ordinality t(x, o)))
+     where id = r.id;
+  end if;
+  insert into pelada_members (pelada_id, user_id) values (r.id, auth.uid()) on conflict do nothing;
+  return (select to_jsonb(p) from peladas p where p.id = r.id);
+end $$;
+revoke execute on function public.claim_card(text, text) from anon, public;
+grant execute on function public.claim_card(text, text) to authenticated;
