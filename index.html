@@ -929,7 +929,7 @@ async function cloudStart(){Cloud.started=true;
 async function cloudLogout(){try{await sb.auth.signOut();}catch(e){}cloudReset();}
 async function cloudDeleteAccount(){const {error}=await sb.rpc("delete_my_account");if(error)throw error;await cloudLogout();}
 
-const LSG="sempanela-v3",CREATOR="ivanbrasileiro2110@gmail.com";
+const LSG="opeladeiro-v3",CREATOR="ivanbrasileiro2110@gmail.com";
 function emptyG(){return {v:4,seq:0,users:[],peladas:[],camps:[],quadras:[],sess:null,cfg:{price:"19,90",freePlayers:20,freePeladas:1,proEmails:[],vipSeeded:{}},ui:{theme:"auto"}};}
 function cfgDefaults(){if(!G.cfg)G.cfg={};if(!G.cfg.proEmails)G.cfg.proEmails=[];if(!G.cfg.vipSeeded)G.cfg.vipSeeded={};if(G.cfg.price==null)G.cfg.price="19,90";if(G.cfg.freePlayers==null)G.cfg.freePlayers=20;if(G.cfg.freePeladas==null)G.cfg.freePeladas=1;
 if(!G.quadras)G.quadras=[];if(!G.ui)G.ui={theme:"auto"};
@@ -1291,7 +1291,7 @@ async function storyImage(p,kind,big,small){
   x.fillStyle="#EEF8F1";x.font=`800 92px ${cond}`;x.fillText(small,W/2,cy0+ch+150);
   const mk=await loadImg(svgURI(MARK.replace(/currentColor/g,"#B8F26B")));if(mk)x.drawImage(mk,W/2-230,H-210,140,80);
   x.textAlign="left";x.fillStyle="#EEF8F1";x.font=`800 80px ${cond}`;x.fillText("Sem",W/2-70,H-142);const w1=x.measureText("Sem").width;x.fillStyle="#B8F26B";x.fillText("Panela",W/2-70+w1,H-142);
-  x.textAlign="center";x.fillStyle="#93AE9F";x.font="500 34px -apple-system,Helvetica,Arial,sans-serif";x.fillText("Times sem panela · opeladeiro.com.br",W/2,H-80);
+  x.textAlign="center";x.fillStyle="#93AE9F";x.font="500 34px -apple-system,Helvetica,Arial,sans-serif";x.fillText("Times sorteados no Opeladeiro · opeladeiro.com.br",W/2,H-80);
   return c;}
 
 /* ---------- admin, agenda ---------- */
@@ -1927,7 +1927,7 @@ function viewWelcome(){
   <div class="feats"><span>⚖️ Sorteio equilibrado</span><span>⏱️ Jogo ao vivo</span><span>⭐ Resenha e craque</span></div>
   ${pendingCode?`<div class="banner info"><span class="grow">Você recebeu um convite para a pelada <b>${esc(pendingCode)}</b>.</span></div>`:""}
   <div style="display:flex;flex-direction:column;gap:10px;margin-top:22px"><button class="btn" data-act="goAuth" data-v="signup">Criar conta</button><button class="btn ghost" data-act="goAuth" data-v="login">Entrar</button></div>
-  <p class="sf" style="text-align:center">Chega de time panelado. A pelada inteira num app só.</p></div>`;
+  <p class="sf" style="text-align:center">Do sorteio à resenha. A pelada inteira num app só.</p></div>`;
 }
 function viewAuth(){
   const su=authMode==="signup",P=pendingCode&&pByCode(pendingCode);
@@ -2314,7 +2314,7 @@ function viewResults(){
   const spread=(arr,f)=>arr.length>1?Math.max(...arr.map(f))-Math.min(...arr.map(f)):0;
   const maxDev=Math.max(...ST.map(s=>Math.max(Math.abs(s.mA-g.a),Math.abs(s.mD-g.d))));
   const q=maxDev<=2.5?["Muito equilibrado",""]:maxDev<=6?["Equilibrado",""]:["Diferença perceptível","warn"];
-  return `${stale?`<div class="banner"><span class="grow">A lista mudou depois do sorteio.</span><button class="pill warn" data-act="draw">Sortear de novo</button></div>`:`<div class="section" style="margin-top:20px"><div class="box" style="flex-direction:row;align-items:center;gap:10px;padding:12px 16px"><span class="pos" style="font-size:12px;padding:4px 8px">✓</span><b style="font-size:16px">${result.manual?"Times escolhidos na mão.":"Times fechados. Sem panela."}</b></div></div>`}
+  return `${stale?`<div class="banner"><span class="grow">A lista mudou depois do sorteio.</span><button class="pill warn" data-act="draw">Sortear de novo</button></div>`:`<div class="section" style="margin-top:20px"><div class="box" style="flex-direction:row;align-items:center;gap:10px;padding:12px 16px"><span class="pos" style="font-size:12px;padding:4px 8px">✓</span><b style="font-size:16px">${result.manual?"Times escolhidos na mão.":"Times fechados e equilibrados."}</b></div></div>`}
   <div class="section"><div class="sh"><span>MÉDIA DO GRUPO · ${T.map(t=>t.length).join(" + ")}</span></div>
     <div class="group"><div class="stats3"><div><span class="l">Ataque</span><span class="v">${f1(g.a)}</span></div><div><span class="l">Defesa</span><span class="v">${f1(g.d)}</span></div><div><span class="l">Geral</span><span class="v">${f1(g.g)}</span></div></div>
     <div class="qual"><span class="pill ${q[1]}">${q[0]} · desvio máx. ${f1(maxDev)}</span></div></div></div>
@@ -2415,7 +2415,7 @@ function sheetFill(){const L=S.live,c=L.cur,t=sheet.team,need=L.full-rosterLen(t
     return `${bar("Peladeiros do Time "+(sheet.from+1),"Voltar").replace('data-act="closeSheet"','data-act="fillBack" data-v="from"')}
     <p class="sf" style="padding-top:8px">Escolha ${k===1?"1 peladeiro":"até "+k+" peladeiros"} para completar o Time ${t+1}. Selecionados: <b style="color:var(--text)">${sheet.sel.length} de ${k}</b>.</p>
     <div class="section"><div class="group">${ps.map(p=>`<button class="cell av" data-act="fillPick" data-id="${p.id}" aria-pressed="${sheet.sel.includes(p.id)}"><span class="check" aria-checked="${sheet.sel.includes(p.id)}" aria-hidden="true"><span>${CHECK}</span></span>${ava(p)}${nameBlock(p)}${lvChips(p)}</button>`).join("")}
-      <button class="cell auto" data-act="fillAuto"><span class="grow"><b>Modo sem panela</b> | Equilibrar automaticamente<br><span class="status">Escolhe, só entre os peladeiros do Time ${sheet.from+1}, quem deixa o Time ${t+1} mais perto da média do grupo.</span></span></button></div></div>
+      <button class="cell auto" data-act="fillAuto"><span class="grow"><b>Escolha automática</b> | Equilibrar os times<br><span class="status">Escolhe, só entre os peladeiros do Time ${sheet.from+1}, quem deixa o Time ${t+1} mais perto da média do grupo.</span></span></button></div></div>
     <div class="section"><button class="btn" data-act="fillConfirm" ${sheet.sel.length?"":"disabled"}>Confirmar${sheet.sel.length?" ("+sheet.sel.length+")":""}</button></div>`;}
   const names=sheet.sel.map(pname).map(esc).join(", "),left=rosterLen(sheet.from)-sheet.sel.length;
   return `${bar("Transferência","Voltar").replace('data-act="closeSheet"','data-act="fillBack" data-v="players"')}
@@ -2729,7 +2729,7 @@ function openStory(d){const st=dayStats(d),opts=[];const r=(S.rounds||[]).find(x
   if(r&&byId(r.mvp)){const id=r.mvp;opts.push({k:"crq",l:"Craque",pid:id,title:"CRAQUE DA PELADA",g:(st.g.find(x=>x[0]===id)||[0,0])[1],a:(st.a.find(x=>x[0]===id)||[0,0])[1],line:"ELEITO PELA GALERA"});}
   if(st.g[0]){const [id,n]=st.g[0];opts.push({k:"art",l:"Artilheiro",pid:id,title:"ARTILHEIRO DA PELADA",g:n,a:(st.a.find(x=>x[0]===id)||[0,0])[1],line:n+(n===1?" GOL":" GOLS")});}
   if(st.a[0]){const [id,n]=st.a[0];opts.push({k:"gar",l:"Garçom",pid:id,title:"GARÇOM DA PELADA",g:(st.g.find(x=>x[0]===id)||[0,0])[1],a:n,line:n+(n===1?" ASSISTÊNCIA":" ASSISTÊNCIAS")});}
-  const me=byId(S.me);if(me&&d.ids.includes(me.id))opts.push({k:"eu",l:"Meu card",pid:me.id,title:"EU JOGUEI",g:(st.g.find(x=>x[0]===me.id)||[0,0])[1],a:(st.a.find(x=>x[0]===me.id)||[0,0])[1],line:"TIME SEM PANELA"});
+  const me=byId(S.me);if(me&&d.ids.includes(me.id))opts.push({k:"eu",l:"Meu card",pid:me.id,title:"EU JOGUEI",g:(st.g.find(x=>x[0]===me.id)||[0,0])[1],a:(st.a.find(x=>x[0]===me.id)||[0,0])[1],line:"TIME EQUILIBRADO"});
   if(!opts.length){hud("Registre gols no ao vivo para gerar o card");return;}
   openSheet({type:"story",opts,k:opts[0].k,date:d.date});buildStory();}
 function waStatus(){const l=(S.pelada.waLink||"").trim();return !l?"Sem grupo cadastrado.":waOk(l)?`Grupo salvo. <a href="${esc(l)}" target="_blank" rel="noopener" style="color:var(--lime);font-weight:700">Abrir grupo</a>`:"Esse link não parece de um grupo do WhatsApp. Ele começa com https://chat.whatsapp.com/";}
@@ -3219,7 +3219,7 @@ document.addEventListener("click",e=>{
     case "qExport":{const q=myQuadra(),months=[...Array(6).keys()].map(i=>mShift(curMK(),i-5));const rows=[["Mês","Pelada/Reserva","Organizador","Valor","Situação"]];
       months.forEach(m=>monthItems(q,m).forEach(x=>rows.push([mLabel(m),x.name,x.org||"",x.valor.toFixed(2).replace(".",","),ST_L[x.status]])));
       const tsv=rows.map(r=>r.join("\t")).join("\n");copyText(tsv);setTimeout(()=>hud("Planilha copiada: cole no Excel ou no Google Planilhas"),300);break;}
-    case "qSeed":{const q=myQuadra(),c=q.campos,mk=curMK(),prev=mShift(mk,-1);const ex=[["Fut dos Cria","Ivan","31999990001",3,"20:30","900"],["Racha da Firma","Paulo","31999990002",1,"19:00","750"],["Pelada dos Coroas","Seu Zé","31999990003",6,"08:00","800"],["Quinta Sem Panela","Bruno","31999990004",4,"21:00","850"],["Galera do Bairro","Lucas","31999990005",2,"20:00","700"]];
+    case "qSeed":{const q=myQuadra(),c=q.campos,mk=curMK(),prev=mShift(mk,-1);const ex=[["Fut dos Cria","Ivan","31999990001",3,"20:30","900"],["Racha da Firma","Paulo","31999990002",1,"19:00","750"],["Pelada dos Coroas","Seu Zé","31999990003",6,"08:00","800"],["Quinta dos Peladeiros","Bruno","31999990004",4,"21:00","850"],["Galera do Bairro","Lucas","31999990005",2,"20:00","700"]];
       ex.forEach((e,i)=>{const f={id:"f_"+uid(),since:mShift(mk,-5),code:i===0?"SP0001":"",name:e[0],org:e[1],phone:e[2],weekday:e[3],time:e[4],valor:e[5],campoId:c[i%c.length].id};q.fixas.push(f);
         for(let k=5;k>=1;k--){const m=mShift(mk,-k);if(!(k===1&&i===3))q.pays[f.id+"|"+m]={at:Date.now(),via:"manual"};}if(i<2)q.pays[f.id+"|"+mk]={at:Date.now(),via:i?"pix":"manual"};});
       save();render();hud("Exemplo carregado");break;}
@@ -3271,7 +3271,7 @@ document.addEventListener("click",e=>{
     case "fillFrom":sheet.from=+v;sheet.sel=[];sheet.step="players";renderSheet();$("sheet").scrollTop=0;break;
     case "fillBack":sheet.step=v;renderSheet();break;
     case "fillPick":{const need=Math.min(S.live.full-rosterLen(sheet.team),rosterLen(sheet.from));if(sheet.sel.includes(id))sheet.sel=sheet.sel.filter(x=>x!==id);else if(sheet.sel.length<need)sheet.sel.push(id);else hud(need===1?"Só falta 1":"Só faltam "+need);const sc=$("sheet").scrollTop;renderSheet();$("sheet").scrollTop=sc;break;}
-    case "fillAuto":sheet.sel=autoFill(sheet.team,sheet.from);{const sc=$("sheet").scrollTop;renderSheet();$("sheet").scrollTop=sc;}hud("Modo sem panela: escolhidos para equilibrar");break;
+    case "fillAuto":sheet.sel=autoFill(sheet.team,sheet.from);{const sc=$("sheet").scrollTop;renderSheet();$("sheet").scrollTop=sc;}hud("Escolhidos automaticamente para equilibrar");break;
     case "fillConfirm":if(!sheet.sel.length)break;sheet.step="type";renderSheet();$("sheet").scrollTop=0;break;
     case "fillApply":{const L=S.live,t=sheet.team,from=sheet.from,n=sheet.sel.length;sheet.sel.forEach(pid=>{L.rosters[from]=L.rosters[from].filter(x=>x!==pid);if(!L.rosters[t].includes(pid))L.rosters[t].push(pid);if(v==="loan")L.loans.push({pid,from,to:t});});
       closeSheet();hud(v==="loan"?`${n===1?"1 emprestado":n+" emprestados"} para o Time ${t+1}`:`${n===1?"1 transferido":n+" transferidos"} para o Time ${t+1}`);afterNewMatch();break;}

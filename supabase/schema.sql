@@ -1,5 +1,5 @@
 -- =====================================================================
--- SemPanela · banco de dados (fase 2: contas reais e peladas compartilhadas)
+-- Opeladeiro · banco de dados (fase 2: contas reais e peladas compartilhadas)
 -- Rodar inteiro no SQL Editor do Supabase. Pode rodar de novo sem quebrar.
 -- =====================================================================
 
