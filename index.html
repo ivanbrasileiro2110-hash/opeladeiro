@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <base href="/">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SemPanela</title>
+<title>Opeladeiro</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="SemPanela">
+<meta name="apple-mobile-web-app-title" content="Opeladeiro">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="O app que organiza a sua pelada">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
@@ -572,7 +572,7 @@ textarea.field{min-height:110px;padding:12px 0;resize:vertical;line-height:1.4;f
   
 </nav></div>
 <div class="modebar" id="modebar" hidden></div>
-<div class="tabbar qtabbar" id="qtabbar" hidden><nav aria-label="SemPanela Quadras">
+<div class="tabbar qtabbar" id="qtabbar" hidden><nav aria-label="Opeladeiro Quadras">
   <button data-act="qtab" data-v="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
   <button data-act="qtab" data-v="peladas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>Mensalistas</button>
   <button data-act="qtab" data-v="financeiro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 19V9M10 19V5M16 19v-7M21 19H3"/></svg>Financeiro</button>
@@ -804,7 +804,7 @@ async function fetchRow(col,id){const {data,error}=await sb.from(col).select("*"
 function schedule(ms){if(!CLOUD||!Cloud.uid)return;clearTimeout(Cloud.timer);Cloud.timer=setTimeout(flush,ms==null?700:ms);}
 async function flush(){if(!CLOUD||!Cloud.uid)return;if(Cloud.busy){Cloud.again=true;return;}Cloud.busy=true;Cloud.again=false;let fail=false;
   try{await flushImgs();if(isCreator())await flushCfg();for(const col of COL_ORDER)await flushCol(col);}
-  catch(e){fail=true;console.warn("[SemPanela] sync",e);}
+  catch(e){fail=true;console.warn("[Opeladeiro] sync",e);}
   finally{Cloud.busy=false;lsCache();if(Cloud.again)schedule(50);else if(fail)schedule(15000);}}
 async function flushCol(col){const C=COLS[col],seen=new Set();
   for(const it of C.list().slice()){const id=C.id(it);if(!id)continue;seen.add(id);const key=col+":"+id,b=Cloud.base[key],row=C.row(it),s=stableStr(row.doc);
@@ -1006,7 +1006,7 @@ function hud(m){const h=$("hud");h.textContent=m;h.classList.add("show");clearTi
 const CHECK='<svg viewBox="0 0 13 13" aria-hidden="true"><path d="M2 6.8l2.9 2.9L11 3.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const CHEV='<svg class="chev" viewBox="0 0 8 13" aria-hidden="true"><path d="M1.5 1.5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const MARK='<svg viewBox="44 142 424 244" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"><line x1="92" y1="170" x2="420" y2="170"/><line x1="58" y1="232" x2="116" y2="232"/><line x1="396" y1="232" x2="454" y2="232"/><path d="M116 170V328Q116 372 160 372H352Q396 372 396 328V170"/><line x1="256" y1="170" x2="256" y2="372"/><circle cx="256" cy="270" r="46"/></g><circle cx="256" cy="270" r="16" fill="currentColor"/></svg>';
-const BRAND=`<div class="brand">${MARK}<span class="wm">Sem<b>Panela</b></span></div>`;
+const BRAND=`<div class="brand">${MARK}<span class="wm">o<b>peladeiro</b></span></div>`;
 const STAR='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>';
 const CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 const SIL3D=`<svg viewBox="0 0 200 230" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><defs>
@@ -1134,7 +1134,7 @@ function joinPelada(){const u=meU(),P=pByCode(joinFound);if(!u||!P)return;const 
   pendingCode="";if(location.hash)try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}joinPrev=null;
   enterPelada(P.code);hud("Você entrou em "+st.pelada.name);}
 function setUserPhoto(u,data){const key="up_"+u.id;setImg(key,data);u.photo=key;G.peladas.forEach(P=>P.state.players.forEach(p=>{if(p.uid===u.id)p.photo=key;}));save();}
-function inviteURL(){return (CLOUD?location.origin:"https://sempanela.app.br")+"/convite/"+curP.code;}
+function inviteURL(){return (CLOUD?location.origin:"https://opeladeiro.com.br")+"/convite/"+curP.code;}
 function qrSVG(t){try{const q=qrcode(0,"M");q.addData(t);q.make();return q.createSvgTag(5,0);}catch(e){return `<div class="bigcode" style="color:#0A2416;font-size:30px">${esc(curP.code)}</div>`;}}
 const agendaOf=st=>{const w=st.pelada.weekday,t=st.pelada.time;if(w==null&&!t)return "";
   const d=w==null?"":w===0?"Todo domingo":w===6?"Todo sábado":"Toda "+WD[w].toLowerCase()+"-feira";return (d+(t?(d?" às ":"Às ")+t:"")).trim();};
@@ -1194,8 +1194,8 @@ function cxMonth(mk){const C=cx(),rows=cxItemsMonth(mk).map(it=>({it,p:byId(it.p
     bx=rows.reduce((s,r)=>s+itBaixa(r.it),0),dsp=desp.reduce((s,d)=>s+d.v,0);
   return {rows,desp,prev,rec,bx,falta:Math.max(0,prev-rec-bx),dsp,saldo:rec-dsp};}
 function cxSaldoTotal(){const ms=new Set(cxMonthsUpTo());cx().desp.forEach(d=>ms.add(d.date.slice(0,7)));let t=0;ms.forEach(m=>{if(m<=curMK())t+=cxMonth(m).saldo;});return t;}
-function cxMsg(it){const C=cx(),p=byId(it.pid),f=itFee(it);return `Fala, ${p.name}! ${it.label} da ${S.pelada.name}: ${brl(itDue(it))}${f>0?` (já com ${brl(f)} de multa por atraso)`:""}.${C.pix?" Pix: "+C.pix:""} Depois é só tocar em "Já paguei" na Caixinha do SemPanela.`;}
-function cxGroupMsg(mk){const M=cxMonth(mk),pend=M.rows.filter(r=>!["paga","baixa"].includes(r.st));return `*Caixinha da ${S.pelada.name} · ${mLabel(mk)}*\n\nFaltam pagar:\n`+pend.map(r=>`• ${r.p.name}: ${r.it.label.replace(/^Mensalidade de .*/,"mensalidade")} · ${brl(r.due)}`).join("\n")+(cx().pix?`\n\nPix: ${cx().pix}`:"")+"\n\nCaixinha no SemPanela";}
+function cxMsg(it){const C=cx(),p=byId(it.pid),f=itFee(it);return `Fala, ${p.name}! ${it.label} da ${S.pelada.name}: ${brl(itDue(it))}${f>0?` (já com ${brl(f)} de multa por atraso)`:""}.${C.pix?" Pix: "+C.pix:""} Depois é só tocar em "Já paguei" na Caixinha do Opeladeiro.`;}
+function cxGroupMsg(mk){const M=cxMonth(mk),pend=M.rows.filter(r=>!["paga","baixa"].includes(r.st));return `*Caixinha da ${S.pelada.name} · ${mLabel(mk)}*\n\nFaltam pagar:\n`+pend.map(r=>`• ${r.p.name}: ${r.it.label.replace(/^Mensalidade de .*/,"mensalidade")} · ${brl(r.due)}`).join("\n")+(cx().pix?`\n\nPix: ${cx().pix}`:"")+"\n\nCaixinha no Opeladeiro";}
 function cxOverdue(){return cxAll().filter(it=>itSt(it)==="atrasada").map(it=>({it,p:byId(it.pid)})).filter(r=>r.p).sort((a,b)=>a.it.venc<b.it.venc?-1:1);}
 function cxPendInf(){return cxAll().concat(cxItemsMonth(mShift(curMK(),1))).filter(it=>itSt(it)==="informado").map(it=>({it,p:byId(it.pid),inf:cx().informed[it.key]})).filter(r=>r.p);}
 function hasDebt(p){return isPro()&&cxAll().some(it=>it.pid===p.id&&itSt(it)==="atrasada");}
@@ -1290,7 +1290,7 @@ async function storyImage(p,kind,big,small){
   x.fillStyle="#EEF8F1";x.font=`800 92px ${cond}`;x.fillText(small,W/2,cy0+ch+150);
   const mk=await loadImg(svgURI(MARK.replace(/currentColor/g,"#B8F26B")));if(mk)x.drawImage(mk,W/2-230,H-210,140,80);
   x.textAlign="left";x.fillStyle="#EEF8F1";x.font=`800 80px ${cond}`;x.fillText("Sem",W/2-70,H-142);const w1=x.measureText("Sem").width;x.fillStyle="#B8F26B";x.fillText("Panela",W/2-70+w1,H-142);
-  x.textAlign="center";x.fillStyle="#93AE9F";x.font="500 34px -apple-system,Helvetica,Arial,sans-serif";x.fillText("Times sem panela · sempanela.app.br",W/2,H-80);
+  x.textAlign="center";x.fillStyle="#93AE9F";x.font="500 34px -apple-system,Helvetica,Arial,sans-serif";x.fillText("Times sem panela · opeladeiro.com.br",W/2,H-80);
   return c;}
 
 /* ---------- admin, agenda ---------- */
@@ -1385,7 +1385,7 @@ const CP=()=>camps().find(c=>c.id===cid)||null;
 const T_COL=["#B8F26B","#5AA9FF","#FF6B5A","#F6D44E","#C08BFF","#4FD1C5","#FF9F43","#F4F4F5","#FF7AB6","#8FD3FF","#E0A85E","#9AE66E","#A1A1AA","#6EE7B7","#FDBA74","#93C5FD"];
 const T_NOM=["Time Verde","Time Azul","Time Vermelho","Time Amarelo","Time Roxo","Time Ciano","Time Laranja","Time Branco","Time Rosa","Time Celeste","Time Areia","Time Lima","Time Cinza","Time Menta","Time Pêssego","Time Céu"];
 const KO_L={8:"Oitavas",4:"Quartas",2:"Semifinal",1:"Final",0:"3º lugar"};
-const MONTA={draft:["Capitães + draft","Cada capitão escolhe na sua vez, em cobrinha (1-2-3-4, depois 4-3-2-1)."],equilibrado:["Sorteio equilibrado","O SemPanela divide pelos níveis de ataque e defesa, como no sorteio da pelada."],potes:["Sorteio por potes","Os melhores vão para o pote 1, os seguintes para o pote 2… cada time tira um de cada pote."],puro:["Sorteio puro","Totalmente aleatório, sem olhar nível."],manual:["Montar na mão","Você escolhe o time de cada atleta."]};
+const MONTA={draft:["Capitães + draft","Cada capitão escolhe na sua vez, em cobrinha (1-2-3-4, depois 4-3-2-1)."],equilibrado:["Sorteio equilibrado","O app divide pelos níveis de ataque e defesa, como no sorteio da pelada."],potes:["Sorteio por potes","Os melhores vão para o pote 1, os seguintes para o pote 2… cada time tira um de cada pote."],puro:["Sorteio puro","Totalmente aleatório, sem olhar nível."],manual:["Montar na mão","Você escolhe o time de cada atleta."]};
 const DES_L={pts:"Pontos",v:"Vitórias",sg:"Saldo de gols",gp:"Gols marcados",cd:"Confronto direto"};
 const campPlanOf=c=>{if(c.tier==="pago")return "pro";if(c.pel){const P=pByCode(c.pel);return P&&P.state.pelada.plan==="pro"?"pro":"free";}return userPro(G.users.find(x=>x.id===c.ownerUid))?"pro":"free";};
 const campPro=c=>campPlanOf(c)==="pro";
@@ -1623,7 +1623,7 @@ function retroSlides(u,s){const yr=new Date().getFullYear(),nm=esc(dispName(u)),
    {bg:"#03130D",sum:1,h:`<span class="rk">RESUMO ${yr}</span><div class="rgrid"><div><b>${s.games}</b><span>peladas</span></div><div><b>${s.goals}</b><span>gols</span></div><div><b>${s.assists}</b><span>assist.</span></div><div><b>${s.mvp}</b><span>craque</span></div></div><b class="rbig" style="color:#B8F26B">${P[0]}</b><button class="btn" data-act="retroShare" style="margin-top:18px;max-width:320px">Compartilhar nos Stories</button>`}];}
 function retroRender(){const R=$("retro");if(!retro){R.hidden=true;R.innerHTML="";return;}const sl=retro.slides[retro.i];R.hidden=false;R.style.background=sl.bg;R.style.color=sl.ink||"#fff";
   R.innerHTML=`<div class="rbars">${retro.slides.map((_,k)=>`<i class="${k<retro.i?"done":k===retro.i?"cur":""}"></i>`).join("")}</div>
-  <div class="rtop"><span>${MARK}<b>SemPanela</b></span><button class="fsx" data-act="retroClose" aria-label="Fechar" style="${sl.ink?"background:rgba(0,0,0,.12);color:#0A2416":""}">✕</button></div>
+  <div class="rtop"><span>${MARK}<b>Opeladeiro</b></span><button class="fsx" data-act="retroClose" aria-label="Fechar" style="${sl.ink?"background:rgba(0,0,0,.12);color:#0A2416":""}">✕</button></div>
   <div class="rbody">${sl.h}</div>${retro.demo?`<span class="rdemo">dados de exemplo</span>`:""}
   ${sl.sum?"":`<button class="rnav l" data-act="retroNav" data-v="-1" aria-label="Anterior"></button><button class="rnav r" data-act="retroNav" data-v="1" aria-label="Próximo"></button>`}`;}
 async function retroCard(){const u=meU(),s=retro.s,P=retroPersona(s),yr=new Date().getFullYear(),W=1080,H=1920,cv=document.createElement("canvas");cv.width=W;cv.height=H;const x=cv.getContext("2d");
@@ -1634,7 +1634,7 @@ async function retroCard(){const u=meU(),s=retro.s,P=retroPersona(s),yr=new Date
   const box=(bx,by,v,l)=>{x.fillStyle="rgba(255,255,255,.07)";x.beginPath();x.roundRect(bx,by,440,300,36);x.fill();x.fillStyle="#fff";x.font="900 150px Inter,system-ui,sans-serif";x.fillText(v,bx+220,by+180);x.fillStyle="rgba(255,255,255,.65)";x.font="700 40px Inter,system-ui,sans-serif";x.fillText(l,bx+220,by+250);};
   box(80,600,s.games,"PELADAS");box(560,600,s.goals,"GOLS");box(80,940,s.assists,"ASSISTÊNCIAS");box(560,940,s.mvp,"VEZES CRAQUE");
   x.fillStyle="#F6D44E";x.font="900 110px Inter,system-ui,sans-serif";x.fillText(P[0].toUpperCase(),W/2,1430);x.fillStyle="rgba(255,255,255,.75)";x.font="600 42px Inter,system-ui,sans-serif";x.fillText(P[1],W/2,1510);
-  x.fillStyle="rgba(255,255,255,.55)";x.font="600 38px Inter,system-ui,sans-serif";x.fillText("Minha temporada no SemPanela",W/2,1800);return cv;}
+  x.fillStyle="rgba(255,255,255,.55)";x.font="600 38px Inter,system-ui,sans-serif";x.fillText("Minha temporada no Opeladeiro",W/2,1800);return cv;}
 function retroCardHTML(u){const ok=retroAllowed(u),yr=new Date().getFullYear();return `<div class="section"><button class="retrobtn" data-act="${ok?"retroOpen":"upsell"}" data-what="Retrospectiva do ano" data-scope="me"><span class="rk">RETROSPECTIVA ${yr}</span><b>Seu ano na pelada</b><span class="status" style="color:rgba(255,255,255,.75)">Gols, craques, troféus e o seu estilo de jogo, pronto para os Stories.</span>${ok?"":'<span class="pro" style="align-self:flex-start">PRO</span>'}</button></div>`;}
 /* ---------- chegou mais gente ---------- */
 function addArrivals(ids){const D=S.lastDraw,L=S.live,base=Math.max(2,D.base||S.pelada.base);if(!D.gks)D.gks=D.teams.map(()=>null);
@@ -1864,7 +1864,7 @@ async function campStory(c,k,svg,line){const W=1080,H=1920,cv=document.createEle
   const im=await loadImg(svg);if(im)x.drawImage(im,W/2-340,430,680,850);
   x.fillStyle="#F6D44E";x.font="900 92px Inter,system-ui,sans-serif";x.fillText(AW_L[k].toUpperCase(),W/2,1440);
   x.fillStyle="#FFFFFF";x.font="800 76px Inter,system-ui,sans-serif";x.fillText(line,W/2,1550);
-  x.fillStyle="rgba(255,255,255,.6)";x.font="600 38px Inter,system-ui,sans-serif";x.fillText(new Date(c.endedAt||Date.now()).getFullYear()+" · Campeonato no SemPanela",W/2,1800);return cv;}
+  x.fillStyle="rgba(255,255,255,.6)";x.font="600 38px Inter,system-ui,sans-serif";x.fillText(new Date(c.endedAt||Date.now()).getFullYear()+" · Campeonato no Opeladeiro",W/2,1800);return cv;}
 async function openCampStory(c,k){const A=c.awards,pro=campPro(c),ind=["art","gar","gol","craque"].includes(k);const svg=await tr3d(trSpec(c,k,pro));
   const line=ind?cName(c,A[k]):esc(cTeam(c,A[k]).name);openSheet({type:"cstory",k,cid:c.id});const cv=await campStory(c,k,svg,line);sheet.canvas=cv;const b=$("storyBox");if(b)b.innerHTML=`<img class="story" src="${cv.toDataURL("image/png")}" alt="Card para Stories">`;}
 function sheetCStory(){const c=CP()||camps().find(q=>q.id===sheet.cid);const ks=["camp","art","gar","gol","craque"].filter(k=>c&&c.awards&&c.awards[k]);
@@ -1917,12 +1917,12 @@ document.addEventListener("visibilitychange",()=>{if(liveFS&&document.visibility
 function setTab(t){tab=t;render();window.scrollTo(0,0);}
 
 function modeSeg(cur){return `<div class="seg" role="group" aria-label="Modo">${modesOf().map(k=>`<button data-act="goMode" data-v="${k}" aria-pressed="${cur===k}">${MODE_L[k]}</button>`).join("")}</div>`;}
-function viewLoading(){return `<div class="auth"><div class="logo-big">${MARK}<span class="wm">Sem<b>Panela</b></span><p>Carregando suas peladas…</p></div></div>`;}
-function viewOffline(){return `<div class="auth"><div class="logo-big">${MARK}<span class="wm">Sem<b>Panela</b></span><p>${esc(cloudErr||"Sem conexão.")}</p></div><div style="margin-top:22px"><button class="btn" data-act="retryCloud">Tentar de novo</button></div></div>`;}
-function viewNewPass(){return `<div class="hero" style="padding-top:18px"><div class="eyebrow">SemPanela</div><h1>Nova senha</h1><p class="sub">Escolha a senha nova da sua conta.</p></div><div class="section authf"><div class="group"><div class="cell"><label class="lbl" for="npPass">Nova senha</label><input class="inl" id="npPass" type="password" autocomplete="new-password" placeholder="mínimo 6 caracteres"></div></div><div class="err" role="alert">${esc(authErr)}</div></div><button class="btn" data-act="setNewPass" ${authBusy?"disabled":""}>${authBusy?"Aguarde…":"Salvar senha"}</button>`;}
+function viewLoading(){return `<div class="auth"><div class="logo-big">${MARK}<span class="wm">o<b>peladeiro</b></span><p>Carregando suas peladas…</p></div></div>`;}
+function viewOffline(){return `<div class="auth"><div class="logo-big">${MARK}<span class="wm">o<b>peladeiro</b></span><p>${esc(cloudErr||"Sem conexão.")}</p></div><div style="margin-top:22px"><button class="btn" data-act="retryCloud">Tentar de novo</button></div></div>`;}
+function viewNewPass(){return `<div class="hero" style="padding-top:18px"><div class="eyebrow">Opeladeiro</div><h1>Nova senha</h1><p class="sub">Escolha a senha nova da sua conta.</p></div><div class="section authf"><div class="group"><div class="cell"><label class="lbl" for="npPass">Nova senha</label><input class="inl" id="npPass" type="password" autocomplete="new-password" placeholder="mínimo 6 caracteres"></div></div><div class="err" role="alert">${esc(authErr)}</div></div><button class="btn" data-act="setNewPass" ${authBusy?"disabled":""}>${authBusy?"Aguarde…":"Salvar senha"}</button>`;}
 function viewScreen(){return ({loading:viewLoading,offline:viewOffline,newpass:viewNewPass,welcome:viewWelcome,auth:viewAuth,onboard:viewOnboard,creatorPick:viewCreatorPick,home:viewHome,create:viewCreate,join:viewJoin,creator:viewCreator,qsetup:viewQSetup,quadras:viewQuadras,camp:viewCamp,campNew:viewCampNew}[screen]||viewWelcome)();}
 function viewWelcome(){
-  return `<div class="auth"><div class="logo-big">${MARK}<span class="wm">Sem<b>Panela</b></span><p>O app que organiza a sua pelada.</p></div>
+  return `<div class="auth"><div class="logo-big">${MARK}<span class="wm">o<b>peladeiro</b></span><p>O app que organiza a sua pelada.</p></div>
   <div class="feats"><span>⚖️ Sorteio equilibrado</span><span>⏱️ Jogo ao vivo</span><span>⭐ Resenha e craque</span></div>
   ${pendingCode?`<div class="banner info"><span class="grow">Você recebeu um convite para a pelada <b>${esc(pendingCode)}</b>.</span></div>`:""}
   <div style="display:flex;flex-direction:column;gap:10px;margin-top:22px"><button class="btn" data-act="goAuth" data-v="signup">Criar conta</button><button class="btn ghost" data-act="goAuth" data-v="login">Entrar</button></div>
@@ -1931,7 +1931,7 @@ function viewWelcome(){
 function viewAuth(){
   const su=authMode==="signup",P=pendingCode&&pByCode(pendingCode);
   return `<button class="back" data-act="goWelcome">‹ Voltar</button>
-  <div class="hero" style="padding-top:6px"><div class="eyebrow">SemPanela</div><h1>${su?"Criar conta":"Entrar"}</h1>${su?`<p class="sub">É grátis. Entre na pelada da galera ou crie a sua.</p>`:""}</div>
+  <div class="hero" style="padding-top:6px"><div class="eyebrow">Opeladeiro</div><h1>${su?"Criar conta":"Entrar"}</h1>${su?`<p class="sub">É grátis. Entre na pelada da galera ou crie a sua.</p>`:""}</div>
   ${P?`<div class="banner info"><span class="grow">Convite para <b>${esc(P.state.pelada.name)}</b> · ${P.code}. ${su?"Crie sua conta":"Entre"} para participar.</span></div>`:""}
   <div class="section authf" style="margin-top:18px"><div class="group">
     ${su?`<div class="cell"><label class="lbl" for="aName">Nome</label><input class="inl" id="aName" autocomplete="name" placeholder="Seu nome" value="${esc(authVals.name)}" data-input="aname"></div>`:""}
@@ -1946,7 +1946,7 @@ function viewAuth(){
   ${CLOUD?"":`<div class="section"><div class="box testbox"><div class="note"><b>Protótipo.</b> As contas ficam só neste aparelho. A conta ${esc(CREATOR)} já existe com a Fut dos Cria: no primeiro acesso, a senha que você digitar vira a senha dela.</div></div></div>`}`;
 }
 function viewOnboard(){const u=meU(),d=obDraft,ph=img(u.photo),tmp={name:d.full||u.name,nick:d.name,show:d.show};
-  return `<div class="hero"><div class="eyebrow">Bem-vindo ao SemPanela</div><h1>Seu perfil de atleta</h1><p class="sub">Aparece nas peladas em que você entrar. Dá para mudar depois no Perfil.</p></div>
+  return `<div class="hero"><div class="eyebrow">Bem-vindo ao Opeladeiro</div><h1>Seu perfil de atleta</h1><p class="sub">Aparece nas peladas em que você entrar. Dá para mudar depois no Perfil.</p></div>
   <div class="section"><label class="pava">${ph?`<img src="${ph}" alt="">`:esc(initials(d.name||u.name))}<span class="cam">${ph?"Trocar foto":"Adicionar foto"}</span><input class="hidden-file" type="file" accept="image/*" data-file="uphoto"></label></div>
   <div class="section"><div class="group"><div class="cell"><label class="lbl" for="obFull">Nome</label><input class="inl" id="obFull" value="${esc(d.full)}" data-input="obfull" autocomplete="name"></div>
     <div class="cell"><label class="lbl" for="obName">Apelido</label><input class="inl" id="obName" value="${esc(d.name)}" placeholder="Como te chamam no campo" data-input="obname" autocomplete="nickname"></div></div></div>
@@ -1957,7 +1957,7 @@ function viewOnboard(){const u=meU(),d=obDraft,ph=img(u.photo),tmp={name:d.full|
 function viewCreatorPick(){const u=meU(),q=myQuadra();
   return `${BRAND}<div class="hero"><div class="eyebrow">Acesso de criador</div><h1>Olá, ${esc(u.nick||u.name.split(" ")[0])}</h1><p class="sub">Seu e-mail tem acesso de criador do app. Como você quer entrar agora?</p></div>
   <div class="section choice"><button class="optcard" data-act="goMode" data-v="peladas"><span class="ic">⚽</span><span><b>Minhas peladas</b><span class="t">Como qualquer usuário: a Fut dos Cria, as peladas em que você joga e as que criar.</span></span></button>
-    ${q?`<button class="optcard" data-act="goMode" data-v="quadras"><span class="ic">▦</span><span><b>SemPanela Quadras</b><span class="t">${esc(q.name)}: agenda, mensalistas e financeiro.</span></span></button>`:""}
+    ${q?`<button class="optcard" data-act="goMode" data-v="quadras"><span class="ic">▦</span><span><b>Opeladeiro Quadras</b><span class="t">${esc(q.name)}: agenda, mensalistas e financeiro.</span></span></button>`:""}
     <button class="optcard goldc" data-act="goMode" data-v="creator"><span class="ic">✦</span><span><b>Criador do app</b><span class="t">Painel com todas as peladas, quadras e usuários (CRM), planos e configurações.</span></span></button></div>
   <p class="sf" style="text-align:center">Dá para trocar de modo a qualquer momento pela barra de baixo ou pelo Perfil.</p>
   <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button></div></div>`;
@@ -1977,7 +1977,7 @@ function viewHome(){const u=meU(),all=myPeladas(u),q=myQuadra();
   `<div class="section choice"><button class="optcard" data-act="goJoin"><span class="ic">⚽</span><span><b>Vou jogar</b><span class="t">Tenho o convite ou o código da pelada.</span></span></button>
     <button class="optcard" data-act="newPelada"><span class="ic">📋</span><span><b>Vou organizar</b><span class="t">Crie sua pelada, chame a galera e sorteie times equilibrados. É grátis.</span></span></button></div>`}
   ${campListHTML(camps().filter(c=>campVisible(c,u)).sort((a,b)=>b.createdAt-a.createdAt),"Times fixos, tabela, artilharia e taça no final. Monte o seu.","")}
-  ${q?`<div class="section"><div class="group"><button class="cell action" data-act="goMode" data-v="quadras"><span class="grow">Abrir SemPanela Quadras · ${esc(q.name)}</span>${CHEV}</button></div></div>`:""}
+  ${q?`<div class="section"><div class="group"><button class="cell action" data-act="goMode" data-v="quadras"><span class="grow">Abrir Opeladeiro Quadras · ${esc(q.name)}</span>${CHEV}</button></div></div>`:""}
   <div class="section"><div class="sh"><span>APARÊNCIA</span></div>${themeSeg()}</div>
   <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button>${isCreator()?"":`<button class="cell danger" data-act="delAccount" style="font-weight:500;font-size:15px">Excluir minha conta</button>`}</div></div>`;
 }
@@ -2030,17 +2030,17 @@ const DAY=864e5;
 function idleDays(P){const ref=P.lastDrawAt||P.createdAt;return Math.floor((Date.now()-ref)/DAY);}
 function retentionAlerts(){return G.peladas.map(P=>({P,d:idleDays(P)})).filter(x=>x.d>=30).sort((a,b)=>b.d-a.d);}
 function alertRow(x){const P=x.P,ow=G.users.find(u=>u.id===P.ownerUid)||{},lvl=x.d>=90?3:1,ph=String(ow.phone||"").replace(/\D/g,"");
-  const msg=`Oi, ${dispName(ow)||""}! Aqui é o Ivan, criador do SemPanela. Vi que a ${P.state.pelada.name} não sorteia times há um tempo. Aconteceu alguma coisa? Posso ajudar em algo?`;
+  const msg=`Oi, ${dispName(ow)||""}! Aqui é o Ivan, criador do Opeladeiro. Vi que a ${P.state.pelada.name} não sorteia times há um tempo. Aconteceu alguma coisa? Posso ajudar em algo?`;
   return `<div class="alert"><span class="dot" style="background:${lvl===3?"var(--down)":"var(--gold)"}"></span><span class="grow"><b>${esc(P.state.pelada.name)}</b> <span class="code" style="font-size:12px">${P.code}</span><br>
     <span class="status">${lvl===3?"3 meses":"1 mês"} sem sorteio · ${P.lastDrawAt?"último sorteio "+dmy(P.lastDrawAt):"nunca sorteou (criada "+dmy(P.createdAt)+")"}</span><br>
     <span class="status">Dono: ${esc(ow.name||"—")} · ${esc(ow.email||"")}${P.contactedAt?" · contatado em "+dmy(P.contactedAt):""}</span>
-    <span style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">${ph?`<a class="mbtn" style="text-decoration:none" href="https://wa.me/${ph.length<=11?"55"+ph:ph}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">WhatsApp</a>`:""}<a class="mbtn" style="text-decoration:none" href="mailto:${esc(ow.email||"")}?subject=${encodeURIComponent("SemPanela · "+P.state.pelada.name)}&body=${encodeURIComponent(msg)}">E-mail</a><button class="mbtn l" data-act="crContacted" data-v="${P.code}">${P.contactedAt?"Desmarcar contato":"Marcar como contatado"}</button></span></span></div>`;}
+    <span style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">${ph?`<a class="mbtn" style="text-decoration:none" href="https://wa.me/${ph.length<=11?"55"+ph:ph}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">WhatsApp</a>`:""}<a class="mbtn" style="text-decoration:none" href="mailto:${esc(ow.email||"")}?subject=${encodeURIComponent("Opeladeiro · "+P.state.pelada.name)}&body=${encodeURIComponent(msg)}">E-mail</a><button class="mbtn l" data-act="crContacted" data-v="${P.code}">${P.contactedAt?"Desmarcar contato":"Marcar como contatado"}</button></span></span></div>`;}
 const PLAN_L={free:"Grátis",pro:"Pro",vip:"Acesso Total"};const planKey=u=>u.courtesy?"vip":u.plan==="pro"?"pro":"free";
 function planSel(u){const k=planKey(u);return `<div class="seg" role="group" aria-label="Plano de ${esc(u.name||"")}" style="margin:8px 0 0 46px;flex:0 0 calc(100% - 46px);max-width:calc(100% - 46px)">${["free","pro","vip"].map(x=>`<button data-act="crPlanSet" data-id="${u.id}" data-v="${x}" aria-pressed="${k===x}" style="font-size:13px">${PLAN_L[x]}</button>`).join("")}</div>`;}
 function viewCreator(){
   const U=G.users,Ps=G.peladas.slice().sort((a,b)=>a.code<b.code?-1:1),pros=U.filter(u=>u.plan==="pro"&&!u.courtesy&&u.email!==CREATOR&&ownedBy(u).length),vips=U.filter(u=>u.courtesy&&!u._stub),totP=Ps.reduce((s,P)=>s+P.state.players.length,0),realSet=new Set(),semConta=Ps.reduce((s,P)=>s+P.state.players.filter(p=>{if(p.uid){realSet.add(p.uid);return false;}return true;}).length,0),realU=U.filter(u=>!u._stub);
   const price=num(G.cfg.price),Qs=G.quadras,qPaying=Qs.filter(q=>!(q.trialEnds>Date.now())),qRev=qPaying.reduce((s,q)=>s+qMRR(q),0);
-  let h=`${BRAND}<div class="hero"><div class="eyebrow">Criador do app</div><h1>Painel SemPanela</h1><p class="sub">Tudo o que está registrado no app.</p></div>
+  let h=`${BRAND}<div class="hero"><div class="eyebrow">Criador do app</div><h1>Painel Opeladeiro</h1><p class="sub">Tudo o que está registrado no app.</p></div>
   <div class="seg" role="group" aria-label="Painel">${[["geral","Geral"],["peladas","Peladas"],["quadras","Quadras"],["usuarios","Usuários"],["config","Config"]].map(([k,l])=>`<button data-act="crSeg" data-v="${k}" aria-pressed="${crSeg===k}" style="font-size:13px">${l}</button>`).join("")}</div>`;
   if(crSeg==="geral"){const al=retentionAlerts(),a3=al.filter(x=>x.d>=90),a1=al.filter(x=>x.d<90);
     h+=`<div class="section"><div class="sh"><span>ALERTAS DE RETENÇÃO</span><span>${al.length}</span></div><div class="group">${al.length?`${a3.length?`<div class="cell"><span class="status" style="color:var(--down);font-weight:700">3 MESES SEM SORTEIO · ${a3.length}</span></div>`+a3.map(alertRow).join(""):""}${a1.length?`<div class="cell"><span class="status" style="color:var(--gold);font-weight:700">1 MÊS SEM SORTEIO · ${a1.length}</span></div>`+a1.map(alertRow).join(""):""}`:`<div class="empty">Nenhuma pelada parada. Todas sortearam times no último mês.</div>`}</div>
@@ -2069,7 +2069,7 @@ function viewCreator(){
       <p class="sf"><b>Grátis</b> e <b>Pro</b> são os planos normais (o Pro entra na receita). <b>Acesso Total</b> libera tudo do Pro sem cobrança e não entra na receita. Para tirar, é só escolher outro plano.</p></div>`;
   } else {
     const T=G.cfg.tiers,inp=(id,lbl,val,k,f,w=90,mode="decimal")=>`<div class="cell"><label class="lbl" for="${id}" style="width:auto;flex:1">${lbl}</label><input class="inl" id="${id}" inputmode="${mode}" value="${esc(val)}" data-input="cfgt" data-k="${k}" data-f="${f}" style="max-width:${w}px"></div>`;
-    h+=`<div class="section"><div class="sh"><span>SEMPANELA (DONO DE PELADA)</span></div><div class="group">
+    h+=`<div class="section"><div class="sh"><span>OPELADEIRO (DONO DE PELADA)</span></div><div class="group">
       <div class="cell"><label class="lbl" for="cfP" style="width:auto;flex:1">Preço do Pro (R$/mês)</label><input class="inl" id="cfP" inputmode="decimal" value="${esc(G.cfg.price)}" data-input="cfgprice" style="max-width:110px"></div>
       <div class="cell"><label class="lbl" for="cfF" style="width:auto;flex:1">Peladeiros no Grátis</label><input class="inl" id="cfF" type="number" inputmode="numeric" value="${G.cfg.freePlayers}" data-input="cfgfree" style="max-width:90px"></div>
       <div class="cell"><label class="lbl" for="cfE" style="width:auto;flex:1">Peladas por dono no Grátis</label><input class="inl" id="cfE" type="number" inputmode="numeric" value="${G.cfg.freePeladas}" data-input="cfgpel" style="max-width:90px"></div>
@@ -2089,7 +2089,7 @@ function viewCreator(){
   return h+`<div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button></div></div>`;
 }
 
-/* ---------- SemPanela Quadras ---------- */
+/* ---------- Opeladeiro Quadras ---------- */
 const TIER_RANK={quadra:0,arena:1,complexo:2};
 const hasT=(q,min)=>TIER_RANK[q.tier]>=TIER_RANK[min];
 const TIER_FEATS={
@@ -2118,7 +2118,7 @@ function slotsOf(q){const a=parseInt((q.open||"08:00").slice(0,2)),b=parseInt((q
 function occupancy(q){const slots=slotsOf(q).length*7*q.campos.length;return {used:q.fixas.length,total:slots,pct:slots?Math.round(q.fixas.length/slots*100):0};}
 function viewQSetup(){const d=qsDraft;
   return `<button class="back" data-act="goMode" data-v="peladas">‹ Minhas peladas</button>
-  <div class="qhead" style="padding-top:6px"><div class="brand">${MARK}<span class="wm">Sem<b>Panela</b> <span class="qsub">Quadras</span></span></div></div>
+  <div class="qhead" style="padding-top:6px"><div class="brand">${MARK}<span class="wm">o<b>peladeiro</b> <span class="qsub">Quadras</span></span></div></div>
   <div class="hero"><h1>Sua quadra organizada</h1><p class="sub">Agenda, mensalistas, mensalidades e o financeiro do mês em um lugar só. 30 dias grátis para testar.</p></div>
   <div class="section"><div class="group"><div class="cell"><label class="lbl" for="qsName">Nome</label><input class="inl" id="qsName" placeholder="Ex.: Arena da Vila" value="${esc(d.name)}" data-input="qsname"></div>
     <div class="cell"><label class="lbl" for="qsB">Bairro</label><input class="inl" id="qsB" placeholder="Ex.: Santa Tereza, BH" value="${esc(d.bairro)}" data-input="qsbairro"></div>
@@ -2134,7 +2134,7 @@ function tiersHTML(cur,act,campos){const T=G.cfg.tiers;
       <ul>${TIER_FEATS[k].map(x=>`<li>${x}</li>`).join("")}</ul>${!fits?`<span class="lock">Seus ${campos} campos não cabem neste nível</span>`:""}${cur===k?`<span class="pill">${act==="qTier"?"Plano atual":"Selecionado"}</span>`:""}</button>`;}).join("")}</div>`;}
 function viewQuadras(){const q=myQuadra();if(!q){screen="home";return viewHome();}
   const t=G.cfg.tiers[q.tier],tr=q.trialEnds>Date.now(),days=Math.ceil((q.trialEnds-Date.now())/864e5);
-  let h=`<div class="qhead"><div class="brand">${MARK}<span class="wm">Sem<b>Panela</b> <span class="qsub">Quadras</span></span></div><button class="mini" data-act="goMode" data-v="peladas">Minhas peladas ›</button></div>
+  let h=`<div class="qhead"><div class="brand">${MARK}<span class="wm">o<b>peladeiro</b> <span class="qsub">Quadras</span></span></div><button class="mini" data-act="goMode" data-v="peladas">Minhas peladas ›</button></div>
   <div class="hero" style="padding-top:12px"><div class="eyebrow">Plano ${t.name}${tr?` · teste grátis, ${days} ${days===1?"dia":"dias"}`:""}</div><h1>${esc(q.name)}</h1>${q.bairro?`<p class="sub">${esc(q.bairro)}</p>`:""}</div>`;
   if(qtab==="agenda")h+=qAgenda(q);else if(qtab==="peladas")h+=qPeladas(q);else if(qtab==="financeiro")h+=qFin(q);else h+=qConfig(q);
   return h;
@@ -2204,7 +2204,7 @@ function sheetQFixa(){const q=myQuadra(),d=sheet.d,isNew=!sheet.id,P=d.code&&pBy
   return `${bar(isNew?"Novo mensalista":"Mensalista","Cancelar","Salvar","qSaveFixa")}
   <div class="section"><div class="group">
     <div class="cell"><label class="lbl" for="fxCode">Código</label><input class="inl" id="fxCode" placeholder="SP0000 (opcional)" value="${esc(d.code||"")}" data-input="fxcode" autocapitalize="characters"></div>
-    ${P?`<div class="cell"><span class="grow status">Vinculada à <b style="color:var(--text)">${esc(P.state.pelada.name)}</b> no SemPanela. Dados preenchidos pelo app.</span></div>`:""}
+    ${P?`<div class="cell"><span class="grow status">Vinculada à <b style="color:var(--text)">${esc(P.state.pelada.name)}</b> no Opeladeiro. Dados preenchidos pelo app.</span></div>`:""}
     <div class="cell"><label class="lbl" for="fxName">Pelada</label><input class="inl" id="fxName" value="${esc(d.name)}" placeholder="Nome da pelada" data-input="fxname"></div>
     <div class="cell"><label class="lbl" for="fxOrg">Organizador</label><input class="inl" id="fxOrg" value="${esc(d.org)}" placeholder="Nome" data-input="fxorg"></div>
     <div class="cell"><label class="lbl" for="fxPh">WhatsApp</label><input class="inl" id="fxPh" type="tel" inputmode="tel" value="${esc(d.phone)}" placeholder="(31) 99999-0000" data-input="fxphone"></div>
@@ -2226,7 +2226,7 @@ function sheetQAvulso(){const q=myQuadra(),d=sheet.d;
     <div class="cell"><label class="lbl" for="avV">Valor</label><input class="inl" inputmode="decimal" id="avV" value="${esc(d.valor)}" placeholder="R$" data-input="avvalor"></div></div></div>
   <div class="section"><div class="sh"><span>CAMPO</span></div><div class="chips">${q.campos.map(c=>`<button data-act="avCampo" data-v="${c.id}" aria-pressed="${d.campoId===c.id}">${esc(c.name)}</button>`).join("")}</div></div>`;
 }
-function sheetQPlans(){const q=myQuadra();return `${bar("Planos SemPanela Quadras")}
+function sheetQPlans(){const q=myQuadra();return `${bar("Planos Opeladeiro Quadras")}
   <div class="section">${tiersHTML(q.tier,"qTier",q.campos.length)}<p class="sf" style="text-align:center">30 dias grátis · no anual, 2 meses grátis · valores de teste</p></div>`;}
 
 function viewPerfil(){const u=meU(),mp=byId(S.me),ph=img(u.photo),own=ownedBy(u),all=myPeladas(u),q=myQuadra();
@@ -2249,7 +2249,7 @@ function viewPerfil(){const u=meU(),mp=byId(S.me),ph=img(u.photo),own=ownedBy(u)
   ${mp?`<div class="section"><div class="group"><button class="cell action" data-act="openPlayer" data-id="${mp.id}"><span class="grow">Ver meu card nesta pelada</span>${CHEV}</button></div></div>`:""}
   <div class="section"><div class="sh"><span>MINHAS PELADAS</span><span class="links"><button data-act="goMode" data-v="peladas">Ver início</button></span></div><div class="group">${all.map(P=>`<button class="cell" data-act="openPelada" data-v="${P.code}"><span class="code">${P.code}</span><span class="grow"><b>${esc(P.state.pelada.name)}</b><br><span class="status">${roleIn(P,u)} · ${P.state.players.length} ${P.state.players.length===1?"peladeiro":"peladeiros"}</span></span>${P===curP?'<span class="pill">aberta</span>':CHEV}</button>`).join("")}</div>
     <div class="group" style="margin-top:10px"><button class="cell action" data-act="newPelada"><span class="grow">Criar nova pelada</span>${userPro(u)||own.length<G.cfg.freePeladas?"":'<span class="pro">PRO</span>'}</button><button class="cell action" data-act="goJoin"><span class="grow">Entrar em outra pelada</span></button></div></div>
-  <div class="section"><div class="group">${q?`<button class="cell action" data-act="goMode" data-v="quadras"><span class="grow">Abrir SemPanela Quadras · ${esc(q.name)}</span>${CHEV}</button>`:`<button class="cell" data-act="goMode" data-v="qsetup"><span class="grow">Tem uma quadra? <span class="status">Conheça o SemPanela Quadras</span></span>${CHEV}</button>`}</div></div>
+  <div class="section"><div class="group">${q?`<button class="cell action" data-act="goMode" data-v="quadras"><span class="grow">Abrir Opeladeiro Quadras · ${esc(q.name)}</span>${CHEV}</button>`:`<button class="cell" data-act="goMode" data-v="qsetup"><span class="grow">Tem uma quadra? <span class="status">Conheça o Opeladeiro Quadras</span></span>${CHEV}</button>`}</div></div>
   ${modesOf().length>1?`<div class="section"><div class="sh"><span>TROCAR MODO</span></div>${modeSeg("peladas")}</div>`:""}
   <div class="section"><div class="sh"><span>NOTIFICAÇÕES</span></div><div class="group">${[["vespera","Véspera da pelada","Lembrete no dia anterior"],["lista","Lista de presença","Abriu, perto de fechar, fechou e vaga aberta"],["times","Times sorteados","Avisa em qual time você caiu"],["resenha","Resenha e votação","Súmula do dia e votação do craque"],["caixinha","Caixinha","Mensalidade, diária e atrasos"],["pedidos","Convites e pedidos","Convites, transferências e pedidos de Pro"]].map(([k,l,d])=>`<div class="cell"><span class="grow">${l}<br><span class="status">${d}</span></span><button class="switch" role="switch" aria-checked="${notifOn(k)}" aria-label="${l}" data-act="notif" data-v="${k}"></button></div>`).join("")}</div></div>
   ${isCreator()?`<div class="section"><div class="sh"><span>TESTE · SÓ VOCÊ VÊ</span></div>
@@ -2330,7 +2330,7 @@ function viewResults(){
   <div class="section"><div class="group">
     ${isAdmin()?`<button class="cell action" data-act="redraw"><span class="grow">${redrawArm?"Toque de novo: o jogo ao vivo será zerado":result.manual?"Sortear equilibrado":"Sortear de novo"}</span>${CHEV}</button>${S.live?"":`<button class="cell action" data-act="mdEdit"><span class="grow">Ajustar os times na mão</span>${CHEV}</button>`}`:""}
     ${isAdmin()&&!dayClosed()?`<button class="cell action" data-act="arrOpen"><span class="grow">Chegou mais gente</span>${CHEV}</button>`:""}<button class="cell action" data-act="copyTeams"><span class="grow">Copiar para o WhatsApp</span>${CHEV}</button></div>
-    ${isAdmin()?`<p class="sf">${result.manual?"Quer o SemPanela dividindo? “Sortear equilibrado” usa os níveis.":"“Sortear de novo” traz outra divisão equilibrada. “Ajustar na mão” deixa você trocar quem quiser."}</p>`:""}
+    ${isAdmin()?`<p class="sf">${result.manual?"Quer o app dividindo? “Sortear equilibrado” usa os níveis.":"“Sortear de novo” traz outra divisão equilibrada. “Ajustar na mão” deixa você trocar quem quiser."}</p>`:""}
     <div class="group" id="copyWrap" style="margin-top:10px" hidden><textarea class="copybox" id="copyText" readonly></textarea></div></div>
   ${isAdmin()||dayClosed()?`<div class="section"><button class="btn ghost" data-act="endGame">${S.session?"Votação aberta · ver resenha":dayClosed()?"Pelada encerrada · ver súmula":"Encerrar pelada"}</button>
     <p class="sf">${dayClosed()?"":isPro()?"No fim do dia: a súmula vai para a Resenha e a votação abre por 24h.":"No fim do dia: a súmula vai para a Resenha. No Pro, abre também a votação do craque."}</p></div>`:""}`;
@@ -2414,7 +2414,7 @@ function sheetFill(){const L=S.live,c=L.cur,t=sheet.team,need=L.full-rosterLen(t
     return `${bar("Peladeiros do Time "+(sheet.from+1),"Voltar").replace('data-act="closeSheet"','data-act="fillBack" data-v="from"')}
     <p class="sf" style="padding-top:8px">Escolha ${k===1?"1 peladeiro":"até "+k+" peladeiros"} para completar o Time ${t+1}. Selecionados: <b style="color:var(--text)">${sheet.sel.length} de ${k}</b>.</p>
     <div class="section"><div class="group">${ps.map(p=>`<button class="cell av" data-act="fillPick" data-id="${p.id}" aria-pressed="${sheet.sel.includes(p.id)}"><span class="check" aria-checked="${sheet.sel.includes(p.id)}" aria-hidden="true"><span>${CHECK}</span></span>${ava(p)}${nameBlock(p)}${lvChips(p)}</button>`).join("")}
-      <button class="cell auto" data-act="fillAuto"><span class="grow"><b>Modo SemPanela</b> | Equilibrar automaticamente<br><span class="status">Escolhe, só entre os peladeiros do Time ${sheet.from+1}, quem deixa o Time ${t+1} mais perto da média do grupo.</span></span></button></div></div>
+      <button class="cell auto" data-act="fillAuto"><span class="grow"><b>Modo sem panela</b> | Equilibrar automaticamente<br><span class="status">Escolhe, só entre os peladeiros do Time ${sheet.from+1}, quem deixa o Time ${t+1} mais perto da média do grupo.</span></span></button></div></div>
     <div class="section"><button class="btn" data-act="fillConfirm" ${sheet.sel.length?"":"disabled"}>Confirmar${sheet.sel.length?" ("+sheet.sel.length+")":""}</button></div>`;}
   const names=sheet.sel.map(pname).map(esc).join(", "),left=rosterLen(sheet.from)-sheet.sel.length;
   return `${bar("Transferência","Voltar").replace('data-act="closeSheet"','data-act="fillBack" data-v="players"')}
@@ -2442,7 +2442,7 @@ function sheetDel(){const p=byId(sheet.id);if(!p){closeSheet();return "";}
     <span class="status" style="max-width:40ch">Essa ação é definitiva. ${esc(p.name)} sai do elenco desta pelada, perde o histórico de níveis, gols e assistências e não entra mais nos sorteios.${p.uid?" A conta continua existindo, mas perde o acesso a esta pelada.":""}</span></div>
   <div class="section choice"><button class="btn" style="background:var(--down);color:#2A0700" data-act="delPlayer">Excluir definitivamente</button><button class="btn ghost" data-act="closeSheet">Cancelar</button></div>`;
 }
-function inviteMsg(){const wa=S.pelada.waLink;return `Bora pra ${S.pelada.name}! ⚽\nEntre como peladeiro no SemPanela: ${inviteURL()}\nCódigo da pelada: ${curP.code}`+(waOk(wa)?`\nGrupo do WhatsApp: ${wa}`:"");}
+function inviteMsg(){const wa=S.pelada.waLink;return `Bora pra ${S.pelada.name}! ⚽\nEntre como peladeiro no Opeladeiro: ${inviteURL()}\nCódigo da pelada: ${curP.code}`+(waOk(wa)?`\nGrupo do WhatsApp: ${wa}`:"");}
 const waOk=l=>/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]+/.test(String(l||"").trim());
 function sheetInvite(){const msg=inviteMsg();
   return `${bar("Convidar peladeiro")}
@@ -2480,7 +2480,7 @@ function sumulaHTML(){const D=S.days||[];
     <div style="align-items:stretch;text-align:left;padding:12px 16px"><span class="l">ARTILHARIA</span>${seasonG.map((p,i)=>`<span class="status" style="display:flex;justify-content:space-between;color:var(--text)"><span>${i+1}. ${esc(p.name)}</span><b>${p.goals}</b></span>`).join("")||'<span class="status">—</span>'}</div>
     <div style="align-items:stretch;text-align:left;padding:12px 16px"><span class="l">ASSISTÊNCIAS</span>${seasonA.map((p,i)=>`<span class="status" style="display:flex;justify-content:space-between;color:var(--text)"><span>${i+1}. ${esc(p.name)}</span><b>${p.assists}</b></span>`).join("")||'<span class="status">—</span>'}</div></div></div></div>`:""}`;}
 function sumulaText(d){const st=dayStats(d);return `*${S.pelada.name} · súmula ${dateBR(d.date)}*\n\n`+d.games.map((g,i)=>`Jogo ${i+1}: Time ${g.a+1} ${g.sa} x ${g.sb} Time ${g.b+1}`).join("\n")+
-  (st.g.length?`\n\n⚽ Gols: `+st.g.map(([id,n])=>pname(id)+(n>1?" ("+n+")":"")).join(", "):"")+(st.a.length?`\n🅰️ Assistências: `+st.a.map(([id,n])=>pname(id)+(n>1?" ("+n+")":"")).join(", "):"")+"\n\nSúmula do SemPanela";}
+  (st.g.length?`\n\n⚽ Gols: `+st.g.map(([id,n])=>pname(id)+(n>1?" ("+n+")":"")).join(", "):"")+(st.a.length?`\n🅰️ Assistências: `+st.a.map(([id,n])=>pname(id)+(n>1?" ("+n+")":"")).join(", "):"")+"\n\nSúmula do Opeladeiro";}
 function sheetDay(){const d=(S.days||[]).find(x=>x.id===sheet.id);if(!d){closeSheet();return "";}const st=dayStats(d);
   return `${bar("Súmula · "+dateBR(d.date))}
   <div class="section"><div class="group">${d.games.map((g,i)=>`<div class="cell"><span class="evmin tnum">${i+1}</span><span class="grow"><b>Time ${g.a+1} ${g.sa} x ${g.sb} Time ${g.b+1}</b><br><span class="status">${mmss(g.ms)}${g.events.length?" · "+g.events.map(e=>esc(pname(e.scorer))).join(", "):""}</span></span></div>`).join("")||`<div class="empty">Nenhum jogo registrado no ao vivo.</div>`}</div></div>
@@ -2558,7 +2558,7 @@ function viewLista(){const c=lc(),L=S.lst,adm=isAdmin(),own=isOwner();
   if(nao.length)h+=`<div class="section"><div class="sh"><span>NÃO VÃO · ${nao.length}</span></div><div class="group">${nao.map(p=>lRow(p,null)).join("")}</div></div>`;
   if(adm){const sim=L.simLeft;h+=`<div class="section"><div class="sh"><span>CONTROLE DA LISTA</span></div><div class="group">
       ${L.status==="aberta"?`<button class="cell action" data-act="lClose"><span class="grow">${c.modo==="auto"?"Fechar agora (simular o horário)":"Fechar a lista agora"}</span></button>${c.modo==="auto"?`<button class="cell action" data-act="lAlmost"><span class="grow">Ver aviso “a lista fecha em 1 hora”</span></button>`:""}`:""}
-      ${L.status==="fechada"&&fL>0?`<a class="cell action" style="text-decoration:none" href="https://wa.me/?text=${encodeURIComponent(`Ainda tem ${fL} ${fL===1?"vaga":"vagas"} na ${S.pelada.name} (${gameDayTxt(L.date)})! Entra na lista pelo SemPanela: ${inviteURL()}`)}" target="_blank" rel="noopener"><span class="grow">Compartilhar vaga no WhatsApp</span>${CHEV}</a>`:""}
+      ${L.status==="fechada"&&fL>0?`<a class="cell action" style="text-decoration:none" href="https://wa.me/?text=${encodeURIComponent(`Ainda tem ${fL} ${fL===1?"vaga":"vagas"} na ${S.pelada.name} (${gameDayTxt(L.date)})! Entra na lista pelo Opeladeiro: ${inviteURL()}`)}" target="_blank" rel="noopener"><span class="grow">Compartilhar vaga no WhatsApp</span>${CHEV}</a>`:""}
       <button class="cell action" data-act="tab" data-tab="pelada"><span class="grow">Regras e vagas da lista</span>${CHEV}</button></div>
       ${L.status==="fechada"?`<div class="sh" style="margin-top:14px"><span>TESTE · QUANTO FALTA PARA A PELADA</span></div><div class="chips">${[[null,"Horário real"],[30,"30 min"],[90,"1h30"],[300,"5h"]].map(([m,l])=>`<button data-act="lSim" data-v="${m==null?"":m}" aria-pressed="${sim===m||(m==null&&sim==null)}">${l}</button>`).join("")}</div><p class="sf">Para testar a multa de desistência em cima da hora.</p>`:""}</div>`;}
   return h;}
@@ -2647,7 +2647,7 @@ function viewCaixinha(){const own=isOwner(),pro=isPro(),mk=cxMk||curMK(),C=cx(),
   <div class="section"><div class="sh"><span>AVULSOS · ${dia.length}</span><span>${brl(dia.reduce((s,r)=>s+r.v,0))}</span></div><div class="group">${dia.map(r=>cxRowOwner(r,pro)).join("")||`<div class="empty">Nenhuma diária neste mês.</div>`}</div>
     <p class="sf">Avulso paga a diária de cada pelada que jogou (conta pelas súmulas). Prazo: ${PRAZO[C.prazoAv][0].toLowerCase()} da pelada.</p></div></div>
   ${mul.length?`<div class="section"><div class="sh"><span>MULTAS DA LISTA · ${mul.length}</span><span>${brl(mul.reduce((s,r)=>s+r.v,0))}</span></div><div class="group">${mul.map(r=>cxRowOwner(r,pro)).join("")}</div></div>`:""}
-  <div class="section"><div class="sh"><span>DESPESAS</span><button class="mini" data-act="${pro?"cxNewDesp":"upsell"}" data-what="Caixinha da pelada">${pro?"+ Despesa":"🔒 + Despesa"}</button></div><div class="group">${M.desp.map(d=>`<div class="qrow"><span class="grow"><b>${esc(d.desc)}</b><br><span class="status">${d.auto?"Pelo SemPanela Quadras · "+ST_L[d.st].toLowerCase():d.aluguel?`Vence ${dBR(d.venc)} · ${ST_X[d.st].toLowerCase()}`:d.date.split("-").reverse().join("/")}</span></span><span class="r"><span class="val" style="color:var(--down)">− ${brl(d.v)}</span>${!d.auto&&!d.aluguel&&pro?`<button class="mbtn l" data-act="cxDelDesp" data-id="${d.id}">Remover</button>`:""}${d.aluguel&&pro?(d.st==="paga"?`<button class="mbtn l" data-act="cxAlug" data-v="${d.mk}">Desfazer</button>`:`<button class="mbtn" data-act="cxAlug" data-v="${d.mk}">Paguei</button>`):""}</span></div>`).join("")||`<div class="empty">Sem despesas neste mês. Aluguel da quadra, bola, colete, juiz…</div>`}</div></div>
+  <div class="section"><div class="sh"><span>DESPESAS</span><button class="mini" data-act="${pro?"cxNewDesp":"upsell"}" data-what="Caixinha da pelada">${pro?"+ Despesa":"🔒 + Despesa"}</button></div><div class="group">${M.desp.map(d=>`<div class="qrow"><span class="grow"><b>${esc(d.desc)}</b><br><span class="status">${d.auto?"Pelo Opeladeiro Quadras · "+ST_L[d.st].toLowerCase():d.aluguel?`Vence ${dBR(d.venc)} · ${ST_X[d.st].toLowerCase()}`:d.date.split("-").reverse().join("/")}</span></span><span class="r"><span class="val" style="color:var(--down)">− ${brl(d.v)}</span>${!d.auto&&!d.aluguel&&pro?`<button class="mbtn l" data-act="cxDelDesp" data-id="${d.id}">Remover</button>`:""}${d.aluguel&&pro?(d.st==="paga"?`<button class="mbtn l" data-act="cxAlug" data-v="${d.mk}">Desfazer</button>`:`<button class="mbtn" data-act="cxAlug" data-v="${d.mk}">Paguei</button>`):""}</span></div>`).join("")||`<div class="empty">Sem despesas neste mês. Aluguel da quadra, bola, colete, juiz…</div>`}</div></div>
   <div class="section"><div class="sh"><span>QUEM PAGA COMO</span></div><div class="group">${S.players.map(p=>`<div class="cell"><span class="grow">${esc(p.name)}</span><span class="pisosel"><button data-act="${pro?"cxType":"upsell"}" data-what="Caixinha da pelada" data-id="${p.id}" data-v="m" aria-pressed="${cxType(p)==="m"}">Mensal</button><button data-act="${pro?"cxType":"upsell"}" data-what="Caixinha da pelada" data-id="${p.id}" data-v="d" aria-pressed="${cxType(p)==="d"}">Avulso</button></span></div>`).join("")}</div></div>
   <div class="section"><div class="sh"><span>LEMBRETES AUTOMÁTICOS</span></div><div class="box"><div class="note"><b style="color:var(--text)">Mensalista:</b> dia 1 (mensalidade nova), no vencimento e, se atrasar, todo dia na primeira semana e depois a cada 3 dias.<br><b style="color:var(--text)">Avulso:</b> logo depois da pelada, no vencimento e nos dias de atraso, do mesmo jeito.<br>O lembrete para quando a pessoa toca em “Já paguei”. Nada é enviado à noite.</div>
     <button class="btn ghost sm" data-act="cxDemo">Ver exemplo de lembrete</button></div></div>`;
@@ -2676,7 +2676,7 @@ function sheetCxConfig(){const C=cx(),M=C.multa,m=num(C.mensal),d=num(C.diaria);
   ${quadraLink()?"":`<div class="section"><div class="sh"><span>ALUGUEL DA QUADRA</span></div><div class="group">
     <div class="cell"><label class="lbl" for="cxAv">Valor/mês</label>${inp("cxAv","aluguel.valor",C.aluguel.valor,"R$")}</div>
     <div class="cell"><label class="lbl" for="cxAd">Vence dia</label>${inp("cxAd","aluguel.venc",C.aluguel.venc,"5","numeric")}</div></div>
-    <p class="sf">Para quadra que não usa o SemPanela Quadras. Entra nas despesas e você recebe lembrete no dia 1, no vencimento e nos dias de atraso.</p></div>`}`;}
+    <p class="sf">Para quadra que não usa o Opeladeiro Quadras. Entra nas despesas e você recebe lembrete no dia 1, no vencimento e nos dias de atraso.</p></div>`}`;}
 function sheetPay(){const s=sheet,ph=s.proof?img(s.proof):null;
   return `${bar("Já paguei","Cancelar")}
   <div class="section"><div class="box"><b style="font-size:17px">${esc(s.label)}</b><div class="kpi" style="box-shadow:none;padding:0;background:none"><span class="l">Valor</span><span class="v money">${brl(s.valor)}</span>${s.sub?`<span class="status">${esc(s.sub)}</span>`:""}</div></div></div>
@@ -2792,21 +2792,21 @@ function viewPelada(){
     </div></div>
 
   ${(()=>{const L=quadraLink(),mk=curMK();if(L){const st=fixaStatus(L.q,L.f,mk),inf=(L.q.informed||{})[L.f.id+"|"+mk];
-      return `<div class="section"><div class="sh"><span>ONDE JOGAMOS</span><span class="pill">SemPanela Quadras</span></div><div class="box">
+      return `<div class="section"><div class="sh"><span>ONDE JOGAMOS</span><span class="pill">Opeladeiro Quadras</span></div><div class="box">
         <div><b style="font-size:18px">${esc(L.q.name)}</b><br><span class="status">${esc(L.q.bairro||"")}${L.q.bairro?" · ":""}${esc(campoName(L.q,L.f.campoId))} · ${WD[L.f.weekday]} às ${L.f.time}</span></div>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>Mensalidade de ${mLabel(mk).toLowerCase()} · <b>${brl(num(L.f.valor))}</b></span><span class="st ${st}">${st!=="paga"&&inf?"Informado":ST_L[st]}</span></div>
         ${isOwner()&&st!=="paga"?`${L.q.pix?`<div class="group" style="background:rgba(var(--ov),.04)"><div class="cell"><span class="lbl">Pix</span><span class="grow trunc" style="text-align:right">${esc(L.q.pix)}</span><button class="mini" data-act="qlPix">Copiar</button></div></div><button class="btn sm" data-act="qlPixQR">Pagar com Pix</button>`:""}
           ${inf?`<span class="status">Você avisou o pagamento. Falta a quadra confirmar.</span>`:`<button class="btn sm" data-act="qlInform">Já paguei, avisar a quadra</button>`}`:""}
         <span class="status">A mensalidade da quadra entra sozinha nas despesas da Caixinha.</span></div></div>`;}
-    return isOwner()?`<div class="section"><div class="sh"><span>ONDE JOGAMOS</span></div><div class="box"><div class="note">Sua quadra usa o <b>SemPanela Quadras</b>? Peça para ela cadastrar a pelada como mensalista com o código <b>${curP.code}</b>. Aí você vê aqui o local, o horário e se a mensalidade está paga.</div>
-      <a class="btn ghost sm" style="text-decoration:none" href="https://wa.me/?text=${encodeURIComponent(`Oi! Nossa pelada ${S.pelada.name} usa o SemPanela. Cadastra a gente como mensalista no SemPanela Quadras com o código ${curP.code}? Assim a gente acompanha a mensalidade por lá.`)}" target="_blank" rel="noopener">Enviar o código para a quadra</a></div></div>`:"";})()}
+    return isOwner()?`<div class="section"><div class="sh"><span>ONDE JOGAMOS</span></div><div class="box"><div class="note">Sua quadra usa o <b>Opeladeiro Quadras</b>? Peça para ela cadastrar a pelada como mensalista com o código <b>${curP.code}</b>. Aí você vê aqui o local, o horário e se a mensalidade está paga.</div>
+      <a class="btn ghost sm" style="text-decoration:none" href="https://wa.me/?text=${encodeURIComponent(`Oi! Nossa pelada ${S.pelada.name} usa o Opeladeiro. Cadastra a gente como mensalista no Opeladeiro Quadras com o código ${curP.code}? Assim a gente acompanha a mensalidade por lá.`)}" target="_blank" rel="noopener">Enviar o código para a quadra</a></div></div>`:"";})()}
   ${isOwner()?`<div class="section"><div class="sh"><span>DONO DE PELADA</span></div><div class="group">${S.transfer?`<div class="cell"><span class="grow">Transferência pendente para <b>${esc(pname(S.transfer.to))}</b>. Esperando ele aceitar.</span><button class="mini" data-act="cancelTransfer">Cancelar</button></div>`:`<button class="cell action" data-act="transfer"><span class="grow">Transferir pelada para outro dono</span>${CHEV}</button>`}</div>
     <p class="sf">Para a pelada não morrer quando você sair. Você continua no elenco como peladeiro.</p></div>`:""}
   <div class="section"><div class="group">${isOwner()?`<button class="cell danger" data-act="delPelada">Excluir pelada</button>`:`<button class="cell danger" data-act="leavePelada">Sair desta pelada</button>`}</div></div>
   <div class="section"><div class="sh"><span>PRIVACIDADE (LGPD)</span></div><div class="box">
     <div class="note">As fotos do rosto servem só para gerar o personagem e são apagadas logo depois. Ficam guardados só o card e a foto de perfil. O personagem por IA não é gerado para menores de 18 anos.</div>
   </div></div>
-  <div class="foot">${MARK}<span><b style="color:var(--text)">SemPanela</b> · O app que organiza a sua pelada.</span></div>`;
+  <div class="foot">${MARK}<span><b style="color:var(--text)">Opeladeiro</b> · O app que organiza a sua pelada.</span></div>`;
 }
 let wipeArm=false;
 
@@ -3243,7 +3243,7 @@ document.addEventListener("click",e=>{
     case "joinNew":joinStep="new";joinErr="";render();window.scrollTo(0,0);break;
     case "doClaim":claimCard();break;
     case "invCard":{const p=byId(id);if(!p||!isAdmin())break;const url=inviteURL()+"?eu="+encodeURIComponent(p.id);
-      const txt=`Bora jogar com a gente no SemPanela! Entra na ${S.pelada.name} por este link e toca em "Sou eu, entrar": ${url}`;
+      const txt=`Bora jogar com a gente no Opeladeiro! Entra na ${S.pelada.name} por este link e toca em "Sou eu, entrar": ${url}`;
       try{window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank");}catch(e){}
       try{navigator.clipboard&&navigator.clipboard.writeText(url);}catch(e){}hud("Link do "+p.name+" copiado");break;}
     case "unlinkCard":{const p=byId(id);if(!p||!isAdmin()||!p.uid||p.uid===curP.ownerUid)break;if(!el.dataset.ok){openSheet({type:"confirm",title:"Desligar conta",head:"Desligar a conta do card “"+esc(p.name)+"”?",text:"O card continua no elenco com a história dele, mas fica sem dono. A pessoa sai da pelada até entrar de novo pelo convite.",btn:"Desligar conta",act:"unlinkCard"});sheet.pid=id;break;}
@@ -3270,7 +3270,7 @@ document.addEventListener("click",e=>{
     case "fillFrom":sheet.from=+v;sheet.sel=[];sheet.step="players";renderSheet();$("sheet").scrollTop=0;break;
     case "fillBack":sheet.step=v;renderSheet();break;
     case "fillPick":{const need=Math.min(S.live.full-rosterLen(sheet.team),rosterLen(sheet.from));if(sheet.sel.includes(id))sheet.sel=sheet.sel.filter(x=>x!==id);else if(sheet.sel.length<need)sheet.sel.push(id);else hud(need===1?"Só falta 1":"Só faltam "+need);const sc=$("sheet").scrollTop;renderSheet();$("sheet").scrollTop=sc;break;}
-    case "fillAuto":sheet.sel=autoFill(sheet.team,sheet.from);{const sc=$("sheet").scrollTop;renderSheet();$("sheet").scrollTop=sc;}hud("Modo SemPanela: escolhidos para equilibrar");break;
+    case "fillAuto":sheet.sel=autoFill(sheet.team,sheet.from);{const sc=$("sheet").scrollTop;renderSheet();$("sheet").scrollTop=sc;}hud("Modo sem panela: escolhidos para equilibrar");break;
     case "fillConfirm":if(!sheet.sel.length)break;sheet.step="type";renderSheet();$("sheet").scrollTop=0;break;
     case "fillApply":{const L=S.live,t=sheet.team,from=sheet.from,n=sheet.sel.length;sheet.sel.forEach(pid=>{L.rosters[from]=L.rosters[from].filter(x=>x!==pid);if(!L.rosters[t].includes(pid))L.rosters[t].push(pid);if(v==="loan")L.loans.push({pid,from,to:t});});
       closeSheet();hud(v==="loan"?`${n===1?"1 emprestado":n+" emprestados"} para o Time ${t+1}`:`${n===1?"1 transferido":n+" transferidos"} para o Time ${t+1}`);afterNewMatch();break;}
@@ -3354,7 +3354,7 @@ document.addEventListener("click",e=>{
     case "nextOpt":break;
     case "fixedGK":S.pelada.fixedGK=!S.pelada.fixedGK;changedRoster();break;
     case "copyTeams":{const o=result.options[optIdx],T=o.teams;const ST=T.map(teamStats);
-      const txt=`*${S.pelada.name} · times de hoje*\n\n`+T.map((t,i)=>`⚽ *TIME ${i+1}*${ST[i].k<result.base?" (incompleto)":""}\n`+(o.gks&&o.gks[i]?`🧤 ${(byId(o.gks[i].id)||o.gks[i]).name} (GOL)\n`:"")+t.map(p=>{const q=byId(p.id)||p;return "• "+q.name+" ("+posOf(q)+")";}).join("\n")+`\nMédia: ${f1(ST[i].mG)}`).join("\n\n")+"\n\nTimes sorteados no SemPanela";
+      const txt=`*${S.pelada.name} · times de hoje*\n\n`+T.map((t,i)=>`⚽ *TIME ${i+1}*${ST[i].k<result.base?" (incompleto)":""}\n`+(o.gks&&o.gks[i]?`🧤 ${(byId(o.gks[i].id)||o.gks[i]).name} (GOL)\n`:"")+t.map(p=>{const q=byId(p.id)||p;return "• "+q.name+" ("+posOf(q)+")";}).join("\n")+`\nMédia: ${f1(ST[i].mG)}`).join("\n\n")+"\n\nTimes sorteados no Opeladeiro";
       $("copyText").value=txt;copyText(txt,"copyText","copyWrap");break;}
     case "endGame":{if(dayClosed()){setTab("avaliar");break;}if(!isAdmin())break;
       if(!el.dataset.ok){openSheet({type:"endconfirm"});break;}closeSheet();
@@ -3370,8 +3370,8 @@ document.addEventListener("click",e=>{
     case "openDay":openSheet({type:"day",id});break;
     case "storyDay":{const d=S.days.find(x=>x.id===id);closeSheet();setTimeout(()=>openStory(d),300);break;}
     case "storyPick":sheet.k=v;renderSheet();buildStory();break;
-    case "storyShare":{const c=sheet.canvas;if(!c)break;c.toBlob(async b=>{const f=new File([b],"sempanela-stories.png",{type:"image/png"});
-      try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"SemPanela"});return;}}catch(e){}hud("Toque e segure a imagem para salvar");},"image/png");break;}
+    case "storyShare":{const c=sheet.canvas;if(!c)break;c.toBlob(async b=>{const f=new File([b],"opeladeiro-stories.png",{type:"image/png"});
+      try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Opeladeiro"});return;}}catch(e){}hud("Toque e segure a imagem para salvar");},"image/png");break;}
     case "cxMonth":cxMk=mShift(cxMk||curMK(),+v);render();break;
     case "cxRcv":{if(!cxCan())break;openSheet({type:"rcv",key:el.dataset.k,via:"pix"});break;}
     case "rcvVia":sheet.via=v;renderSheet();break;
@@ -3438,7 +3438,7 @@ document.addEventListener("click",e=>{
     case "caPasteDo":{const c=CP(),lines=(($("caText")||{}).value||"").split(/\n/).map(l=>l.trim()).filter(Boolean);let n=0;
       lines.forEach(l=>{const m=l.match(/^(.*?)(?:\s+(\d{1,2})\s+(\d{1,2}))?$/),nm=m[1].replace(/^[\d\-.)\s•*]+/,"").trim();if(nm){n++;c.athletes.push({id:"a_"+uid(),name:nm,uid:null,a:m[2]?+m[2]:60,d:m[3]?+m[3]:60,pos:/gol/i.test(nm)?"GOL":"MEI",photo:null});}});
       cPaste=false;c.teams=[];save();render();hud(n+" atletas adicionados");break;}
-    case "caInvite":{const c=CP();copyText("https://sempanela.app.br/campeonato/"+c.id.slice(2));hud("Link copiado. Quem entrar aparece na lista de atletas.");break;}
+    case "caInvite":{const c=CP();copyText(location.origin+"/campeonato/"+c.id.slice(2));hud("Link copiado. Quem entrar aparece na lista de atletas.");break;}
     case "cMonta":{const c=CP();c.monta=v;c.teams=[];save();render();break;}
     case "cBuild":{const c=CP();if(c.athletes.length<teamsNeed(c))break;if(c.monta==="manual")emptyTeams(c);else buildTeams(c);save();render();break;}
     case "cAssign":{const c=CP(),t=cTeam(c,v);if(t.ids.length>=perTeam(c)){hud("Esse time já está completo");break;}t.ids.push(id);if(!t.cap)t.cap=id;save();render();break;}
@@ -3514,7 +3514,7 @@ document.addEventListener("click",e=>{
       const nm=S.pelada.name;G.peladas=G.peladas.filter(P=>P!==curP);closeSheet();goHome("peladas");hud(nm+" excluída");break;}
     case "leavePelada":{if(isOwner())break;if(!el.dataset.ok){openSheet({type:"confirm",title:"Sair da pelada",head:"Sair de “"+esc(S.pelada.name)+"”?",text:"Seu card, níveis, gols e assistências nesta pelada serão apagados. Para voltar, você precisa do código ou de um novo convite.",btn:"Sair da pelada",act:"leavePelada"});break;}
       const nm=S.pelada.name,me=S.me;S.players=S.players.filter(p=>p.id!==me);if(S.tempAdminId===me)S.tempAdminId=null;closeSheet();goHome("peladas");hud("Você saiu de "+nm);break;}
-    case "delAccount":{const u=meU();if(!el.dataset.ok){openSheet({type:"confirm",title:"Excluir conta",head:"Excluir sua conta?",text:`Essa ação é definitiva. Apagamos seu perfil e suas fotos, as peladas em que você é Dono de Pelada${ownedBy(u).length?" ("+ownedBy(u).map(P=>esc(P.state.pelada.name)).join(", ")+")":""}${myQuadra()?", sua quadra no SemPanela Quadras":""} e seus cards nas outras peladas.`,btn:"Excluir minha conta",act:"delAccount"});break;}
+    case "delAccount":{const u=meU();if(!el.dataset.ok){openSheet({type:"confirm",title:"Excluir conta",head:"Excluir sua conta?",text:`Essa ação é definitiva. Apagamos seu perfil e suas fotos, as peladas em que você é Dono de Pelada${ownedBy(u).length?" ("+ownedBy(u).map(P=>esc(P.state.pelada.name)).join(", ")+")":""}${myQuadra()?", sua quadra no Opeladeiro Quadras":""} e seus cards nas outras peladas.`,btn:"Excluir minha conta",act:"delAccount"});break;}
       closeSheet();if(CLOUD){hud("Excluindo…");cloudDeleteAccount().then(()=>{G.sess=null;screen="welcome";render();hud("Conta excluída");},()=>hud("Não deu para excluir agora. Confira a internet."));break;}G.peladas=G.peladas.filter(P=>P.ownerUid!==u.id);G.peladas.forEach(P=>{P.state.players=P.state.players.filter(p=>p.uid!==u.id);});G.quadras=G.quadras.filter(q=>q.ownerUid!==u.id);
       if(u.photo)setImg(u.photo,null);G.users=G.users.filter(x=>x.id!==u.id);logout();hud("Conta excluída");break;}
     case "copyDay":{const d=S.days.find(x=>x.id===id);copyText(sumulaText(d),"dayText","dayWrap");break;}

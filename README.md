@@ -1,4 +1,4 @@
-# SemPanela
+# Opeladeiro
 
 O app que organiza a sua pelada.
 
