@@ -949,7 +949,7 @@ if(!G||!Array.isArray(G.users)){
   const iv={id:"u_ivan",email:CREATOR,name:"Ivan",pass:null,pos:"AUTO",photo:null,plan:old.pelada.plan||"pro",roles:["dono"],createdAt:Date.now()};
   const ip=old.players.find(p=>normTxt(p.name)==="ivan")||old.players[0];
   if(ip){ip.uid=iv.id;old.ownerId=ip.id;old.me=ip.id;iv.pos=ip.pos||"AUTO";iv.photo=ip.photo||null;}
-  G={v:3,seq:1,users:[iv],peladas:[{id:uid(),code:"SP0001",ownerUid:iv.id,createdAt:Date.now(),state:old}],sess:null,cfg:{price:"19,90",freePlayers:20,freePeladas:1}};
+  G={v:3,seq:1,users:[iv],peladas:[{id:uid(),code:"OP0001",ownerUid:iv.id,createdAt:Date.now(),state:old}],sess:null,cfg:{price:"19,90",freePlayers:20,freePeladas:1}};
 }
 G.peladas.forEach(P=>fixState(P.state));
 
@@ -958,7 +958,7 @@ if(!G.cfg.vipAdd2){G.cfg.vipAdd2=1;if(!G.cfg.proEmails.includes("gusbroliveira@g
 function ensureVip(){G.cfg.proEmails.forEach(em=>{em=em.trim().toLowerCase();if(!em)return;let u=G.users.find(x=>x.email===em);const nm=VIP_NAME[em]||[em.split("@")[0],""];
   if(!u){u={id:"u_"+Math.random().toString(36).slice(2,9),email:em,name:nm[0],pass:null,pos:"AUTO",photo:null,plan:"pro",roles:[],createdAt:Date.now()};G.users.push(u);}
   u.plan="pro";
-  if(nm[1]&&!G.cfg.vipSeeded[em]){G.cfg.vipSeeded[em]=1;let c;do{G.seq++;c="SP"+String(G.seq).padStart(4,"0");}while(G.peladas.some(P=>P.code===c));
+  if(nm[1]&&!G.cfg.vipSeeded[em]){G.cfg.vipSeeded[em]=1;let c;do{G.seq++;c="OP"+String(G.seq).padStart(4,"0");}while(G.peladas.some(P=>P.code===c));
     const ow={id:"p_"+Math.random().toString(36).slice(2,9),name:nm[0],a:50,d:50,gk:50,on:true,pos:"AUTO",photo:null,art:null,artPose:null,birth:"",h:null,w:null,games:0,mvp:0,uid:u.id};
     const st={scale:99,pelada:{name:nm[1],base:5,plan:"pro",fixedGK:false,matchMin:null,weekday:null,time:"",waLink:""},uniform:{type:"colete",front:null,back:null,model:null,desc:""},players:[ow],rounds:[],session:null,lastDraw:null,ownerId:ow.id,me:ow.id,tempAdminId:null,live:null,nudges:[]};
     fixState(st);G.peladas.push({id:"pl_"+Math.random().toString(36).slice(2,9),code:c,ownerUid:u.id,createdAt:Date.now(),state:st});}
@@ -966,11 +966,11 @@ function ensureVip(){G.cfg.proEmails.forEach(em=>{em=em.trim().toLowerCase();if(
   try{localStorage.setItem(LSG,JSON.stringify(G));}catch(e){}}
 ensureVip();
 /* elenco padrão da Fut dos Cria (lista do Ivan, out/2026) */
-if(!G.cfg.fdcV2){const P=G.peladas.find(x=>x.code==="SP0001");if(P){const st=P.state;FDC_ROSTER.forEach(([n,a,d])=>{const ex=st.players.find(p=>nameKey(p.name)===nameKey(n));if(ex){ex.a=a;ex.d=d;if(nameKey(ex.name)===nameKey(n)&&ex.name!==n&&!ex.uid)ex.name=n;}else st.players.push(newPlayer({name:n,a,d,on:false}));});}
+if(!G.cfg.fdcV2){const P=G.peladas.find(x=>x.code==="OP0001"||x.code==="SP0001");if(P){const st=P.state;FDC_ROSTER.forEach(([n,a,d])=>{const ex=st.players.find(p=>nameKey(p.name)===nameKey(n));if(ex){ex.a=a;ex.d=d;if(nameKey(ex.name)===nameKey(n)&&ex.name!==n&&!ex.uid)ex.name=n;}else st.players.push(newPlayer({name:n,a,d,on:false}));});}
   G.cfg.fdcV2=1;try{localStorage.setItem(LSG,JSON.stringify(G));}catch(e){}}
 (function ensureSeeds(){Object.entries(SEEDS).forEach(([em,o])=>{let u=G.users.find(x=>x.email===em);
   if(!u){u={id:"u_"+Math.random().toString(36).slice(2,9),email:em,name:o.name,pass:null,pos:"AUTO",photo:null,plan:G.cfg.proEmails.includes(em)?"pro":"free",roles:[],createdAt:Date.now()};G.users.push(u);}
-  if(G.cfg.vipSeeded[em])return;G.cfg.vipSeeded[em]=1;let c;do{G.seq++;c="SP"+String(G.seq).padStart(4,"0");}while(G.peladas.some(P=>P.code===c));
+  if(G.cfg.vipSeeded[em])return;G.cfg.vipSeeded[em]=1;let c;do{G.seq++;c="OP"+String(G.seq).padStart(4,"0");}while(G.peladas.some(P=>P.code===c));
   const players=fdcPlayers(true),ow=players.find(p=>nameKey(p.name)===nameKey(o.owner))||players[0];ow.uid=u.id;
   const st={scale:99,pelada:{name:o.pelada,base:5,plan:u.plan,fixedGK:false,matchMin:null,weekday:null,time:"",waLink:""},uniform:{type:"colete",front:null,back:null,model:null,desc:""},players,rounds:[],session:null,lastDraw:null,ownerId:ow.id,me:ow.id,tempAdminId:null,live:null,nudges:[]};
   fixState(st);G.peladas.push({id:"pl_"+Math.random().toString(36).slice(2,9),code:c,ownerUid:u.id,createdAt:Date.now(),state:st});});
@@ -1057,7 +1057,8 @@ function cardHTML(p,mini){
 const meU=()=>G.sess?G.users.find(u=>u.id===G.sess.uid)||null:null;
 const isCreator=()=>{const u=meU();return !!u&&u.email===CREATOR;};
 const ownerU=()=>curP?G.users.find(u=>u.id===curP.ownerUid):null;
-const pByCode=c=>G.peladas.find(P=>P.code===c)||(joinPrev&&joinPrev.code===c?joinPrev:null);
+const normCode=c=>{c=String(c||"").toUpperCase().replace(/\s/g,"");const d=c.replace(/\D/g,"");return d?"OP"+d.padStart(4,"0"):c;};
+const pByCode=c=>{c=normCode(c);return G.peladas.find(P=>normCode(P.code)===c)||(joinPrev&&normCode(joinPrev.code)===c?joinPrev:null);};
 const ownedBy=u=>G.peladas.filter(P=>P.ownerUid===u.id);
 const memberOf=u=>G.peladas.filter(P=>P.state.players.some(x=>x.uid===u.id));
 const myPeladas=u=>[...ownedBy(u),...memberOf(u).filter(P=>P.ownerUid!==u.id)];
@@ -1115,7 +1116,7 @@ function doLogin(u,isNew){G.sess={uid:u.id,mode:"peladas",code:null};u.lastLogin
   if(u.email===CREATOR&&!pendingCode){screen="creatorPick";save();render();window.scrollTo(0,0);return;}
   goHome("peladas");}
 function logout(){if(CLOUD)cloudLogout();G.sess=null;closeSheet();curP=null;S=null;screen="welcome";authErr="";save();render();window.scrollTo(0,0);}
-function newCode(){let c;do{G.seq++;c="SP"+String(G.seq).padStart(4,"0");}while(pByCode(c));return c;}
+function newCode(){let c;do{G.seq++;c="OP"+String(G.seq).padStart(4,"0");}while(pByCode(c));return c;}
 function peladaState(d){const u=meU();const owner=newPlayer({name:dispName(u),pos:u.pos||"AUTO",photo:u.photo,uid:u.id});
   const st={scale:99,pelada:{name:d.name,base:d.base,plan:u.plan,fixedGK:false,matchMin:null,weekday:d.weekday,time:d.time,waLink:""},uniform:{type:"colete",front:null,back:null,model:null,desc:""},
     players:[owner],rounds:[],session:null,lastDraw:null,ownerId:owner.id,me:owner.id,tempAdminId:null,live:null,nudges:[]};
@@ -1995,8 +1996,8 @@ function viewCreate(){const d=createDraft||{name:"",weekday:null,time:"",base:5}
   <button class="btn" data-act="doCreate">Criar pelada</button>`;
 }
 function viewJoin(){const u=meU(),back=`<button class="back" data-act="joinBack">‹ Minhas peladas</button>`;
-  if(!joinFound)return `${back}<div class="hero" style="padding-top:6px"><div class="eyebrow">Olá, ${esc(u.nick||u.name.split(" ")[0])}</div><h1>Entrar em uma pelada</h1><p class="sub">Peça o código para o Dono de Pelada. Ele começa com SP e tem 4 números.</p></div>
-    <div class="section"><input class="codein" id="jCode" placeholder="SP0000" maxlength="6" autocomplete="off" autocapitalize="characters" enterkeyhint="go" aria-label="Código da pelada"><div class="err" role="alert">${esc(joinErr)}</div></div>
+  if(!joinFound)return `${back}<div class="hero" style="padding-top:6px"><div class="eyebrow">Olá, ${esc(u.nick||u.name.split(" ")[0])}</div><h1>Entrar em uma pelada</h1><p class="sub">Peça o código para o Dono de Pelada. Ele começa com OP e tem 4 números.</p></div>
+    <div class="section"><input class="codein" id="jCode" placeholder="OP0000" maxlength="6" autocomplete="off" autocapitalize="characters" enterkeyhint="go" aria-label="Código da pelada"><div class="err" role="alert">${esc(joinErr)}</div></div>
     <button class="btn" data-act="findPelada">Buscar pelada</button>
     <p class="sf" style="text-align:center">Recebeu o link ou o QR code? Abra por ele e a pelada já vem preenchida.</p>`;
   const P=pByCode(joinFound),st=P.state,ow=G.users.find(x=>x.id===P.ownerUid),already=st.players.some(x=>x.uid===u.id),ph=img(u.photo),d=joinDraft;
@@ -2204,7 +2205,7 @@ function qConfig(q){const t=G.cfg.tiers[q.tier],maxC=q.tier==="complexo"?99:+t.c
 function sheetQFixa(){const q=myQuadra(),d=sheet.d,isNew=!sheet.id,P=d.code&&pByCode(d.code.toUpperCase()),mk=curMK(),st=!isNew?fixaStatus(q,q.fixas.find(f=>f.id===sheet.id),mk):null;
   return `${bar(isNew?"Novo mensalista":"Mensalista","Cancelar","Salvar","qSaveFixa")}
   <div class="section"><div class="group">
-    <div class="cell"><label class="lbl" for="fxCode">Código</label><input class="inl" id="fxCode" placeholder="SP0000 (opcional)" value="${esc(d.code||"")}" data-input="fxcode" autocapitalize="characters"></div>
+    <div class="cell"><label class="lbl" for="fxCode">Código</label><input class="inl" id="fxCode" placeholder="OP0000 (opcional)" value="${esc(d.code||"")}" data-input="fxcode" autocapitalize="characters"></div>
     ${P?`<div class="cell"><span class="grow status">Vinculada à <b style="color:var(--text)">${esc(P.state.pelada.name)}</b> no Opeladeiro. Dados preenchidos pelo app.</span></div>`:""}
     <div class="cell"><label class="lbl" for="fxName">Pelada</label><input class="inl" id="fxName" value="${esc(d.name)}" placeholder="Nome da pelada" data-input="fxname"></div>
     <div class="cell"><label class="lbl" for="fxOrg">Organizador</label><input class="inl" id="fxOrg" value="${esc(d.org)}" placeholder="Nome" data-input="fxorg"></div>
@@ -3220,7 +3221,7 @@ document.addEventListener("click",e=>{
       months.forEach(m=>monthItems(q,m).forEach(x=>rows.push([mLabel(m),x.name,x.org||"",x.valor.toFixed(2).replace(".",","),ST_L[x.status]])));
       const tsv=rows.map(r=>r.join("\t")).join("\n");copyText(tsv);setTimeout(()=>hud("Planilha copiada: cole no Excel ou no Google Planilhas"),300);break;}
     case "qSeed":{const q=myQuadra(),c=q.campos,mk=curMK(),prev=mShift(mk,-1);const ex=[["Fut dos Cria","Ivan","31999990001",3,"20:30","900"],["Racha da Firma","Paulo","31999990002",1,"19:00","750"],["Pelada dos Coroas","Seu Zé","31999990003",6,"08:00","800"],["Quinta dos Peladeiros","Bruno","31999990004",4,"21:00","850"],["Galera do Bairro","Lucas","31999990005",2,"20:00","700"]];
-      ex.forEach((e,i)=>{const f={id:"f_"+uid(),since:mShift(mk,-5),code:i===0?"SP0001":"",name:e[0],org:e[1],phone:e[2],weekday:e[3],time:e[4],valor:e[5],campoId:c[i%c.length].id};q.fixas.push(f);
+      ex.forEach((e,i)=>{const f={id:"f_"+uid(),since:mShift(mk,-5),code:i===0?"OP0001":"",name:e[0],org:e[1],phone:e[2],weekday:e[3],time:e[4],valor:e[5],campoId:c[i%c.length].id};q.fixas.push(f);
         for(let k=5;k>=1;k--){const m=mShift(mk,-k);if(!(k===1&&i===3))q.pays[f.id+"|"+m]={at:Date.now(),via:"manual"};}if(i<2)q.pays[f.id+"|"+mk]={at:Date.now(),via:i?"pix":"manual"};});
       save();render();hud("Exemplo carregado");break;}
     case "logout":logout();break;
@@ -3233,8 +3234,8 @@ document.addEventListener("click",e=>{
       authErr="";if(CLOUD){if(authBusy)break;authBusy=true;render();cloudCreatePelada(peladaState(d)).then(code=>{authBusy=false;enterPelada(code);setTimeout(()=>hud("Pelada criada · código "+code),200);},()=>{authBusy=false;authErr="Sem conexão. Confira a internet e tente de novo.";render();});break;}const code=createPelada(d);enterPelada(code);setTimeout(()=>hud("Pelada criada · código "+code),200);break;}
     case "goJoin":closeSheet();curP=null;S=null;G.sess.mode="peladas";G.sess.code=null;joinFound=null;joinDraft=null;joinErr="";screen="join";save();render();window.scrollTo(0,0);break;
     case "findPelada":{const raw=($("jCode").value||"").toUpperCase().replace(/\s/g,""),dg=raw.replace(/\D/g,"");
-      if(!dg||dg.length>6){joinErr="O código tem SP e 4 números, por exemplo SP0001.";render();break;}
-      const code="SP"+dg.padStart(4,"0");if(CLOUD){openJoinCloud(code);break;}const P=pByCode(code);if(!P){joinErr=`Não achamos a pelada ${code}. Confira com o Dono de Pelada.`;render();break;}
+      if(!dg||dg.length>6){joinErr="O código tem OP e 4 números, por exemplo OP0001.";render();break;}
+      const code="OP"+dg.padStart(4,"0");if(CLOUD){openJoinCloud(code);break;}const P=pByCode(code);if(!P){joinErr=`Não achamos a pelada ${code}. Confira com o Dono de Pelada.`;render();break;}
       startJoin(P);render();window.scrollTo(0,0);break;}
     case "jPos":joinDraft.pos=v;render();break;
     case "jshow":{const u=meU();u.show=v;syncUserName(u);save();render();break;}
@@ -3306,7 +3307,7 @@ document.addEventListener("click",e=>{
     case "retroNav":retro.i=Math.max(0,Math.min(retro.slides.length-1,retro.i+ +v));retroRender();break;
     case "retroClose":retro=null;retroRender();break;
     case "retroShare":{const r=retro;(async()=>{const cv=await retroCard();retro=null;retroRender();openSheet({type:"rstory"});sheet.canvas=cv;const b=$("storyBox");if(b)b.innerHTML=`<img class="story" src="${cv.toDataURL("image/png")}" alt="Retrospectiva">`;})();break;}
-    case "pixPay":{const it=cxFind(el.dataset.k),C=cx();if(!it)break;const o=ownerU();openSheet({type:"pixqr",key:C.pix,tipo:C.pixTipo,name:C.pixNome||(o?o.name:""),city:C.pixCidade,amount:itDue(it),txid:"SP"+curP.code+it.mk.replace("-",""),label:it.label+" · "+S.pelada.name,next:{type:"pay",target:"cx",key:it.key,label:it.label,valor:itDue(it),sub:itFee(it)>0?itValTxt(it):"",via:"pix",proof:null}});break;}
+    case "pixPay":{const it=cxFind(el.dataset.k),C=cx();if(!it)break;const o=ownerU();openSheet({type:"pixqr",key:C.pix,tipo:C.pixTipo,name:C.pixNome||(o?o.name:""),city:C.pixCidade,amount:itDue(it),txid:curP.code+it.mk.replace("-",""),label:it.label+" · "+S.pelada.name,next:{type:"pay",target:"cx",key:it.key,label:it.label,valor:itDue(it),sub:itFee(it)>0?itValTxt(it):"",via:"pix",proof:null}});break;}
     case "qlPixQR":{const L=quadraLink(),mk=curMK();openSheet({type:"pixqr",key:L.q.pix,name:L.q.name,city:L.q.bairro||"",amount:num(L.f.valor),txid:"Q"+curP.code+mk.replace("-",""),label:"Mensalidade de "+mLabel(mk).toLowerCase()+" · "+L.q.name,next:{type:"pay",target:"quadra",key:L.f.id+"|"+mk,label:"Mensalidade de "+mLabel(mk).toLowerCase()+" · "+L.q.name,valor:num(L.f.valor),via:"pix",proof:null}});break;}
     case "cfPix":{const c=CP(),F=c.fin,o=G.users.find(x=>x.id===c.ownerUid);openSheet({type:"pixqr",key:F.pix,name:o?o.name:"",city:"",amount:num(F.taxa),txid:"CAMP"+c.id.slice(2,10),label:"Inscrição · "+c.name,next:{type:"pay",target:"camp",key:id,label:"Inscrição · "+c.name,valor:num(F.taxa),via:"pix",proof:null}});break;}
     case "pixCopy":copyText(pixPayload(sheet),"pixText","pixWrap");break;
@@ -3584,7 +3585,7 @@ document.addEventListener("input",e=>{
   else if(["qname","qbairro","qpix","qopen","qclose"].includes(k)){const q=myQuadra(),f={qname:"name",qbairro:"bairro",qpix:"pix",qopen:"open",qclose:"close"}[k];q[f]=k==="qname"?(val.trim()||q.name):val.trim();save();}
   else if(k==="qcampo"){const q=myQuadra(),c=q.campos.find(x=>x.id===e.target.dataset.id);if(c)c.name=val.trim()||c.name;save();}
   else if(k.startsWith("fx")){const f={fxcode:"code",fxname:"name",fxorg:"org",fxphone:"phone",fxvalor:"valor",fxtime:"time"}[k];sheet.d[f]=val;
-    if(k==="fxcode"){const P=pByCode(val.trim().toUpperCase());if(P){const st=P.state,ow=G.users.find(x=>x.id===P.ownerUid);sheet.d.code=P.code;if(!sheet.d.name)sheet.d.name=st.pelada.name;if(!sheet.d.org&&ow)sheet.d.org=ow.name;if(st.pelada.weekday!=null)sheet.d.weekday=st.pelada.weekday;if(st.pelada.time)sheet.d.time=st.pelada.time;renderSheet();const n=$("fxCode");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}}}}
+    if(k==="fxcode"){const P=pByCode(val);if(P){const st=P.state,ow=G.users.find(x=>x.id===P.ownerUid);sheet.d.code=P.code;if(!sheet.d.name)sheet.d.name=st.pelada.name;if(!sheet.d.org&&ow)sheet.d.org=ow.name;if(st.pelada.weekday!=null)sheet.d.weekday=st.pelada.weekday;if(st.pelada.time)sheet.d.time=st.pelada.time;renderSheet();const n=$("fxCode");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}}}}
   else if(k.startsWith("av")){const f={avname:"name",avphone:"phone",avdate:"date",avtime:"time",avvalor:"valor"}[k];sheet.d[f]=val;}
   else if(k==="cfgt"){const t=G.cfg.tiers[e.target.dataset.k],f=e.target.dataset.f;t[f]=["campos","fixas","acessos"].includes(f)?Math.max(1,Math.round(+val)||1):(val.trim()||t[f]);save();}
   else if(k==="cfgpix"){G.cfg.pixFee=val.trim()||"0";save();}
@@ -3633,9 +3634,9 @@ document.addEventListener("change",async e=>{
     else if(f==="art"){const p=byId(e.target.dataset.id);const d=await compress(file,720,.75,.9,"image/png");p.art=p.art||"art_"+p.id;setImg(p.art,d);
       if(sheet&&sheet.w){sheet.w.selfies=[null,null,null];}save();render();openSheet({type:"player",id:p.id});hud("Personagem salvo · fotos do rosto descartadas");}
     else if(f==="selfie"){sheet.w.selfies[+e.target.dataset.i]=await compress(file,900);renderSheet();}
-    else if(f==="uFront"||f==="uBack"){const key=f==="uFront"?"front":"back";const d=await compress(file,900);const ik=curP.code==="SP0001"?"u_"+key:"u_"+curP.code+"_"+key;S.uniform[key]=ik;setImg(ik,d);save();render();}
+    else if(f==="uFront"||f==="uBack"){const key=f==="uFront"?"front":"back";const d=await compress(file,900);const ik=["SP0001","OP0001"].includes(curP.code)?"u_"+key:"u_"+curP.code+"_"+key;S.uniform[key]=ik;setImg(ik,d);save();render();}
     else if(f==="proof"){const d=await compress(file,1100);const key="pf_"+uid();setImg(key,d);if(sheet){if(sheet.proof)setImg(sheet.proof,null);sheet.proof=key;renderSheet();}}
-    else if(f==="uModel"){const d=await compress(file,1000);S.uniform.model=curP.code==="SP0001"?"u_model":"u_"+curP.code+"_model";setImg(S.uniform.model,d);save();render();renderSheet();hud("Uniforme 3D salvo");}
+    else if(f==="uModel"){const d=await compress(file,1000);S.uniform.model=["SP0001","OP0001"].includes(curP.code)?"u_model":"u_"+curP.code+"_model";setImg(S.uniform.model,d);save();render();renderSheet();hud("Uniforme 3D salvo");}
   }catch(err){hud("Não consegui abrir essa imagem");}
   e.target.value="";
 });
@@ -3644,7 +3645,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();
   if(e.key==="Enter"){const t=e.target.id;if(["aName","aEmail","aPass"].includes(t)){e.preventDefault();document.querySelector('[data-act="authSubmit"]').click();}else if(t==="jCode"){e.preventDefault();document.querySelector('[data-act="findPelada"]').click();}}});
 setInterval(()=>{if(S&&screen==="app"&&S.session&&!sheet&&(tab==="avaliar"||Date.now()>=S.session.closesAt))render();},30000);
 setInterval(()=>{if(!S||!S.live)return;if(checkCap()){hud("Tempo esgotado!");try{navigator.vibrate&&navigator.vibrate([300,150,300]);}catch(e){}if(screen==="app"&&tab==="jogo"&&jogoSeg==="aovivo"&&!sheet)render();else fsRender();return;}const el=$("liveClock");if(el)el.textContent=mmss(liveElapsed());const e2=$("fsClock");if(e2&&!$("fs").hidden)e2.textContent=mmss(liveElapsed());},500);
-(async function boot(){const m=(location.pathname+" "+location.hash).match(/convite\/?(SP\d{4,6})/i);if(m)pendingCode=m[1].toUpperCase();try{pendingClaim=new URLSearchParams(location.search).get("eu")||"";}catch(e){}applyTheme();
+(async function boot(){const m=(location.pathname+" "+location.hash).match(/convite\/?((?:SP|OP)\d{4,6})/i);if(m)pendingCode=normCode(m[1]);try{pendingClaim=new URLSearchParams(location.search).get("eu")||"";}catch(e){}applyTheme();
   if(CLOUD){try{await cloudStart();}catch(e){return;}if(screen==="offline"||screen==="newpass")return;}
   const u=meU();
   if(u&&pendingCode){goHome("peladas");return;}

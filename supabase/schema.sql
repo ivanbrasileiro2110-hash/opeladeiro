@@ -9,13 +9,19 @@ language sql stable as $$
   select coalesce(lower(auth.jwt()->>'email'),'') = 'ivanbrasileiro2110@gmail.com'
 $$;
 
+-- código da pelada: aceita OP0001, SP0001 (antigo), "1" ou "0001"
+create or replace function public.op_code(t text) returns text language sql immutable as $$
+  select case when regexp_replace(coalesce(t,''), '\D', '', 'g') = '' then upper(trim(coalesce(t,'')))
+              else 'OP' || lpad(regexp_replace(t, '\D', '', 'g'), 4, '0') end
+$$;
+
 create or replace function public.try_uuid(t text) returns uuid
 language plpgsql immutable as $$
 begin return t::uuid; exception when others then return null; end $$;
 
 -- controle de versão: cada gravação manda version = anterior + 1.
 -- Se outra pessoa gravou antes, dá conflito e o app mescla as mudanças.
-create or replace function public.sp_version() returns trigger
+create or replace function public.op_version() returns trigger
 language plpgsql as $$
 begin
   if tg_op = 'UPDATE' and new.version is distinct from old.version + 1 then
@@ -122,7 +128,7 @@ $$;
 
 -- ---------- gatilhos ----------
 -- novo usuário → cria o perfil
-create or replace function public.sp_new_user() returns trigger
+create or replace function public.op_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare pro text[];
 begin
@@ -140,10 +146,10 @@ begin
 end $$;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users
-  for each row execute function public.sp_new_user();
+  for each row execute function public.op_new_user();
 
 -- perfil: e-mail e plano não são editáveis pelo próprio usuário
-create or replace function public.sp_profiles_before() returns trigger
+create or replace function public.op_profiles_before() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   if tg_op = 'UPDATE' then
@@ -155,7 +161,7 @@ begin
 end $$;
 
 -- plano mudou → atualiza o plano das peladas dele
-create or replace function public.sp_profiles_after() returns trigger
+create or replace function public.op_profiles_after() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   if new.plan is distinct from old.plan then
@@ -165,14 +171,14 @@ begin
 end $$;
 
 -- pelada: dono, código e plano são definidos pelo servidor
-create or replace function public.sp_peladas_before() returns trigger
+create or replace function public.op_peladas_before() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare p text; nowner uuid;
 begin
   if tg_op = 'INSERT' then
     new.owner := coalesce(auth.uid(), new.owner);
     if new.code is null or new.code = '' then
-      new.code := 'SP' || lpad(nextval('pelada_code_seq')::text, 4, '0');
+      new.code := 'OP' || lpad(nextval('pelada_code_seq')::text, 4, '0');
     end if;
   else
     new.code := old.code;
@@ -194,7 +200,7 @@ begin
 end $$;
 
 -- pelada: lista de membros = dono + peladeiros com conta
-create or replace function public.sp_peladas_members() returns trigger
+create or replace function public.op_peladas_members() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   delete from pelada_members m
@@ -212,7 +218,7 @@ begin
 end $$;
 
 -- campeonato: dono fixo, pelada e participantes extraídos do documento
-create or replace function public.sp_camps_before() returns trigger
+create or replace function public.op_camps_before() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   if tg_op = 'INSERT' then new.owner := coalesce(auth.uid(), new.owner); else new.owner := old.owner; end if;
@@ -224,7 +230,7 @@ begin
 end $$;
 
 -- quadra: dono fixo
-create or replace function public.sp_quadras_before() returns trigger
+create or replace function public.op_quadras_before() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   if tg_op = 'INSERT' then new.owner := coalesce(auth.uid(), new.owner); else new.owner := old.owner; end if;
@@ -233,7 +239,7 @@ begin
 end $$;
 
 -- configuração: e-mails Pro novos viram Pro na hora
-create or replace function public.sp_config_after() returns trigger
+create or replace function public.op_config_after() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   update profiles set plan = 'pro', version = version + 1
@@ -241,7 +247,7 @@ begin
   return null;
 end $$;
 
-create or replace function public.sp_images_before() returns trigger
+create or replace function public.op_images_before() returns trigger
 language plpgsql as $$
 begin new.updated_at := now(); if tg_op = 'UPDATE' then new.owner := old.owner; end if; return new; end $$;
 
@@ -249,27 +255,27 @@ do $$
 declare t text;
 begin
   foreach t in array array['app_config','profiles','peladas','camps','quadras'] loop
-    execute format('drop trigger if exists sp_00_version on public.%I', t);
-    execute format('create trigger sp_00_version before update on public.%I for each row execute function public.sp_version()', t);
+    execute format('drop trigger if exists op_00_version on public.%I', t);
+    execute format('create trigger op_00_version before update on public.%I for each row execute function public.op_version()', t);
   end loop;
 end $$;
 
-drop trigger if exists sp_10_profiles on public.profiles;
-create trigger sp_10_profiles before insert or update on public.profiles for each row execute function public.sp_profiles_before();
-drop trigger if exists sp_20_profiles_after on public.profiles;
-create trigger sp_20_profiles_after after update on public.profiles for each row execute function public.sp_profiles_after();
-drop trigger if exists sp_10_peladas on public.peladas;
-create trigger sp_10_peladas before insert or update on public.peladas for each row execute function public.sp_peladas_before();
-drop trigger if exists sp_20_peladas_members on public.peladas;
-create trigger sp_20_peladas_members after insert or update on public.peladas for each row execute function public.sp_peladas_members();
-drop trigger if exists sp_10_camps on public.camps;
-create trigger sp_10_camps before insert or update on public.camps for each row execute function public.sp_camps_before();
-drop trigger if exists sp_10_quadras on public.quadras;
-create trigger sp_10_quadras before insert or update on public.quadras for each row execute function public.sp_quadras_before();
-drop trigger if exists sp_20_config_after on public.app_config;
-create trigger sp_20_config_after after update on public.app_config for each row execute function public.sp_config_after();
-drop trigger if exists sp_10_images on public.images;
-create trigger sp_10_images before insert or update on public.images for each row execute function public.sp_images_before();
+drop trigger if exists op_10_profiles on public.profiles;
+create trigger op_10_profiles before insert or update on public.profiles for each row execute function public.op_profiles_before();
+drop trigger if exists op_20_profiles_after on public.profiles;
+create trigger op_20_profiles_after after update on public.profiles for each row execute function public.op_profiles_after();
+drop trigger if exists op_10_peladas on public.peladas;
+create trigger op_10_peladas before insert or update on public.peladas for each row execute function public.op_peladas_before();
+drop trigger if exists op_20_peladas_members on public.peladas;
+create trigger op_20_peladas_members after insert or update on public.peladas for each row execute function public.op_peladas_members();
+drop trigger if exists op_10_camps on public.camps;
+create trigger op_10_camps before insert or update on public.camps for each row execute function public.op_camps_before();
+drop trigger if exists op_10_quadras on public.quadras;
+create trigger op_10_quadras before insert or update on public.quadras for each row execute function public.op_quadras_before();
+drop trigger if exists op_20_config_after on public.app_config;
+create trigger op_20_config_after after update on public.app_config for each row execute function public.op_config_after();
+drop trigger if exists op_10_images on public.images;
+create trigger op_10_images before insert or update on public.images for each row execute function public.op_images_before();
 
 -- ---------- funções chamadas pelo app ----------
 -- prévia do convite (sem precisar ser membro)
@@ -286,7 +292,7 @@ language sql stable security definer set search_path = public as $$
       'players', (select coalesce(jsonb_agg(jsonb_build_object('uid', x->'uid')), '[]'::jsonb)
                     from jsonb_array_elements(coalesce(p.doc->'state'->'players', '[]')) x)))
   from peladas p left join profiles pr on pr.id = p.owner
-  where p.code = upper(trim(p_code)) and auth.uid() is not null
+  where p.code = op_code(p_code) and auth.uid() is not null
 $$;
 
 -- entrar na pelada pelo código
@@ -295,7 +301,7 @@ language plpgsql security definer set search_path = public as $$
 declare r peladas; lim int;
 begin
   if auth.uid() is null then raise exception 'auth_required'; end if;
-  select * into r from peladas where code = upper(trim(p_code)) for update;
+  select * into r from peladas where code = op_code(p_code) for update;
   if not found then return null; end if;
   if not exists (select 1 from jsonb_array_elements(coalesce(r.doc->'state'->'players', '[]')) x
                   where x->>'uid' = auth.uid()::text) then
@@ -411,7 +417,7 @@ end $$;
 alter table public.profiles add column if not exists courtesy boolean not null default false;
 drop function if exists public.admin_delete_user(uuid);
 
-create or replace function public.sp_new_user() returns trigger
+create or replace function public.op_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare pro text[]; vip boolean;
 begin
@@ -428,7 +434,7 @@ begin
   return new;
 end $$;
 
-create or replace function public.sp_profiles_before() returns trigger
+create or replace function public.op_profiles_before() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   if tg_op = 'UPDATE' then
@@ -442,7 +448,7 @@ begin
   return new;
 end $$;
 
-create or replace function public.sp_profiles_after() returns trigger
+create or replace function public.op_profiles_after() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   if new.plan is distinct from old.plan or new.courtesy is distinct from old.courtesy then
@@ -451,14 +457,14 @@ begin
   return null;
 end $$;
 
-create or replace function public.sp_peladas_before() returns trigger
+create or replace function public.op_peladas_before() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare p text; c boolean; nowner uuid;
 begin
   if tg_op = 'INSERT' then
     new.owner := coalesce(auth.uid(), new.owner);
     if new.code is null or new.code = '' then
-      new.code := 'SP' || lpad(nextval('pelada_code_seq')::text, 4, '0');
+      new.code := 'OP' || lpad(nextval('pelada_code_seq')::text, 4, '0');
     end if;
   else
     new.code := old.code;
@@ -481,7 +487,7 @@ begin
 end $$;
 
 -- e-mails da lista ganham Acesso Total quando a lista muda
-create or replace function public.sp_config_after() returns trigger
+create or replace function public.op_config_after() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   update profiles set plan = 'pro', courtesy = true, version = version + 1
@@ -490,7 +496,7 @@ begin
 end $$;
 
 -- ---------- "Sou eu": jogador assume um card que o Dono de Pelada já cadastrou ----------
-create or replace function public.sp_new_user() returns trigger
+create or replace function public.op_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare pro text[]; vip boolean; nick text; em text := lower(new.email);
 begin
@@ -530,7 +536,7 @@ language sql stable security definer set search_path = public as $$
       'players', (select coalesce(jsonb_agg(jsonb_build_object('id', x->'id', 'name', x->'name', 'pos', x->'pos', 'uid', x->'uid')), '[]'::jsonb)
                     from jsonb_array_elements(coalesce(p.doc->'state'->'players', '[]')) x)))
   from peladas p left join profiles pr on pr.id = p.owner
-  where p.code = upper(trim(p_code)) and auth.uid() is not null
+  where p.code = op_code(p_code) and auth.uid() is not null
 $$;
 
 create or replace function public.claim_card(p_code text, p_card text) returns jsonb
@@ -538,7 +544,7 @@ language plpgsql security definer set search_path = public as $$
 declare r peladas; c jsonb;
 begin
   if auth.uid() is null then raise exception 'auth_required'; end if;
-  select * into r from peladas where code = upper(trim(p_code)) for update;
+  select * into r from peladas where code = op_code(p_code) for update;
   if not found then return null; end if;
   if not exists (select 1 from jsonb_array_elements(coalesce(r.doc->'state'->'players','[]')) x where x->>'uid' = auth.uid()::text) then
     select x into c from jsonb_array_elements(coalesce(r.doc->'state'->'players','[]')) x where x->>'id' = p_card;
