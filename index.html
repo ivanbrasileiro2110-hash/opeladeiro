@@ -928,6 +928,12 @@ async function cloudStart(){Cloud.started=true;
 async function cloudLogout(){try{await sb.auth.signOut();}catch(e){}cloudReset();}
 async function cloudDeleteAccount(){const {error}=await sb.rpc("delete_my_account");if(error)throw error;await cloudLogout();}
 
+/* Registro de erros: manda para o banco (log_error), no máximo 5 por abertura do app e sem repetir a mesma mensagem */
+(function(){let n=0;const seen=new Set();
+function rep(msg,stack,ctx){try{if(!sb||n>=5)return;msg=String(msg||"").slice(0,300);if(!msg||seen.has(msg))return;seen.add(msg);n++;
+sb.rpc("log_error",{p_msg:msg,p_stack:String(stack||"").slice(0,3000),p_ctx:Object.assign({url:location.pathname,ua:navigator.userAgent.slice(0,160),v:"v25"},ctx||{})}).then(()=>{},()=>{});}catch(e){}}
+window.addEventListener("error",e=>rep(e.message,e.error&&e.error.stack,{src:(e.filename||"").split("/").pop()+":"+e.lineno}));
+window.addEventListener("unhandledrejection",e=>{const r=e.reason;rep(r&&r.message||r,r&&r.stack,{kind:"promise"});});})();
 const LSG="opeladeiro-v3",CREATOR="ivanbrasileiro2110@gmail.com";
 function emptyG(){return {v:4,seq:0,users:[],peladas:[],camps:[],quadras:[],sess:null,cfg:{price:"19,90",freePlayers:20,freePeladas:1,proEmails:[],vipSeeded:{}},ui:{theme:"auto"}};}
 function cfgDefaults(){if(!G.cfg)G.cfg={};if(!G.cfg.proEmails)G.cfg.proEmails=[];if(!G.cfg.vipSeeded)G.cfg.vipSeeded={};if(G.cfg.price==null)G.cfg.price="19,90";if(G.cfg.freePlayers==null)G.cfg.freePlayers=20;if(G.cfg.freePeladas==null)G.cfg.freePeladas=1;
