@@ -1,0 +1,12 @@
+{
+  "appId": "app.opeladeiro",
+  "appName": "Opeladeiro",
+  "webDir": "www",
+  "backgroundColor": "#060B09",
+  "server": { "androidScheme": "https" },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 800, "backgroundColor": "#060B09", "showSpinner": false },
+    "StatusBar": { "style": "DARK", "backgroundColor": "#060B09" },
+    "PushNotifications": { "presentationOptions": ["badge", "sound", "alert"] }
+  }
+}

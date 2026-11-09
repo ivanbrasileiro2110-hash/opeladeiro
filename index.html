@@ -1985,6 +1985,7 @@ function viewHome(){const u=meU(),all=myPeladas(u),q=myQuadra();
     <button class="optcard" data-act="newPelada"><span class="ic">📋</span><span><b>Vou organizar</b><span class="t">Crie sua pelada, chame a galera e sorteie times equilibrados. É grátis.</span></span></button></div>`}
   ${campListHTML(camps().filter(c=>campVisible(c,u)).sort((a,b)=>b.createdAt-a.createdAt),"Times fixos, tabela, artilharia e taça no final. Monte o seu.","")}
   ${q?`<div class="section"><div class="group"><button class="cell action" data-act="goMode" data-v="quadras"><span class="grow">Abrir Opeladeiro Quadras · ${esc(q.name)}</span>${CHEV}</button></div></div>`:""}
+  <div class="section"><div class="sh"><span>NOTIFICAÇÕES</span></div><div class="group"><button class="cell action" data-act="pushToggle"><span class="grow">Avisos da pelada<br><span class="status">${Push.ok?"Times sorteados e lembretes no celular.":"Neste aparelho, instale o app na tela inicial para receber avisos."}</span></span><span class="pill ${Push.on?"gold":""}">${Push.on?"Ativado":"Ativar"}</span></button></div></div>
   <div class="section"><div class="sh"><span>APARÊNCIA</span></div>${themeSeg()}</div>
   <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button>${isCreator()?"":`<button class="cell danger" data-act="delAccount" style="font-weight:500;font-size:15px">Excluir minha conta</button>`}</div></div><p class="sf" style="text-align:center;margin-top:10px"><a href="/termos/" target="_blank" rel="noopener" style="color:inherit">Termos de uso</a> · <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit">Política de privacidade</a></p>`;
 }
@@ -2204,6 +2205,7 @@ function qConfig(q){const t=G.cfg.tiers[q.tier],maxC=q.tier==="complexo"?99:+t.c
     ${1+q.staff.length<maxA?`<div class="cell"><input class="field" id="qStaff" type="email" placeholder="E-mail de quem trabalha na quadra" style="font-size:15px"><button class="mini" data-act="qAddStaff">Adicionar</button></div>`:lockRow(q.tier==="quadra"?"arena":"complexo","Mais acessos para a equipe")}</div></div>
   <div class="section"><div class="sh"><span>DO NÍVEL COMPLEXO</span></div><div class="group">${["Várias unidades, com comparativo","Permissões por acesso","Destaque na busca de quadras","Logo da arena nos cards dos atletas","Torneios internos","Suporte prioritário"].map(x=>`<div class="cell"><span class="grow">${x}</span>${hasT(q,"complexo")?'<span class="pill">Incluído</span>':`<span class="lock">🔒 Complexo</span>`}</div>`).join("")}</div></div>
   ${modesOf().length>1?`<div class="section"><div class="sh"><span>TROCAR MODO</span></div>${modeSeg("quadras")}</div>`:""}
+  <div class="section"><div class="sh"><span>NOTIFICAÇÕES</span></div><div class="group"><button class="cell action" data-act="pushToggle"><span class="grow">Avisos da pelada<br><span class="status">${Push.ok?"Times sorteados e lembretes no celular.":"Neste aparelho, instale o app na tela inicial para receber avisos."}</span></span><span class="pill ${Push.on?"gold":""}">${Push.on?"Ativado":"Ativar"}</span></button></div></div>
   <div class="section"><div class="sh"><span>APARÊNCIA</span></div>${themeSeg()}</div>
   <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button></div></div>`;
 }
@@ -2262,6 +2264,7 @@ function viewPerfil(){const u=meU(),mp=byId(S.me),ph=img(u.photo),own=ownedBy(u)
   ${isCreator()?`<div class="section"><div class="sh"><span>TESTE · SÓ VOCÊ VÊ</span></div>
     <div class="group"><div class="cell"><span class="grow">Testar como</span><select class="sel" data-input="me" aria-label="Ver o app como outro peladeiro">${S.players.map(p=>`<option value="${p.id}" ${p.id===S.me?"selected":""}>${esc(p.name)}${p.id===S.ownerId?" (dono)":p.id===S.tempAdminId?" (admin da vez)":""}</option>`).join("")}</select></div></div>
     <p class="sf">Mostra o app como esse peladeiro vê, para testar permissões e votação.</p></div>`:""}
+  <div class="section"><div class="sh"><span>NOTIFICAÇÕES</span></div><div class="group"><button class="cell action" data-act="pushToggle"><span class="grow">Avisos da pelada<br><span class="status">${Push.ok?"Times sorteados e lembretes no celular.":"Neste aparelho, instale o app na tela inicial para receber avisos."}</span></span><span class="pill ${Push.on?"gold":""}">${Push.on?"Ativado":"Ativar"}</span></button></div></div>
   <div class="section"><div class="sh"><span>APARÊNCIA</span></div>${themeSeg()}</div>
   <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button>${isCreator()?"":`<button class="cell danger" data-act="delAccount" style="font-weight:500;font-size:15px">Excluir minha conta</button>`}</div></div>`;
 }
@@ -3287,7 +3290,8 @@ document.addEventListener("click",e=>{
     case "base":if(!isAdmin())break;S.pelada.base=Math.max(2,Math.min(11,S.pelada.base+ +v));changedRoster();break;
     case "toggle":{if(!isAdmin()||lActive()&&!S.lst.edit)break;const p=byId(id);p.on=!p.on;changedRoster();break;}
     case "all":if(!isAdmin()||lActive()&&!S.lst.edit)break;S.players.forEach(p=>p.on=v==="1");changedRoster();break;
-    case "draw":if(!isAdmin())break;if(S.live&&(S.live.games.length||S.live.cur.events.length)){if(!redrawArm){redrawArm=true;hud("Toque de novo: o jogo ao vivo será zerado");setTimeout(()=>{redrawArm=false;},3500);break;}}redrawArm=false;S.live=null;draw();break;
+    case "pushToggle":{if(!Push.ok){hud("Instale o app para receber avisos");break;}(Push.on?Push.disable():Push.enable()).then(()=>render());break;}
+    case "draw":if(!isAdmin())break;if(S.live&&(S.live.games.length||S.live.cur.events.length)){if(!redrawArm){redrawArm=true;hud("Toque de novo: o jogo ao vivo será zerado");setTimeout(()=>{redrawArm=false;},3500);break;}}redrawArm=false;S.live=null;draw();Push.notify("Times sorteados","Os times da "+S.pelada.name+" saíram. Confira no app.");break;
     case "redraw":{if(!isAdmin())break;if(S.live&&(S.live.games.length||S.live.cur.events.length)&&!redrawArm){redrawArm=true;render();setTimeout(()=>{redrawArm=false;if(tab==="jogo")render();},3500);break;}
       redrawArm=false;S.live=null;if(stale||!result){draw();break;}
       if(result.options.length>1){optIdx=(optIdx+1)%result.options.length;saveDraw();render();window.scrollTo(0,0);hud("Times sorteados de novo");}else{draw();hud("Times sorteados de novo");}break;}
@@ -3650,6 +3654,35 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();
   if(e.key==="Enter"){const t=e.target.id;if(["aName","aEmail","aPass"].includes(t)){e.preventDefault();document.querySelector('[data-act="authSubmit"]').click();}else if(t==="jCode"){e.preventDefault();document.querySelector('[data-act="findPelada"]').click();}}});
 setInterval(()=>{if(S&&screen==="app"&&S.session&&!sheet&&(tab==="avaliar"||Date.now()>=S.session.closesAt))render();},30000);
 setInterval(()=>{if(!S||!S.live)return;if(checkCap()){hud("Tempo esgotado!");try{navigator.vibrate&&navigator.vibrate([300,150,300]);}catch(e){}if(screen==="app"&&tab==="jogo"&&jogoSeg==="aovivo"&&!sheet)render();else fsRender();return;}const el=$("liveClock");if(el)el.textContent=mmss(liveElapsed());const e2=$("fsClock");if(e2&&!$("fs").hidden)e2.textContent=mmss(liveElapsed());},500);
+/* ===== Notificações push (web push) ===== */
+const Push=(function(){
+  const PUB="BKQlIsvlNM_wrJauHrF5M4BsMTB-JdYva50F9gkOtzQJBG0d4J9pVzVwQGQBcvwexvCLKwa4PuJ-VFQYG1ojO70";
+  const ok=!!(CLOUD&&"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window);
+  const o={ok:ok,on:false,busy:false};
+  const b64=function(v){const p="=".repeat((4-v.length%4)%4),r=atob((v+p).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from(r,function(c){return c.charCodeAt(0)});};
+  o.refresh=async function(){if(!ok)return;try{const r=await navigator.serviceWorker.ready;const s=await r.pushManager.getSubscription();o.on=!!s&&Notification.permission==="granted";}catch(e){}};
+  o.enable=async function(){
+    if(!ok||o.busy)return false;o.busy=true;
+    try{
+      const perm=await Notification.requestPermission();if(perm!=="granted"){hud("Notificações bloqueadas no navegador");return false;}
+      const r=await navigator.serviceWorker.ready;let s=await r.pushManager.getSubscription();
+      if(!s)s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(PUB)});
+      const j=s.toJSON(),uid=Cloud.uid;if(!uid)return false;
+      const {error}=await sb.from("push_subscriptions").upsert({endpoint:j.endpoint,user_id:uid,p256dh:j.keys.p256dh,auth:j.keys.auth},{onConflict:"endpoint"});
+      if(error)throw error;o.on=true;hud("Notificações ativadas");return true;
+    }catch(e){hud("Não deu para ativar as notificações");return false;}finally{o.busy=false;}
+  };
+  o.disable=async function(){
+    try{const r=await navigator.serviceWorker.ready;const s=await r.pushManager.getSubscription();if(s){await sb.from("push_subscriptions").delete().eq("endpoint",s.endpoint);await s.unsubscribe();}}catch(e){}
+    o.on=false;hud("Notificações desativadas");
+  };
+  o.notify=function(title,body){
+    try{const P=curP;if(!ok||!CLOUD||!P||!P.code)return;
+      sb.functions.invoke("send-push",{body:{code:P.code,title:title,body:body}}).catch(function(){});}catch(e){}
+  };
+  return o;
+})();
+Push.refresh();
 (async function boot(){const m=(location.pathname+" "+location.hash).match(/convite\/?((?:SP|OP)\d{4,6})/i);if(m)pendingCode=normCode(m[1]);try{pendingClaim=new URLSearchParams(location.search).get("eu")||"";}catch(e){}applyTheme();
   if(CLOUD){try{await cloudStart();}catch(e){return;}if(screen==="offline"||screen==="newpass")return;}
   const u=meU();
