@@ -1933,7 +1933,7 @@ function viewWelcome(){
   <div class="feats"><span>⚖️ Sorteio equilibrado</span><span>⏱️ Jogo ao vivo</span><span>⭐ Resenha e craque</span></div>
   ${pendingCode?`<div class="banner info"><span class="grow">Você recebeu um convite para a pelada <b>${esc(pendingCode)}</b>.</span></div>`:""}
   <div style="display:flex;flex-direction:column;gap:10px;margin-top:22px"><button class="btn" data-act="goAuth" data-v="signup">Criar conta</button><button class="btn ghost" data-act="goAuth" data-v="login">Entrar</button></div>
-  <p class="sf" style="text-align:center">Do sorteio à resenha. A pelada inteira num app só.</p></div>`;
+  <p class="sf" style="text-align:center">Do sorteio à resenha. A pelada inteira num app só.</p><p class="sf" style="text-align:center;margin-top:6px"><a href="/termos/" target="_blank" rel="noopener" style="color:inherit">Termos de uso</a> · <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit">Política de privacidade</a></p></div>`;
 }
 function viewAuth(){
   const su=authMode==="signup",P=pendingCode&&pByCode(pendingCode);
@@ -1947,7 +1947,7 @@ function viewAuth(){
   </div><div class="err" role="alert">${esc(authErr)}</div>${authInfo?`<div class="banner info" style="margin-top:10px"><span class="grow">${esc(authInfo)}</span></div>`:""}</div>
   ${su?"":`<p class="linkline" style="text-align:right;margin:-6px 0 6px"><button data-act="forgot">Esqueci minha senha</button></p>`}
   <button class="btn" data-act="authSubmit" ${authBusy?"disabled":""}>${authBusy?"Aguarde…":su?"Criar conta":"Entrar"}</button>
-  ${su?`<p class="sf" style="text-align:center">Ao criar a conta você aceita os <u>Termos de uso</u> e a <u>Política de privacidade</u>.</p>`:""}
+  ${su?`<p class="sf" style="text-align:center">Ao criar a conta você aceita os <a href="/termos/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Termos de uso</a> e a <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Política de privacidade</a>.</p>`:""}
   <button class="btn ghost" data-act="google" style="margin-top:10px">Continuar com Google</button>
   <p class="linkline" style="margin-top:8px">${su?"Já tem conta?":"Ainda não tem conta?"} <button data-act="goAuth" data-v="${su?"login":"signup"}">${su?"Entrar":"Criar conta"}</button></p>
   ${CLOUD?"":`<div class="section"><div class="box testbox"><div class="note"><b>Protótipo.</b> As contas ficam só neste aparelho. A conta ${esc(CREATOR)} já existe com a Fut dos Cria: no primeiro acesso, a senha que você digitar vira a senha dela.</div></div></div>`}`;
@@ -1986,7 +1986,7 @@ function viewHome(){const u=meU(),all=myPeladas(u),q=myQuadra();
   ${campListHTML(camps().filter(c=>campVisible(c,u)).sort((a,b)=>b.createdAt-a.createdAt),"Times fixos, tabela, artilharia e taça no final. Monte o seu.","")}
   ${q?`<div class="section"><div class="group"><button class="cell action" data-act="goMode" data-v="quadras"><span class="grow">Abrir Opeladeiro Quadras · ${esc(q.name)}</span>${CHEV}</button></div></div>`:""}
   <div class="section"><div class="sh"><span>APARÊNCIA</span></div>${themeSeg()}</div>
-  <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button>${isCreator()?"":`<button class="cell danger" data-act="delAccount" style="font-weight:500;font-size:15px">Excluir minha conta</button>`}</div></div>`;
+  <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button>${isCreator()?"":`<button class="cell danger" data-act="delAccount" style="font-weight:500;font-size:15px">Excluir minha conta</button>`}</div></div><p class="sf" style="text-align:center;margin-top:10px"><a href="/termos/" target="_blank" rel="noopener" style="color:inherit">Termos de uso</a> · <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit">Política de privacidade</a></p>`;
 }
 function viewCreate(){const d=createDraft||{name:"",weekday:null,time:"",base:5};
   return `<button class="back" data-act="goMode" data-v="peladas">‹ Minhas peladas</button>
