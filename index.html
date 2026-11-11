@@ -1087,7 +1087,7 @@ function roleIn(P,u){const st=P.state,mp=st.players.find(p=>p.uid===u.id);if(P.o
 function enterPelada(code){const P=pByCode(code);const u=meU();if(!P||!u||P.preview)return;closeSheet();curP=P;S=P.state;
   const mp=S.players.find(p=>p.uid===u.id);S.me=mp?mp.id:S.ownerId;
   result=null;stale=false;optIdx=0;restoreResult();tab="jogo";jogoSeg=S.live&&!dayClosed()?"aovivo":lActive()&&!isAdmin()?"lista":"presenca";screen="app";
-  G.sess.mode="peladas";G.sess.code=code;P.lastSeenAt=Date.now();save();render();window.scrollTo(0,0);
+  G.sess.mode="peladas";G.sess.code=code;if(!P.lastSeenAt||Date.now()-P.lastSeenAt>6*36e5)P.lastSeenAt=Date.now();save();render();window.scrollTo(0,0);
   if(notifOn("vespera")&&nextTxt(S).startsWith("Amanhã")&&!enterPelada.shown){enterPelada.shown=1;setTimeout(()=>pushNotif("Amanhã tem "+S.pelada.name,nextTxt(S)+". Confirma com o Dono de Pelada se vai."),700);enterPelada.late=1;}
   const rm=isOwner()?ownerReminder():notifOn("caixinha")?myReminder():null;enterPelada.rk=enterPelada.rk||{};
   if(rm&&!enterPelada.rk[code+S.me]){enterPelada.rk[code+S.me]=1;setTimeout(()=>pushNotif(rm[0],rm[1]),enterPelada.late?5200:900);}enterPelada.late=0;}
