@@ -863,7 +863,10 @@ function renderSoon(){if(!CLOUD)return;const a=document.activeElement;
   Cloud.pendingRender=false;try{if(screen==="app"&&!S)goHome("peladas");else render();}catch(e){console.warn(e);}}
 if(CLOUD){document.addEventListener("focusout",()=>setTimeout(()=>{if(Cloud.pendingRender&&!sheet)renderSoon();},60));
   addEventListener("online",()=>{if(Cloud.uid){pull().then(renderSoon,()=>{});schedule(100);}});
-  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&Cloud.uid){pull().then(renderSoon,()=>{});schedule(100);}});}
+  /* economiza o banco: com o app em segundo plano há mais de 1 min, fecha o tempo real; ao voltar, reabre e atualiza tudo */
+  document.addEventListener("visibilitychange",()=>{clearTimeout(Cloud.idleT);
+    if(document.visibilityState==="hidden"){Cloud.idleT=setTimeout(()=>{if(Cloud.ch){try{sb.removeChannel(Cloud.ch);}catch(e){}Cloud.ch=null;}},60000);return;}
+    if(Cloud.uid){if(!Cloud.ch)subscribe();pull().then(renderSoon,()=>{});schedule(100);}});}
 
 /* cache local (abre rápido e funciona sem internet) */
 function lsCache(){if(!CLOUD)return;G.cloud={uid:Cloud.uid,base:Cloud.base};if(!lsSet(LSG,JSON.stringify(G))){/* cache cheio: guarda sem a base */G.cloud={uid:Cloud.uid,base:{}};lsSet(LSG,JSON.stringify(G));}}
