@@ -37,4 +37,4 @@ Esportes (Play e App Store). Classificação indicativa: Livre.
 ## Links
 - Política de privacidade: https://opeladeiro.vercel.app/privacidade/ (trocar para opeladeiro.com.br quando existir)
 - Site de suporte/marketing: https://opeladeiro.vercel.app/sobre/
-- E-mail de suporte: contato@opeladeiro.com.br
+- E-mail de suporte: contato@obrasileiro.work (criar no Cloudflare Email Routing)
