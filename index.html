@@ -846,9 +846,14 @@ async function pull(){if(Cloud.pulling)return Cloud.pulling;Cloud.pulling=(async
   G.peladas.forEach(setMe);lsCache();return true;}finally{Cloud.pulling=null;}})();return Cloud.pulling;}
 
 /* tempo real */
-function subscribe(){if(Cloud.ch)sb.removeChannel(Cloud.ch);let down=false;
+/* cada pessoa escuta só as próprias peladas e os perfis que enxerga (as outras tabelas mudam pouco) */
+function subFilters(){const ids=t=>Object.keys(Cloud.base).filter(k=>k.startsWith(t+":")).map(k=>k.slice(t.length+1));
+  const pel=ids("peladas"),pro=[...new Set([Cloud.uid,...G.users.map(u=>u.id)].filter(Boolean))];
+  const f=a=>a.length&&a.length<=100&&a.every(x=>/^[\w-]+$/.test(x))?"id=in.("+a.sort().join(",")+")":null;
+  return {peladas:f(pel),profiles:f(pro)};}
+function subscribe(){if(Cloud.ch)sb.removeChannel(Cloud.ch);let down=false;const F=subFilters();Cloud.subKey=JSON.stringify(F);
   Cloud.ch=sb.channel("sp-"+Cloud.uid);
-  ["peladas","camps","quadras","profiles"].forEach(t=>Cloud.ch.on("postgres_changes",{event:"*",schema:"public",table:t},e=>onRemote(t,e)));
+  ["peladas","camps","quadras","profiles"].forEach(t=>{const o={event:"*",schema:"public",table:t};if(F[t])o.filter=F[t];Cloud.ch.on("postgres_changes",o,e=>onRemote(t,e));});
   Cloud.ch.on("postgres_changes",{event:"*",schema:"public",table:"app_config"},()=>{pull().then(renderSoon,()=>{});});
   Cloud.ch.subscribe(st=>{if(st==="SUBSCRIBED"){if(down){down=false;pull().then(renderSoon,()=>{});}}else if(st==="CHANNEL_ERROR"||st==="TIMED_OUT"||st==="CLOSED")down=true;});}
 async function onRemote(col,e){try{const id=(e.new&&e.new.id)||(e.old&&e.old.id);if(!id)return;
@@ -857,6 +862,7 @@ async function onRemote(col,e){try{const id=(e.new&&e.new.id)||(e.old&&e.old.id)
   const r=await fetchRow(col,id);if(!r){if(b){cloudDrop(col,id);renderSoon();}return;}
   if(cloudIngest(col,r)){lsCache();renderSoon();}}catch(err){console.warn(err);}}
 
+if(CLOUD)setInterval(()=>{if(Cloud.uid&&Cloud.ch&&document.visibilityState==="visible"&&JSON.stringify(subFilters())!==Cloud.subKey)subscribe();},20000);
 /* redesenha sem atrapalhar quem está digitando ou com uma janela aberta */
 function renderSoon(){if(!CLOUD)return;const a=document.activeElement;
   if(sheet||(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))){Cloud.pendingRender=true;return;}
