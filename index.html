@@ -1180,7 +1180,8 @@ function cxMonthsUpTo(){const C=cx(),c=curMK(),ms=new Set();(S.days||[]).forEach
   let m=cxStartMK(),g=0;while(m<=c&&g++<36){ms.add(m);m=mShift(m,1);}return [...ms].filter(x=>x<=c).sort();}
 function cxAll(){return cxMonthsUpTo().flatMap(cxItemsMonth);}
 function cxFind(key){return cxAll().concat(cxItemsMonth(cxMk||curMK())).find(x=>x.key===key)||null;}
-function itRefDate(it){const C=cx(),pd=C.pays[it.key],inf=C.informed[it.key];if(pd&&pd.at)return isoD(new Date(pd.at));if(inf)return isoD(new Date(inf.at));return today();}
+let refOv=null;const withRef=(iso,fn)=>{refOv=iso;try{return fn();}finally{refOv=null;}};
+function itRefDate(it){if(refOv)return refOv;const C=cx(),pd=C.pays[it.key],inf=C.informed[it.key];if(pd&&pd.at)return isoD(new Date(pd.at));if(inf)return isoD(new Date(inf.at));return today();}
 function itLate(it){return Math.max(0,dayDiff(it.venc,itRefDate(it)));}
 function itFee(it){const C=cx(),pd=C.pays[it.key];if(pd&&pd.fee!=null)return pd.fee;if(it.legacy)return 0;if(it.kind!=="mensal"&&it.kind!=="diaria")return 0;const M=C.multa;if(!M.on||!isPro())return 0;const d=itLate(it);if(d<=0)return 0;
   const f=M.modo==="dia"?num(M.dia)*d:M.modo==="unica"?num(M.unica):it.base*(0.02+0.00033*d);return Math.round(Math.min(f,feeCap(it.kind))*100)/100;}
@@ -2694,9 +2695,13 @@ function sheetPay(){const s=sheet,ph=s.proof?img(s.proof):null;
   <div class="section"><div class="sh"><span>COMPROVANTE · OPCIONAL</span></div><div class="tiles" style="grid-template-columns:minmax(0,180px)"><label class="tile">${ph?`<img src="${ph}" alt="Comprovante">`:CAM+"Anexar print ou foto"}${ph?'<span class="cap">Trocar</span>':""}<input class="hidden-file" type="file" accept="image/*" data-file="proof"></label></div>
     <p class="sf">Print do Pix ou foto do recibo. Fica guardado por 90 dias e depois é apagado.</p></div>
   <div class="section choice"><button class="btn" data-act="paySend" ${s.via?"":"disabled"}>${s.via?"Avisar "+(s.target==="quadra"?"a quadra":"o Dono de Pelada"):"Escolha como pagou"}</button></div>`;}
-function sheetRcv(){const it=cxFind(sheet.key),p=byId(it.pid);return `${bar("Registrar pagamento","Cancelar")}
-  <div class="section"><div class="box"><b style="font-size:17px">${esc(p.name)} · ${esc(it.label)}</b><div class="kpi" style="box-shadow:none;padding:0;background:none"><span class="l">Valor recebido</span><span class="v money">${brl(itDue(it))}</span>${itFee(it)>0||itBaixa(it)>0?`<span class="status">${itValTxt(it)}</span>`:""}</div></div></div>
-  <div class="section"><div class="sh"><span>COMO RECEBEU</span></div><div class="seg" role="group" aria-label="Forma de pagamento">${Object.entries(VIA_L).map(([k,l])=>`<button data-act="rcvVia" data-v="${k}" aria-pressed="${sheet.via===k}">${l}</button>`).join("")}</div></div>
+function rcvCalc(it,iso){return withRef(iso,()=>({fee:itFee(it),due:itDue(it),late:itLate(it)}));}
+function sheetRcv(){const it=cxFind(sheet.key),p=byId(it.pid),iso=sheet.date||today(),k=rcvCalc(it,iso),val=sheet.val!=null?sheet.val:fmtN(k.due);return `${bar("Registrar pagamento","Cancelar")}
+  <div class="section"><div class="box"><b style="font-size:17px">${esc(p.name)} · ${esc(it.label)}</b><span class="status" id="rcvInfo">Valor original ${brl(it.base)}${k.fee>0?` + ${brl(k.fee)} de multa (${k.late} ${k.late===1?"dia":"dias"} de atraso)`:" · sem multa nessa data"}${itBaixa(it)>0?` − ${brl(itBaixa(it))} de baixa`:""}</span></div></div>
+  <div class="section"><div class="sh"><span>QUANDO E QUANTO</span></div><div class="group"><div class="cell"><label class="lbl" for="rcvDate">Pago em</label><input class="inl" id="rcvDate" type="date" max="${today()}" value="${iso}" data-input="rcvd"></div>
+    <div class="cell"><label class="lbl" for="rcvVal">Valor recebido (R$)</label><input class="inl" id="rcvVal" inputmode="decimal" value="${esc(val)}" data-input="rcvv"></div></div>
+    <p class="sf">Esqueceu de registrar? Coloque a data em que a pessoa pagou de verdade: a multa é recalculada. Se o valor foi outro (desconto, combinado), é só editar.</p></div>
+  <div class="section"><div class="sh"><span>COMO RECEBEU</span></div><div class="seg" role="group" aria-label="Forma de pagamento">${Object.entries(VIA_L).map(([k2,l])=>`<button data-act="rcvVia" data-v="${k2}" aria-pressed="${sheet.via===k2}">${l}</button>`).join("")}</div></div>
   <div class="section choice"><button class="btn" data-act="rcvDo" ${sheet.via?"":"disabled"}>Confirmar recebimento</button></div>`;}
 function sheetRefuse(){const it=cxFind(sheet.key),p=byId(it.pid);return `${bar("Recusar aviso","Cancelar")}
   <div class="section"><p class="sf" style="padding-top:0">${esc(p.name)} avisou que pagou ${esc(it.label.toLowerCase())}. Conte o motivo: ele recebe essa mensagem e pode avisar de novo.</p>
@@ -3384,9 +3389,13 @@ document.addEventListener("click",e=>{
     case "storyShare":{const c=sheet.canvas;if(!c)break;c.toBlob(async b=>{const f=new File([b],"opeladeiro-stories.png",{type:"image/png"});
       try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Opeladeiro"});return;}}catch(e){}hud("Toque e segure a imagem para salvar");},"image/png");break;}
     case "cxMonth":cxMk=mShift(cxMk||curMK(),+v);render();break;
-    case "cxRcv":{if(!cxCan())break;openSheet({type:"rcv",key:el.dataset.k,via:"pix"});break;}
+    case "cxRcv":{if(!cxCan())break;openSheet({type:"rcv",key:el.dataset.k,via:"pix",date:today(),val:null});break;}
     case "rcvVia":sheet.via=v;renderSheet();break;
-    case "rcvDo":{if(!cxCan())break;const it=cxFind(sheet.key),C=cx();C.pays[it.key]={at:Date.now(),via:sheet.via,fee:itFee(it),valor:itDue(it)};delete C.informed[it.key];save();closeSheet();render();hud("Pagamento de "+byId(it.pid).name+" registrado");break;}
+    case "rcvDo":{if(!cxCan())break;const it=cxFind(sheet.key),C=cx(),iso=sheet.date||today();if(iso>today()){hud("A data não pode ser no futuro");break;}
+      const k=rcvCalc(it,iso),man=sheet.val!=null?Math.round(num(sheet.val)*100)/100:k.due;if(man<0){hud("Valor inválido");break;}
+      const edited=Math.abs(man-k.due)>0.004,fee=edited?Math.max(0,Math.round((man-(it.base-itBaixa(it)))*100)/100):k.fee;
+      C.pays[it.key]={at:new Date(iso+"T12:00:00").getTime(),via:sheet.via,fee:fee,valor:man};if(edited)C.pays[it.key].manual=true;
+      delete C.informed[it.key];save();closeSheet();render();hud("Pagamento de "+byId(it.pid).name+" registrado");break;}
     case "cxUnpay":{if(!cxCan())break;const C=cx(),k=el.dataset.k,it=cxFind(k);delete C.pays[k];if(it&&it.legacy)delete C.dpays[it.pid+"|"+it.mk];save();render();hud("Pagamento desfeito");break;}
     case "cxConfirm":{if(!cxCan())break;const k=el.dataset.k,it=cxFind(k),C=cx(),inf=C.informed[k];if(!it||!inf)break;C.pays[k]={at:inf.at,via:inf.via,proof:inf.proof,fee:itFee(it),valor:itDue(it),confirmedAt:Date.now()};delete C.informed[k];delete C.refused[k];save();render();hud("Pagamento de "+byId(it.pid).name+" confirmado");break;}
     case "cxRefuse":if(!cxCan())break;openSheet({type:"refuse",key:el.dataset.k});break;
@@ -3585,6 +3594,10 @@ document.addEventListener("click",e=>{
 document.addEventListener("input",e=>{
   const k=e.target.dataset.input;if(!k)return;const val=e.target.value;
   if(k==="pname"){S.pelada.name=val.trim()||"Minha pelada";save();}
+  else if(k==="rcvd"||k==="rcvv"){const it=sheet&&sheet.type==="rcv"&&cxFind(sheet.key);if(!it)return;
+    if(k==="rcvv")sheet.val=val;
+    else if(val&&val<=today()){sheet.date=val;sheet.val=null;const c=rcvCalc(it,val),v=$("rcvVal"),i=$("rcvInfo");if(v)v.value=fmtN(c.due);
+      if(i)i.textContent="Valor original "+brl(it.base)+(c.fee>0?" + "+brl(c.fee)+" de multa ("+c.late+(c.late===1?" dia":" dias")+" de atraso)":" · sem multa nessa data")+(itBaixa(it)>0?" − "+brl(itBaixa(it))+" de baixa":"");}}
   else if(k==="aname")authVals.name=val;
   else if(k==="jsearch"){joinQ=val;const L=$("jList"),P=pByCode(joinFound);if(L&&P)L.innerHTML=claimList(P);}
   else if(k==="obname"||k==="obfull"){if(k==="obname")obDraft.name=val;else obDraft.full=val;const x=$("obShow");if(x){const u=meU();x.innerHTML=`<div class="sh"><span>NA CARTA E NA LISTA, APARECER COMO</span></div>`+showSeg({name:obDraft.full||u.name,nick:obDraft.name,show:obDraft.show},"obshow");}}
