@@ -1862,7 +1862,7 @@ function sheetCAwards(){const c=CP(),A=sheet.a,opts=(k)=>k==="fair"||k==="camp"|
   <div class="section"><div class="cupmid">${campCup(c,campPro(c))}</div></div>
   <div class="section"><div class="sh"><span>COLETIVOS</span></div><div class="group">${["camp","vice","terc","fair"].filter(k=>k!=="terc"||c.ties.some(t=>t.rnd===0)).map(k=>`<div class="cell"><span class="grow">${AW_L[k]}</span>${k==="camp"||k==="vice"||k==="terc"?`<b>${esc((cTeam(c,A[k])||{}).name||"—")}</b>`:sel(k)}</div>`).join("")}</div></div>
   <div class="section"><div class="sh"><span>INDIVIDUAIS</span></div><div class="group">${["art","gar","gol","craque"].map(k=>`<div class="cell"><span class="grow">${AW_L[k]}</span>${sel(k)}</div>`).join("")}</div>
-    <p class="sf">Artilheiro, garçom, goleiro e fair play vêm calculados; ajuste se quiser. O craque, no app final, sai de uma votação de 24h entre os atletas. Aqui você escolhe.</p></div>
+    <p class="sf">Artilheiro, garçom, goleiro e fair play vêm calculados; ajuste se quiser. O craque do campeonato é escolhido por quem organiza.</p></div>
   <div class="section choice"><button class="btn" data-act="cAwardsDo">Encerrar e entregar os troféus</button></div>`;}
 function sheetTrophy(){const x=sheet,c=camps().find(q=>q.id===x.cid),pro=campPro(c),ind=["art","gar","gol","craque"].includes(x.k);
   return `${bar(AW_L[x.k],"Fechar")}<div class="section"><div class="cupmid">${trAward(c,x.k,pro)}</div>
@@ -2062,7 +2062,7 @@ function viewCreator(){
   <div class="seg" role="group" aria-label="Painel">${[["geral","Geral"],["peladas","Peladas"],["quadras","Quadras"],["usuarios","Usuários"],["config","Config"]].map(([k,l])=>`<button data-act="crSeg" data-v="${k}" aria-pressed="${crSeg===k}" style="font-size:13px">${l}</button>`).join("")}</div>`;
   if(crSeg==="geral"){const al=retentionAlerts(),a3=al.filter(x=>x.d>=90),a1=al.filter(x=>x.d<90);
     h+=`<div class="section"><div class="sh"><span>ALERTAS DE RETENÇÃO</span><span>${al.length}</span></div><div class="group">${al.length?`${a3.length?`<div class="cell"><span class="status" style="color:var(--down);font-weight:700">3 MESES SEM SORTEIO · ${a3.length}</span></div>`+a3.map(alertRow).join(""):""}${a1.length?`<div class="cell"><span class="status" style="color:var(--gold);font-weight:700">1 MÊS SEM SORTEIO · ${a1.length}</span></div>`+a1.map(alertRow).join(""):""}`:`<div class="empty">Nenhuma pelada parada. Todas sortearam times no último mês.</div>`}</div>
-      <p class="sf">No app final, você recebe um e-mail e uma notificação quando uma pelada completa 1 mês e 3 meses sem sorteio.</p></div>
+      <p class="sf">Alerta quando uma pelada completa 1 mês e 3 meses sem sorteio.</p></div>
     <div class="section"><div class="kpis"><div class="kpi"><span class="l">Contas criadas</span><span class="v tnum">${realU.length}</span></div><div class="kpi"><span class="l">Peladas</span><span class="v tnum">${Ps.length}</span></div>
       <div class="kpi gold"><span class="l">Donos no Pro (pagantes)</span><span class="v tnum">${pros.length}</span></div><div class="kpi"><span class="l">Acesso Total</span><span class="v tnum">${vips.length}</span></div><div class="kpi"><span class="l">Peladeiros com conta</span><span class="v tnum">${realSet.size}</span></div><div class="kpi"><span class="l">Peladeiros sem conta</span><span class="v tnum">${semConta}</span></div><div class="kpi"><span class="l">Peladeiros no total</span><span class="v tnum">${realSet.size+semConta}</span></div>
       <div class="kpi"><span class="l">Quadras (pagando / teste)</span><span class="v tnum">${qPaying.length} / ${Qs.length-qPaying.length}</span></div><div class="kpi gold"><span class="l">Receita Quadras</span><span class="v tnum money">${brl(qRev)}</span></div>
@@ -2112,7 +2112,7 @@ const TIER_RANK={quadra:0,arena:1,complexo:2};
 const hasT=(q,min)=>TIER_RANK[q.tier]>=TIER_RANK[min];
 const TIER_FEATS={
   quadra:["CRM dos mensalistas com WhatsApp do organizador","Mensalidades que renovam todo dia 1","Balanço do mês: previsto, recebido e a receber","Agenda semanal por campo","Cobrança por WhatsApp com mensagem pronta"],
-  arena:["Tudo do Quadra, com peladas ilimitadas","Cobrança automática por Pix (dia 1, 5 e 10) com baixa automática","Horários vagos publicados no app","Avulsos (day use, aniversário, campeonato)","Relatórios de ocupação e inadimplência, com exportação"],
+  arena:["Tudo do Quadra, com peladas ilimitadas","Cobrança automática por Pix com baixa automática (em breve)","Horários vagos publicados no app","Avulsos (day use, aniversário, campeonato)","Relatórios de ocupação e inadimplência, com exportação"],
   complexo:["Tudo do Arena","Várias unidades, com comparativo","Permissões por acesso (recepção não vê o financeiro)","Destaque na busca de quadras","Logo da arena nos cards e Stories dos atletas","Torneios internos e suporte prioritário"]};
 function tierLimits(k){const t=G.cfg.tiers[k];return [`${k==="complexo"?t.campos+" campos + "+brl(num(t.extra))+" por campo extra":"até "+t.campos+" campos"}`,k==="quadra"?`até ${t.fixas} mensalistas`:"mensalistas ilimitados",k==="complexo"?"acessos ilimitados":`${t.acessos} ${t.acessos==1?"acesso":"acessos"}`];}
 const mKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
@@ -2190,8 +2190,7 @@ function qFin(q){const mk=qMonth||curMK(),F=finOf(q,mk),pct=F.prev?Math.round(F.
   <div class="section"><div class="kpis"><div class="kpi"><span class="l">Previsto</span><span class="v tnum money">${brl(F.prev)}</span></div><div class="kpi"><span class="l">Recebido</span><span class="v tnum money" style="color:var(--lime)">${brl(F.rec)}</span></div>
     <div class="kpi"><span class="l">A receber</span><span class="v tnum money">${brl(F.prev-F.rec)}</span></div><div class="kpi"><span class="l">Atrasado</span><span class="v tnum money" style="color:var(--down)">${brl(F.atr)}</span></div></div>
     <div style="margin-top:12px"><div class="prog"><i style="width:${pct}%"></i></div><div class="status" style="margin-top:6px">${pct}% recebido</div></div></div>
-  <div class="section"><div class="group">${hasT(q,"arena")?`<div class="cell"><span class="grow"><b>Cobrança automática por Pix</b><br><span class="status">${q.autoPix?"Ligada: o link Pix sai dia 1, lembrete dia 5, aviso de atraso dia 10 e a baixa é automática.":"Desligada. Ao ligar, o app cobra sozinho e dá baixa quando o Pix cai."} Taxa: ${brl(num(G.cfg.pixFee))} por cobrança paga.</span></span><button class="switch" role="switch" aria-checked="${!!q.autoPix}" aria-label="Cobrança automática" data-act="qAutoPix"></button></div>
-      ${q.autoPix?`<button class="cell action" data-act="qSimPix"><span class="grow">Simular Pix recebido (teste)</span></button>`:""}`:lockRow("arena","Cobrança automática por Pix")}</div></div>
+  <div class="section"><div class="group"><div class="cell"><span class="grow"><b>Cobrança automática por Pix</b><br><span class="status">Link Pix com baixa automática. Em breve.</span></span><span class="pill">Em breve</span></div></div></div>
   <div class="qcols">${grp("atrasada","ATRASADAS")}${grp("pendente","PENDENTES")}${grp("avencer","A VENCER")}${grp("paga","PAGAS")}</div>
   ${!F.it.length?`<div class="section"><div class="group"><div class="empty">Nada para receber neste mês.</div></div></div>`:""}
   <div class="section"><div class="sh"><span>INADIMPLÊNCIA · ÚLTIMOS 6 MESES</span>${hasT(q,"arena")?`<button class="mini" data-act="qExport">Copiar planilha</button>`:""}</div>
@@ -2276,7 +2275,7 @@ function viewPerfil(){const u=meU(),mp=byId(S.me),ph=img(u.photo),own=ownedBy(u)
     <p class="sf">Mostra o app como esse peladeiro vê, para testar permissões e votação.</p></div>`:""}
   <div class="section"><div class="sh"><span>NOTIFICAÇÕES</span></div><div class="group"><button class="cell action" data-act="pushToggle"><span class="grow">Avisos da pelada<br><span class="status">${Push.ok?"Times sorteados e lembretes no celular.":"Neste aparelho, instale o app na tela inicial para receber avisos."}</span></span><span class="pill ${Push.on?"gold":""}">${Push.on?"Ativado":"Ativar"}</span></button></div></div>
   <div class="section"><div class="sh"><span>APARÊNCIA</span></div>${themeSeg()}</div>
-  <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button>${isCreator()?"":`<button class="cell danger" data-act="delAccount" style="font-weight:500;font-size:15px">Excluir minha conta</button>`}</div></div>`;
+  <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button>${isCreator()?"":`<button class="cell danger" data-act="delAccount" style="font-weight:500;font-size:15px">Excluir minha conta</button>`}</div></div><p class="sf" style="text-align:center;margin-top:10px"><a href="/termos/" target="_blank" rel="noopener" style="color:inherit">Termos de uso</a> · <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit">Política de privacidade</a></p>`;
 }
 
 function viewJogo(){
@@ -2471,7 +2470,7 @@ function sheetInvite(){const msg=inviteMsg();
   <div class="section choice"><a class="btn" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar convite no WhatsApp</a><button class="btn ghost" data-act="copyInvite">Copiar link de convite</button>
     <div class="group" id="invWrap" hidden><textarea class="copybox" id="invText" readonly>${esc(msg)}</textarea></div></div>
   <p class="sf">${waOk(S.pelada.waLink)?"O link do grupo do WhatsApp vai junto no convite.":"Dica: cole o link do grupo do WhatsApp em Ajustes para ele ir junto no convite."}</p>
-  <div class="section"><div class="box testbox"><div class="note"><b>Teste do convite.</b> Simula alguém escaneando o QR code: você sai da conta e abre o cadastro de peladeiro desta pelada.</div><button class="btn ghost sm" data-act="simInvite">Abrir convite como novo peladeiro</button></div></div>`;
+`;
 }
 function sheetPick(){
   const T=S.lastDraw.teams.length,sel=sheet.sel;
@@ -2529,8 +2528,7 @@ function viewAvaliar(){
         `<div class="note">Avalie a atuação de quem jogou com você e escolha o craque.</div><button class="btn" data-act="myVote">Avaliar quem jogou</button>`}
       ${n?`<div><div class="status" style="margin-bottom:6px">Já votaram</div><div class="voted">${Object.keys(ses.votes).map(id=>{const p=byId(id);return p?ava(p,"sm"):""}).join("")}</div></div>`:""}
     </div></div>
-    <div class="section"><div class="box testbox"><div class="note"><b>Modo de teste.</b> No app, a votação fecha sozinha 24 horas depois e os níveis são atualizados na hora.</div>
-      <button class="btn ghost sm" data-act="forceClose">Encerrar votação agora (simula as 24h)</button></div></div>`;
+`;
   }
   h+=sumulaHTML();
   const rounds=isPro()?S.rounds:S.rounds.slice(0,3);
@@ -2559,7 +2557,7 @@ function lMyBox(){const L=S.lst,me=byId(S.me);if(!me)return "";const st=lStateOf
 function viewLista(){const c=lc(),L=S.lst,adm=isAdmin(),own=isOwner();
   if(!lActive()){const ag=c.modo==="auto"?`A lista abre sozinha ${WDs[c.abreWd].toLowerCase()} às ${c.abreH} e fecha ${c.fechaH}h antes da pelada.`:"O Dono de Pelada abre a lista. Todo mundo recebe um aviso.";
     return `<div class="section"><div class="box"><b style="font-size:17px">${L?"Lista da última pelada encerrada.":"A lista da próxima pelada ainda não abriu."}</b><span class="status">${esc(ag)}</span>
-      ${adm?`<button class="btn sm" data-act="lOpen">${c.modo==="auto"?"Abrir agora (simular o horário)":"Abrir lista da próxima pelada"}</button>`:""}</div>
+      ${adm&&c.modo!=="auto"?`<button class="btn sm" data-act="lOpen">Abrir lista da próxima pelada</button>`:""}</div>
       ${L?`<p class="sf">Última lista: ${gameDayTxt(L.date)} · ${L.in.length} confirmados.</p>`:""}
       ${adm?`<p class="sf">Vagas, horários e regras ficam em Ajustes › Lista de presença.</p>`:""}</div>`;}
   const fL=lFree("linha"),gl=S.players.filter(p=>lRole(p)==="gol"),showG=c.golLim||gl.length;
@@ -2577,10 +2575,10 @@ function viewLista(){const c=lc(),L=S.lst,adm=isAdmin(),own=isOwner();
   if(sem.length)h+=`<div class="section"><div class="sh"><span>MENSALISTAS SEM RESPOSTA · ${sem.length}</span></div><div class="group">${sem.map(p=>lRow(p,null)).join("")}</div>${L.status==="fechada"?`<p class="sf">Passou o fechamento: quem não respondeu perdeu a prioridade e entra como qualquer avulso.</p>`:""}</div>`;
   if(nao.length)h+=`<div class="section"><div class="sh"><span>NÃO VÃO · ${nao.length}</span></div><div class="group">${nao.map(p=>lRow(p,null)).join("")}</div></div>`;
   if(adm){const sim=L.simLeft;h+=`<div class="section"><div class="sh"><span>CONTROLE DA LISTA</span></div><div class="group">
-      ${L.status==="aberta"?`<button class="cell action" data-act="lClose"><span class="grow">${c.modo==="auto"?"Fechar agora (simular o horário)":"Fechar a lista agora"}</span></button>${c.modo==="auto"?`<button class="cell action" data-act="lAlmost"><span class="grow">Ver aviso “a lista fecha em 1 hora”</span></button>`:""}`:""}
+      ${L.status==="aberta"?`<button class="cell action" data-act="lClose"><span class="grow">Fechar a lista agora</span></button>`:""}
       ${L.status==="fechada"&&fL>0?`<a class="cell action" style="text-decoration:none" href="https://wa.me/?text=${encodeURIComponent(`Ainda tem ${fL} ${fL===1?"vaga":"vagas"} na ${S.pelada.name} (${gameDayTxt(L.date)})! Entra na lista pelo Opeladeiro: ${inviteURL()}`)}" target="_blank" rel="noopener"><span class="grow">Compartilhar vaga no WhatsApp</span>${CHEV}</a>`:""}
       <button class="cell action" data-act="tab" data-tab="pelada"><span class="grow">Regras e vagas da lista</span>${CHEV}</button></div>
-      ${L.status==="fechada"?`<div class="sh" style="margin-top:14px"><span>TESTE · QUANTO FALTA PARA A PELADA</span></div><div class="chips">${[[null,"Horário real"],[30,"30 min"],[90,"1h30"],[300,"5h"]].map(([m,l])=>`<button data-act="lSim" data-v="${m==null?"":m}" aria-pressed="${sim===m||(m==null&&sim==null)}">${l}</button>`).join("")}</div><p class="sf">Para testar a multa de desistência em cima da hora.</p>`:""}</div>`;}
+      ${L.status==="fechada"&&isCreator()?`<div class="sh" style="margin-top:14px"><span>TESTE · QUANTO FALTA PARA A PELADA</span></div><div class="chips">${[[null,"Horário real"],[30,"30 min"],[90,"1h30"],[300,"5h"]].map(([m,l])=>`<button data-act="lSim" data-v="${m==null?"":m}" aria-pressed="${sim===m||(m==null&&sim==null)}">${l}</button>`).join("")}</div><p class="sf">Para testar a multa de desistência em cima da hora.</p>`:""}</div>`;}
   return h;}
 function viewListaCfg(){const c=lc(),raw=lraw(),pro=isPro(),ed=isOwner()||isAdmin(),own=isOwner(),dis=ed?"":"disabled",lk=pro?"":` <span class="pro">PRO</span>`;
   const hchips=(k,opts,act="lSet")=>`<div class="chips">${opts.map(([v,l])=>`<button data-act="${act}" data-k="${k}" data-v="${v}" aria-pressed="${String(c[k])===String(v)}" ${dis}>${l}</button>`).join("")}</div>`;
