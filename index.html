@@ -2,6 +2,13 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<script>
+/* O Opeladeiro é feito para o celular: no computador mostra só a página de apresentação (?dev=1 libera, ?dev=0 volta ao normal). */
+(function(){try{var q=location.search;if(/[?&]dev=1/.test(q))localStorage.setItem("opl-dev","1");if(/[?&]dev=0/.test(q))localStorage.removeItem("opl-dev");
+var ua=navigator.userAgent,mob=/Android|iPhone|iPad|iPod|Mobile|CriOS|FxiOS/i.test(ua)||(navigator.maxTouchPoints>1&&/Macintosh/.test(ua))||(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
+if(!mob&&!localStorage.getItem("opl-dev"))location.replace("/sobre/"+(location.pathname.indexOf("/convite/")===0?"?convite=1":""));}catch(e){}})();
+</script>
+
 <base href="/">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Opeladeiro</title>
