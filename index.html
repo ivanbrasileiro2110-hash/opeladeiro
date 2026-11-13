@@ -59,7 +59,6 @@ body.sp-futebol{
   --text:#0A2416; --muted:#4B6857; --faint:#88A294; --bg-rgb:237,246,240; --glow:#CFEAD9;
   --deep:#BFE3CC; --green:#E4F4EA; --lime:#1C8346; --lime-ink:#FFFFFF; --acc-rgb:28,131,70;
 }
-body.sp-quadras .app{max-width:1080px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 body{background:var(--bg) radial-gradient(120% 60% at 50% -10%,var(--glow) 0%,rgba(var(--bg-rgb),0) 60%) no-repeat;color:var(--text);font-family:var(--font);font-size:16px;line-height:1.35;letter-spacing:-.01em;
@@ -517,11 +516,9 @@ textarea.field{min-height:110px;padding:12px 0;resize:vertical;line-height:1.4;f
 .trgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .trc{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--surface);border-radius:14px;padding:10px 6px;box-shadow:inset 0 0 0 1px var(--line);text-align:center;min-width:0}
 .trc svg{width:64px;height:76px}.trc b{font-size:13px}.trc .status{font-size:11px;max-width:100%}
-/* quadras */
 .qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:18px}
 .qhead .brand{padding:0}
 .qsub{font-family:var(--font);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-left:4px;vertical-align:3px}
-.qtabbar nav{grid-template-columns:repeat(4,1fr)}
 .piso{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--muted)}.piso i{width:9px;height:9px;border-radius:50%}
 .pisosel{display:flex;gap:4px;flex:none}.pisosel button{height:30px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:700;color:var(--muted);background:rgba(var(--ov),.06)}
 .pisosel button[aria-pressed="true"]{background:var(--lime);color:var(--lime-ink)}
@@ -543,7 +540,6 @@ textarea.field{min-height:110px;padding:12px 0;resize:vertical;line-height:1.4;f
 .frees span{font-size:12px;font-weight:700;border-radius:999px;padding:4px 9px;background:rgba(var(--acc-rgb),.1);color:var(--lime);font-variant-numeric:tabular-nums}
 .campo-h{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;font-weight:800}
 .lock{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;letter-spacing:.06em;border-radius:6px;padding:3px 6px;background:rgba(var(--ov),.1);color:var(--muted);text-transform:uppercase}
-.tiers{display:grid;grid-template-columns:1fr;gap:12px}
 .tier{background:var(--surface);border-radius:20px;padding:18px 16px;box-shadow:inset 0 0 0 1px var(--line2);display:flex;flex-direction:column;gap:10px;text-align:left;width:100%}
 .tier[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--lime)}
 .tier h3{margin:0;font-family:var(--cond);font-size:30px;font-weight:800;text-transform:uppercase;line-height:1}
@@ -560,10 +556,7 @@ textarea.field{min-height:110px;padding:12px 0;resize:vertical;line-height:1.4;f
 .bars i{display:block;width:100%;max-width:34px;border-radius:6px 6px 2px 2px;background:var(--down);min-height:2px}
 .bars i.ok{background:var(--lime)}
 @media (min-width:820px){
-  body.sp-quadras .kpis{grid-template-columns:repeat(4,1fr)}
   .qgrid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
-  .tiers{grid-template-columns:repeat(3,1fr)}
-  body.sp-quadras .qcols{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;align-items:start}
 }
 </style>
 
@@ -578,12 +571,6 @@ textarea.field{min-height:110px;padding:12px 0;resize:vertical;line-height:1.4;f
   
 </nav></div>
 <div class="modebar" id="modebar" hidden></div>
-<div class="tabbar qtabbar" id="qtabbar" hidden><nav aria-label="Opeladeiro Quadras">
-  <button data-act="qtab" data-v="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
-  <button data-act="qtab" data-v="peladas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>Mensalistas</button>
-  <button data-act="qtab" data-v="financeiro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 19V9M10 19V5M16 19v-7M21 19H3"/></svg>Financeiro</button>
-  <button data-act="qtab" data-v="quadra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="M12 5.5v13"/><circle cx="12" cy="12" r="2.6"/></svg>Ajustes</button>
-</nav></div>
 <div class="fs" id="fs" hidden></div>
 <div class="retro" id="retro" hidden></div>
 <div class="scrim" id="scrim" data-act="closeSheet"></div>
@@ -775,13 +762,11 @@ const COLS={
     canIns:P=>P.ownerUid===Cloud.uid&&!!P.code,canWrite:()=>true},
   camps:{list:()=>camps(),set:a=>{G.camps=a;},id:c=>c.id,row:c=>({id:c.id,owner:c.ownerUid,doc:c}),fromRow:r=>{const c=jclone(r.doc)||{};c.id=r.id;c.ownerUid=r.owner;return c;},
     canIns:c=>c.ownerUid===Cloud.uid,canWrite:()=>true},
-  quadras:{list:()=>G.quadras,set:a=>{G.quadras=a;},id:q=>q.id,row:q=>({id:q.id,owner:q.ownerUid,doc:q}),fromRow:r=>{const q=jclone(r.doc)||{};q.id=r.id;q.ownerUid=r.owner;return q;},
-    canIns:q=>q.ownerUid===Cloud.uid,canWrite:q=>q.ownerUid===Cloud.uid||isCreator()},
   profiles:{list:()=>G.users,set:a=>{G.users=a;},id:u=>u.id,row:u=>({id:u.id,email:u.email,plan:u.plan==="pro"?"pro":"free",courtesy:!!u.courtesy,doc:u}),
     fromRow:r=>{const u=jclone(r.doc)||{};u.id=r.id;u.email=r.email;u.plan=r.plan;u.courtesy=!!r.courtesy;return u;},
     canIns:u=>u.id===Cloud.uid,canWrite:u=>!u._stub&&isUuid(u.id)&&(u.id===Cloud.uid||isCreator())}
 };
-const COL_ORDER=["profiles","peladas","camps","quadras"];
+const COL_ORDER=["profiles","peladas","camps"];
 const docStr=(col,it)=>stableStr(COLS[col].row(it).doc);
 function setMe(P){if(!P||!P.state)return;const mp=P.state.players.find(p=>p.uid===Cloud.uid);P.state.me=mp?mp.id:P.state.ownerId;}
 /* coloca no aparelho a versão que veio do servidor */
@@ -860,7 +845,7 @@ function subFilters(){const ids=t=>Object.keys(Cloud.base).filter(k=>k.startsWit
   return {peladas:f(pel),profiles:f(pro)};}
 function subscribe(){if(Cloud.ch)sb.removeChannel(Cloud.ch);let down=false;const F=subFilters();Cloud.subKey=JSON.stringify(F);
   Cloud.ch=sb.channel("sp-"+Cloud.uid);
-  ["peladas","camps","quadras","profiles"].forEach(t=>{const o={event:"*",schema:"public",table:t};if(F[t])o.filter=F[t];Cloud.ch.on("postgres_changes",o,e=>onRemote(t,e));});
+  ["peladas","camps","profiles"].forEach(t=>{const o={event:"*",schema:"public",table:t};if(F[t])o.filter=F[t];Cloud.ch.on("postgres_changes",o,e=>onRemote(t,e));});
   Cloud.ch.on("postgres_changes",{event:"*",schema:"public",table:"app_config"},()=>{pull().then(renderSoon,()=>{});});
   Cloud.ch.subscribe(st=>{if(st==="SUBSCRIBED"){if(down){down=false;pull().then(renderSoon,()=>{});}}else if(st==="CHANNEL_ERROR"||st==="TIMED_OUT"||st==="CLOSED")down=true;});}
 async function onRemote(col,e){try{const id=(e.new&&e.new.id)||(e.old&&e.old.id);if(!id)return;
@@ -951,10 +936,10 @@ sb.rpc("log_error",{p_msg:msg,p_stack:String(stack||"").slice(0,3000),p_ctx:Obje
 window.addEventListener("error",e=>rep(e.message,e.error&&e.error.stack,{src:(e.filename||"").split("/").pop()+":"+e.lineno}));
 window.addEventListener("unhandledrejection",e=>{const r=e.reason;rep(r&&r.message||r,r&&r.stack,{kind:"promise"});});})();
 const LSG="opeladeiro-v3",CREATOR="ivanbrasileiro2110@gmail.com";
-function emptyG(){return {v:4,seq:0,users:[],peladas:[],camps:[],quadras:[],sess:null,cfg:{price:"19,90",freePlayers:20,freePeladas:1,proEmails:[],vipSeeded:{}},ui:{theme:"auto"}};}
+function emptyG(){return {v:4,seq:0,users:[],peladas:[],camps:[],sess:null,cfg:{price:"19,90",freePlayers:20,freePeladas:1,proEmails:[],vipSeeded:{}},ui:{theme:"auto"}};}
 function cfgDefaults(){if(!G.cfg)G.cfg={};if(!G.cfg.proEmails)G.cfg.proEmails=[];if(!G.cfg.vipSeeded)G.cfg.vipSeeded={};if(G.cfg.price==null)G.cfg.price="19,90";if(G.cfg.freePlayers==null)G.cfg.freePlayers=20;if(G.cfg.freePeladas==null)G.cfg.freePeladas=1;
-if(!G.quadras)G.quadras=[];if(!G.ui)G.ui={theme:"auto"};
-G.cfg.tiers=Object.assign({quadra:{name:"Quadra",price:"99",campos:2,fixas:15,acessos:1},arena:{name:"Arena",price:"199",campos:5,fixas:0,acessos:3},complexo:{name:"Complexo",price:"399",campos:8,extra:"39",fixas:0,acessos:0}},G.cfg.tiers||{});
+delete G.quadras;if(!G.ui)G.ui={theme:"auto"};
+
 if(G.cfg.pixFee==null)G.cfg.pixFee="1,49";
 if(G.cfg.campPrice==null)G.cfg.campPrice="9,90";}
 const VIP_NAME={"libaniosamuel519@gmail.com":["Samuel","Pelada do Samuel"]};
@@ -1095,11 +1080,9 @@ const shortName=n=>{const w=String(n||"").trim().split(/\s+/);return w.length>2?
 const dispName=u=>(u.show==="name"||!u.nick)?shortName(u.name):u.nick;
 function syncUserName(u){const n=dispName(u);G.peladas.forEach(P=>P.state.players.forEach(p=>{if(p.uid===u.id)p.name=n;}));}
 const showSeg=(u,act)=>`<div class="seg" role="group" aria-label="Aparecer como" style="margin-top:0">${[["nick","Apelido",u.nick],["name","Nome",u.name]].map(([k,l,v])=>`<button data-act="${act}" data-v="${k}" aria-pressed="${(u.show||"nick")===k||(k==="name"&&!u.nick)}" ${k==="nick"&&!u.nick?"disabled":""}>${l}${v?": "+esc(k==="name"?shortName(v):v):""}</button>`).join("")}</div>`;
-const myQuadra=()=>{const u=meU();return u?G.quadras.find(q=>q.ownerUid===u.id)||null:null;};
-function modesOf(){const m=["peladas"];if(myQuadra())m.push("quadras");if(isCreator())m.push("creator");return m;}
-const MODE_L={peladas:"Peladas",quadras:"Quadras",creator:"Criador do app"};
-let screen="welcome",authMode="signup",authErr="",authVals={name:"",email:""},pendingCode="",pendingClaim="",joinFound=null,joinDraft=null,joinErr="",joinStep="new",joinClaim=null,joinQ="",crSeg="geral",crQ="",createDraft=null,obDraft=null,
-  qtab="agenda",qDay=new Date().getDay(),qMonth=null,qQ="",qsDraft=null;
+function modesOf(){const m=["peladas"];if(isCreator())m.push("creator");return m;}
+const MODE_L={peladas:"Peladas",creator:"Criador do app"};
+let screen="welcome",authMode="signup",authErr="",authVals={name:"",email:""},pendingCode="",pendingClaim="",joinFound=null,joinDraft=null,joinErr="",joinStep="new",joinClaim=null,joinQ="",crSeg="geral",crQ="",createDraft=null,obDraft=null;
 const canEdit=p=>isOwner()||p.id===S.me;
 const canPhoto=p=>p.id===S.me||(!p.uid&&isOwner());
 function roleIn(P,u){const st=P.state,mp=st.players.find(p=>p.uid===u.id);if(P.ownerUid===u.id)return "Dono de Pelada";if(mp&&st.tempAdminId===mp.id)return "Admin da vez";return "Peladeiro";}
@@ -1112,8 +1095,7 @@ function enterPelada(code){const P=pByCode(code);const u=meU();if(!P||!u||P.prev
   if(rm&&!enterPelada.rk[code+S.me]){enterPelada.rk[code+S.me]=1;setTimeout(()=>pushNotif(rm[0],rm[1]),enterPelada.late?5200:900);}enterPelada.late=0;}
 function ownerReminder(){const c=lc(),C=cx(),mk=curMK(),t=today();
   if(c.modo==="manual"&&c.lembra&&!lActive()&&new Date().getDay()===c.lembraWd)return ["Hora de abrir a lista","Abra a lista da "+S.pelada.name+" para a galera confirmar presença."];
-  if(!isPro())return null;const L=quadraLink();
-  if(L){const st=fixaStatus(L.q,L.f,mk),inf=(L.q.informed||{})[L.f.id+"|"+mk];if(!inf&&st==="atrasada")return ["Mensalidade da quadra atrasada",`${L.q.name}: ${brl(num(L.f.valor))}. Pague e avise a quadra pelo app.`];if(!inf&&st==="pendente"&&(new Date().getDate()===1||new Date().getDate()===10))return ["Mensalidade da quadra",`${L.q.name}: ${brl(num(L.f.valor))}${new Date().getDate()===10?" vence hoje.":" já pode ser paga."}`];return null;}
+  if(!isPro())return null;
   if(num(C.aluguel.valor)>0&&!C.qpays[mk]){const vc=mk+"-"+String(Math.max(1,Math.min(28,+C.aluguel.venc||5))).padStart(2,"0");
     if(t===vc)return ["Aluguel da quadra vence hoje",`${brl(num(C.aluguel.valor))}. Depois de pagar, marque como pago na Caixinha.`];
     if(t>vc){const d=dayDiff(vc,t);if(d<=7||(d-7)%3===0)return [`Aluguel da quadra atrasado há ${d} ${d===1?"dia":"dias"}`,`${brl(num(C.aluguel.valor))}. Marque como pago na Caixinha quando acertar.`];}
@@ -1132,10 +1114,8 @@ function claimList(P){const u=meU(),q=normTxt(joinQ||""),free=freeCards(P).filte
   return (hits.length?`<div class="group">${hits.map(x=>claimRow(x,true)).join("")}</div><div style="height:12px"></div>`:"")+
     (rest.length?`<div class="group">${rest.map(x=>claimRow(x,false)).join("")}</div>`:(hits.length?"":`<div class="empty">Nenhum nome encontrado.</div>`));}
 function goHome(mode){closeSheet();curP=null;S=null;const u=meU();if(!u){screen="welcome";render();return;}
-  mode=mode||G.sess.mode||"peladas";if(mode!=="qsetup"&&!modesOf().includes(mode))mode="peladas";G.sess.code=null;
+  mode=mode||G.sess.mode||"peladas";if(!modesOf().includes(mode))mode="peladas";G.sess.code=null;
   if(mode==="creator"){screen="creator";G.sess.mode="creator";}
-  else if(mode==="quadras"){screen="quadras";G.sess.mode="quadras";}
-  else if(mode==="qsetup"){screen="qsetup";qsDraft={name:"",bairro:"",campos:2,tier:"arena"};}
   else{G.sess.mode="peladas";screen="home";const P=pendingCode&&pByCode(pendingCode);if(P){startJoin(P);screen="join";}else if(pendingCode&&CLOUD){const pc=pendingCode;setTimeout(()=>openJoinCloud(pc),0);}}
   save();render();window.scrollTo(0,0);}
 function doLogin(u,isNew){G.sess={uid:u.id,mode:"peladas",code:null};u.lastLogin=Date.now();authErr="";
@@ -1216,9 +1196,8 @@ function itSt(it){const C=cx();if(C.pays[it.key]||it.legacy)return "paga";if(itB
 const ST_X={paga:"Pago",baixa:"Baixa",informado:"Aguardando",pendente:"Pendente",atrasada:"Atrasado",avencer:"A vencer"};
 function itValTxt(it){const f=itFee(it),b=itBaixa(it),d=itLate(it);let t=brl(it.base);if(f>0)t+=` + ${brl(f)} de multa (${d} ${d===1?"dia":"dias"})`;if(b>0)t+=` − ${brl(b)} de baixa`;return t;}
 function cxMonth(mk){const C=cx(),rows=cxItemsMonth(mk).map(it=>({it,p:byId(it.pid),st:itSt(it),v:itGross(it),due:itDue(it)})).filter(r=>r.p);
-  const L=quadraLink(),desp=C.desp.filter(d=>d.date.startsWith(mk)).map(d=>({...d,v:num(d.valor)}));
-  if(L)desp.unshift({id:"quadra",desc:"Mensalidade da quadra · "+L.q.name,v:num(L.f.valor),auto:true,st:fixaStatus(L.q,L.f,mk)});
-  else if(num(C.aluguel.valor)>0&&mk>=cxStartMK()){const vc=mk+"-"+String(Math.max(1,Math.min(28,+C.aluguel.venc||5))).padStart(2,"0");
+  const desp=C.desp.filter(d=>d.date.startsWith(mk)).map(d=>({...d,v:num(d.valor)}));
+  if(num(C.aluguel.valor)>0&&mk>=cxStartMK()){const vc=mk+"-"+String(Math.max(1,Math.min(28,+C.aluguel.venc||5))).padStart(2,"0");
     desp.unshift({id:"aluguel",desc:"Aluguel da quadra",v:num(C.aluguel.valor),aluguel:true,venc:vc,mk,st:C.qpays[mk]?"paga":mk>curMK()?"avencer":today()>vc?"atrasada":"pendente"});}
   const prev=rows.reduce((s,r)=>s+r.v,0),rec=rows.filter(r=>r.st==="paga").reduce((s,r)=>{const pd=C.pays[r.it.key];return s+(pd&&pd.valor!=null?pd.valor:r.v);},0),
     bx=rows.reduce((s,r)=>s+itBaixa(r.it),0),dsp=desp.reduce((s,d)=>s+d.v,0);
@@ -1289,8 +1268,6 @@ function lSync(){const L=S.lst;if(!L||L.status==="encerrada"||L.edit)return fals
 function lBlocked(p){return p.id!==S.ownerId&&lc().bloqInad&&hasDebt(p);}
 function lStateOf(pid){const L=S.lst;if(!L)return "none";if(L.in.includes(pid))return "in";if(L.esp.includes(pid))return "esp";if(L.nao.includes(pid))return "nao";return "none";}
 
-/* pelada ligada à quadra */
-function quadraLink(){if(!curP)return null;for(const q of G.quadras){const f=q.fixas.find(x=>(x.code||"").toUpperCase()===curP.code);if(f)return {q,f};}return null;}
 /* notificações */
 function notifOn(k){const u=meU();return !u||!u.notif||u.notif[k]!==false;}
 /* stories */
@@ -1600,7 +1577,7 @@ function sheetPixQR(){const s=sheet,pay=pixPayload(s);return `${bar("Pagar com P
   <div class="section" style="text-align:center"><div class="status">${esc(s.label)}</div><div style="font-size:34px;font-weight:900;margin:4px 0 2px" class="tnum">${brl(s.amount)}</div><div class="status">para ${esc(s.name||"o recebedor")}</div></div>
   <div class="section"><div class="qrbox" role="img" aria-label="QR code do Pix">${pixQR(pay)}</div><p class="sf" style="text-align:center">Abra o app do banco, escolha Pix › Ler QR code. O valor já vem preenchido.</p></div>
   <div class="section choice"><button class="btn ghost" data-act="pixCopy">Copiar Pix copia e cola</button><div class="group" id="pixWrap" hidden><textarea class="copybox" id="pixText" readonly>${esc(pay)}</textarea></div>
-    ${s.next?`<button class="btn" data-act="pixDone">Já paguei, avisar ${s.next.target==="quadra"?"a quadra":s.next.target==="camp"?"o organizador":"o Dono de Pelada"}</button>`:""}</div>`;}
+    ${s.next?`<button class="btn" data-act="pixDone">Já paguei, avisar ${s.next.target==="camp"?"o organizador":"o Dono de Pelada"}</button>`:""}</div>`;}
 /* ---------- estatísticas do atleta (todas as peladas) ---------- */
 function userStats(u){const mine=G.peladas.map(P=>({P,p:P.state.players.find(x=>x.uid===u.id)})).filter(x=>x.p);
   const t=k=>mine.reduce((s,x)=>s+(x.p[k]||0),0);let bestDay=null,hat=0;const months={};
@@ -1908,8 +1885,7 @@ function athFromP(p){return {id:"a_"+uid(),src:p.id,name:p.name,uid:p.uid||null,
 /* ---------- render ---------- */
 function render(){
   const inApp=screen==="app"&&!!S;$("tabbar").hidden=!inApp;applyTheme();
-  document.body.className=inApp||screen==="camp"?"sp-futebol":(screen==="quadras"||screen==="qsetup")?"sp-quadras":"";
-  const qt=$("qtabbar");qt.hidden=screen!=="quadras";qt.querySelectorAll("button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===qtab?"page":"false"));
+  document.body.className=inApp||screen==="camp"?"sp-futebol":"";
   const mb=$("modebar"),showMb=!inApp&&modesOf().length>1&&(screen==="home"||screen==="creator");mb.hidden=!showMb;if(showMb)mb.innerHTML=`<div class="inner"><div class="lbl3">TROCAR MODO</div>${modeSeg(screen==="creator"?"creator":"peladas")}</div>`;
   if(!inApp){$("cta").hidden=true;$("fs").hidden=true;$("app").innerHTML=viewScreen();return;}
   if(S.session&&Date.now()>=S.session.closesAt){applySession(true);hud("Votação encerrada. Níveis atualizados.");}
@@ -1950,7 +1926,7 @@ function modeSeg(cur){return `<div class="seg" role="group" aria-label="Modo">${
 function viewLoading(){return `<div class="auth"><div class="logo-big">${MARK}<span class="wm">opeladeiro</span><p>Carregando suas peladas…</p></div></div>`;}
 function viewOffline(){return `<div class="auth"><div class="logo-big">${MARK}<span class="wm">opeladeiro</span><p>${esc(cloudErr||"Sem conexão.")}</p></div><div style="margin-top:22px"><button class="btn" data-act="retryCloud">Tentar de novo</button></div></div>`;}
 function viewNewPass(){return `<div class="hero" style="padding-top:18px"><div class="eyebrow">Opeladeiro</div><h1>Nova senha</h1><p class="sub">Escolha a senha nova da sua conta.</p></div><div class="section authf"><div class="group"><div class="cell"><label class="lbl" for="npPass">Nova senha</label><input class="inl" id="npPass" type="password" autocomplete="new-password" placeholder="mínimo 6 caracteres"></div></div><div class="err" role="alert">${esc(authErr)}</div></div><button class="btn" data-act="setNewPass" ${authBusy?"disabled":""}>${authBusy?"Aguarde…":"Salvar senha"}</button>`;}
-function viewScreen(){return ({loading:viewLoading,offline:viewOffline,newpass:viewNewPass,welcome:viewWelcome,auth:viewAuth,onboard:viewOnboard,creatorPick:viewCreatorPick,home:viewHome,create:viewCreate,join:viewJoin,creator:viewCreator,qsetup:viewQSetup,quadras:viewQuadras,camp:viewCamp,campNew:viewCampNew}[screen]||viewWelcome)();}
+function viewScreen(){return ({loading:viewLoading,offline:viewOffline,newpass:viewNewPass,welcome:viewWelcome,auth:viewAuth,onboard:viewOnboard,creatorPick:viewCreatorPick,home:viewHome,create:viewCreate,join:viewJoin,creator:viewCreator,camp:viewCamp,campNew:viewCampNew}[screen]||viewWelcome)();}
 function viewWelcome(){
   return `<div class="auth"><div class="logo-big">${MARK}<span class="wm">opeladeiro</span><p>O app que organiza a sua pelada.</p></div>
   <div class="feats"><span>⚖️ Sorteio equilibrado</span><span>⏱️ Jogo ao vivo</span><span>⭐ Resenha e craque</span></div>
@@ -1984,11 +1960,10 @@ function viewOnboard(){const u=meU(),d=obDraft,ph=img(u.photo),tmp={name:d.full|
   <div class="section"><div class="sh"><span>POSIÇÃO</span></div><div class="chips">${POS.map(x=>`<button data-act="obpos" data-v="${x}" aria-pressed="${d.pos===x}">${x==="AUTO"?"Não sei / automática":x}</button>`).join("")}</div></div>
   <div class="section"><button class="btn" data-act="obDone">Continuar</button></div>`;
 }
-function viewCreatorPick(){const u=meU(),q=myQuadra();
+function viewCreatorPick(){const u=meU();
   return `${BRAND}<div class="hero"><div class="eyebrow">Acesso de criador</div><h1>Olá, ${esc(u.nick||u.name.split(" ")[0])}</h1><p class="sub">Seu e-mail tem acesso de criador do app. Como você quer entrar agora?</p></div>
   <div class="section choice"><button class="optcard" data-act="goMode" data-v="peladas"><span class="ic">⚽</span><span><b>Minhas peladas</b><span class="t">Como qualquer usuário: a Fut dos Cria, as peladas em que você joga e as que criar.</span></span></button>
-    ${q?`<button class="optcard" data-act="goMode" data-v="quadras"><span class="ic">▦</span><span><b>Opeladeiro Quadras</b><span class="t">${esc(q.name)}: agenda, mensalistas e financeiro.</span></span></button>`:""}
-    <button class="optcard goldc" data-act="goMode" data-v="creator"><span class="ic">✦</span><span><b>Criador do app</b><span class="t">Painel com todas as peladas, quadras e usuários (CRM), planos e configurações.</span></span></button></div>
+    <button class="optcard goldc" data-act="goMode" data-v="creator"><span class="ic">✦</span><span><b>Criador do app</b><span class="t">Painel com todas as peladas e usuários (CRM), planos e configurações.</span></span></button></div>
   <p class="sf" style="text-align:center">Dá para trocar de modo a qualquer momento pela barra de baixo ou pelo Perfil.</p>
   <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button></div></div>`;
 }
@@ -1999,7 +1974,7 @@ function pcard(P){const st=P.state,u=meU(),r=roleIn(P,u);
   return `<button class="pcard" data-act="openPelada" data-v="${P.code}"><div class="top"><h3 class="trunc">${esc(st.pelada.name)}</h3><span class="code">${P.code}</span>${CHEV}</div>
   <span class="status">${[nextTxt(st)||agendaOf(st),st.players.length+(st.players.length===1?" peladeiro":" peladeiros"),st.live&&!st.session?"● jogo ao vivo":""].filter(Boolean).join(" · ")}</span>
   <div class="chipline"><span class="pill ${r==="Peladeiro"?"":"gold"}">${r}</span>${st.pelada.plan==="pro"?'<span class="pill gold">Plano Pro</span>':'<span class="pill">Plano Grátis</span>'}${st.session?'<span class="pill gold">Votação aberta</span>':""}${r==="Dono de Pelada"&&st.pelada.plan!=="pro"&&(st.nudges||[]).length?`<span class="pill warn">${st.nudges.length} pedido${st.nudges.length>1?"s":""} de Pro</span>`:""}</div></button>`;}
-function viewHome(){const u=meU(),all=myPeladas(u),q=myQuadra();
+function viewHome(){const u=meU(),all=myPeladas(u);
   return `${BRAND}<div class="hero"><div class="eyebrow">Olá, ${esc(u.nick||u.name.split(" ")[0])}</div><h1>Minhas peladas</h1>${all.length?"":`<p class="sub">Como você quer começar?</p>`}</div>
   ${all.length?`<div class="section"><div class="addrow"><button data-act="goJoin"><span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 4 7 20M17 4l-2 16M4 9h16M3 15h16"/></svg></span>Entrar com código</button>
     <button data-act="newPelada"><span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Criar pelada</button></div></div>
@@ -2007,7 +1982,6 @@ function viewHome(){const u=meU(),all=myPeladas(u),q=myQuadra();
   `<div class="section choice"><button class="optcard" data-act="goJoin"><span class="ic">⚽</span><span><b>Vou jogar</b><span class="t">Tenho o convite ou o código da pelada.</span></span></button>
     <button class="optcard" data-act="newPelada"><span class="ic">📋</span><span><b>Vou organizar</b><span class="t">Crie sua pelada, chame a galera e sorteie times equilibrados. É grátis.</span></span></button></div>`}
   ${campListHTML(camps().filter(c=>campVisible(c,u)).sort((a,b)=>b.createdAt-a.createdAt),"Times fixos, tabela, artilharia e taça no final. Monte o seu.","")}
-  ${q?`<div class="section"><div class="group"><button class="cell action" data-act="goMode" data-v="quadras"><span class="grow">Abrir Opeladeiro Quadras · ${esc(q.name)}</span>${CHEV}</button></div></div>`:""}
   ${blockedSec()}<div class="section"><div class="sh"><span>NOTIFICAÇÕES</span></div><div class="group"><button class="cell action" data-act="pushToggle"><span class="grow">Avisos da pelada<br><span class="status">${Push.ok?"Times sorteados e lembretes no celular.":"Neste aparelho, instale o app na tela inicial para receber avisos."}</span></span><span class="pill ${Push.on?"gold":""}">${Push.on?"Ativado":"Ativar"}</span></button></div></div>
   <div class="section"><div class="sh"><span>APARÊNCIA</span></div>${themeSeg()}</div>
   <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button>${isCreator()?"":`<button class="cell danger" data-act="delAccount" style="font-weight:500;font-size:15px">Excluir minha conta</button>`}</div></div><p class="sf" style="text-align:center;margin-top:10px"><a href="/termos/" target="_blank" rel="noopener" style="color:inherit">Termos de uso</a> · <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit">Política de privacidade</a></p>`;
@@ -2056,7 +2030,6 @@ function viewJoin(){const u=meU(),back=`<button class="back" data-act="joinBack"
 }
 const num=v=>parseFloat(String(v??"").replace(/\./g,"").replace(",","."))||0;
 const brl=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-function qMRR(q){const t=G.cfg.tiers[q.tier];let v=num(t.price);if(q.tier==="complexo")v+=Math.max(0,q.campos.length-t.campos)*num(t.extra);return v;}
 const DAY=864e5;
 function idleDays(P){const ref=P.lastDrawAt||P.createdAt;return Math.floor((Date.now()-ref)/DAY);}
 function retentionAlerts(){return G.peladas.map(P=>({P,d:idleDays(P)})).filter(x=>x.d>=30).sort((a,b)=>b.d-a.d);}
@@ -2070,24 +2043,20 @@ const PLAN_L={free:"Grátis",pro:"Pro",vip:"Acesso Total"};const planKey=u=>u.co
 function planSel(u){const k=planKey(u);return `<div class="seg" role="group" aria-label="Plano de ${esc(u.name||"")}" style="margin:8px 0 0 46px;flex:0 0 calc(100% - 46px);max-width:calc(100% - 46px)">${["free","pro","vip"].map(x=>`<button data-act="crPlanSet" data-id="${u.id}" data-v="${x}" aria-pressed="${k===x}" style="font-size:13px">${PLAN_L[x]}</button>`).join("")}</div>`;}
 function viewCreator(){
   const U=G.users,Ps=G.peladas.slice().sort((a,b)=>a.code<b.code?-1:1),pros=U.filter(u=>u.plan==="pro"&&!u.courtesy&&u.email!==CREATOR&&ownedBy(u).length),vips=U.filter(u=>u.courtesy&&!u._stub),totP=Ps.reduce((s,P)=>s+P.state.players.length,0),realSet=new Set(),semConta=Ps.reduce((s,P)=>s+P.state.players.filter(p=>{if(p.uid){realSet.add(p.uid);return false;}return true;}).length,0),realU=U.filter(u=>!u._stub);
-  const price=num(G.cfg.price),Qs=G.quadras,qPaying=Qs.filter(q=>!(q.trialEnds>Date.now())),qRev=qPaying.reduce((s,q)=>s+qMRR(q),0);
+  const price=num(G.cfg.price);
   let h=`${BRAND}<div class="hero"><div class="eyebrow">Criador do app</div><h1>Painel Opeladeiro</h1><p class="sub">Tudo o que está registrado no app.</p></div>
-  <div class="seg" role="group" aria-label="Painel">${[["geral","Geral"],["peladas","Peladas"],["quadras","Quadras"],["denuncias","Denúncias"+(crRep.filter(r=>r.status==="open").length?" ("+crRep.filter(r=>r.status==="open").length+")":"")],["usuarios","Usuários"],["config","Config"]].map(([k,l])=>`<button data-act="crSeg" data-v="${k}" aria-pressed="${crSeg===k}" style="font-size:13px">${l}</button>`).join("")}</div>`;
+  <div class="seg" role="group" aria-label="Painel">${[["geral","Geral"],["peladas","Peladas"],["denuncias","Denúncias"+(crRep.filter(r=>r.status==="open").length?" ("+crRep.filter(r=>r.status==="open").length+")":"")],["usuarios","Usuários"],["config","Config"]].map(([k,l])=>`<button data-act="crSeg" data-v="${k}" aria-pressed="${crSeg===k}" style="font-size:13px">${l}</button>`).join("")}</div>`;
   if(crSeg==="geral"){const al=retentionAlerts(),a3=al.filter(x=>x.d>=90),a1=al.filter(x=>x.d<90);
     h+=`<div class="section"><div class="sh"><span>ALERTAS DE RETENÇÃO</span><span>${al.length}</span></div><div class="group">${al.length?`${a3.length?`<div class="cell"><span class="status" style="color:var(--down);font-weight:700">3 MESES SEM SORTEIO · ${a3.length}</span></div>`+a3.map(alertRow).join(""):""}${a1.length?`<div class="cell"><span class="status" style="color:var(--gold);font-weight:700">1 MÊS SEM SORTEIO · ${a1.length}</span></div>`+a1.map(alertRow).join(""):""}`:`<div class="empty">Nenhuma pelada parada. Todas sortearam times no último mês.</div>`}</div>
       <p class="sf">Alerta quando uma pelada completa 1 mês e 3 meses sem sorteio.</p></div>
     <div class="section"><div class="kpis"><div class="kpi"><span class="l">Contas criadas</span><span class="v tnum">${realU.length}</span></div><div class="kpi"><span class="l">Peladas</span><span class="v tnum">${Ps.length}</span></div>
       <div class="kpi gold"><span class="l">Donos no Pro (pagantes)</span><span class="v tnum">${pros.length}</span></div><div class="kpi"><span class="l">Acesso Total</span><span class="v tnum">${vips.length}</span></div><div class="kpi"><span class="l">Peladeiros com conta</span><span class="v tnum">${realSet.size}</span></div><div class="kpi"><span class="l">Peladeiros sem conta</span><span class="v tnum">${semConta}</span></div><div class="kpi"><span class="l">Peladeiros no total</span><span class="v tnum">${realSet.size+semConta}</span></div>
-      <div class="kpi"><span class="l">Quadras (pagando / teste)</span><span class="v tnum">${qPaying.length} / ${Qs.length-qPaying.length}</span></div><div class="kpi gold"><span class="l">Receita Quadras</span><span class="v tnum money">${brl(qRev)}</span></div>
-      <div class="kpi gold" style="grid-column:span 2"><span class="l">Receita mensal estimada (Pro + Quadras)</span><span class="v tnum">${brl(pros.length*price+qRev)}</span></div></div><p class="sf"><b>Com conta:</b> pessoas que criaram login e entraram em alguma pelada (cada pessoa conta uma vez, mesmo em várias peladas). <b>Sem conta:</b> nomes que o Dono de Pelada cadastrou no elenco e que ainda não criaram login.</p></div>
+      <div class="kpi gold" style="grid-column:span 2"><span class="l">Receita mensal estimada (Pro)</span><span class="v tnum">${brl(pros.length*price)}</span></div></div><p class="sf"><b>Com conta:</b> pessoas que criaram login e entraram em alguma pelada (cada pessoa conta uma vez, mesmo em várias peladas). <b>Sem conta:</b> nomes que o Dono de Pelada cadastrou no elenco e que ainda não criaram login.</p></div>
     <div class="section"><div class="sh"><span>ÚLTIMOS CADASTROS</span></div><div class="group">${realU.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5).map(u=>`<div class="cell"><span class="ava sm">${esc(initials(u.name))}</span><span class="grow"><b>${esc(u.name)}</b><br><span class="status">${esc(u.email)}</span></span><span class="status">${dmy(u.createdAt)}</span></div>`).join("")}</div></div>`;
   } else if(crSeg==="peladas"){
     h+=`<div class="section"><div class="sh"><span>${Ps.length} PELADAS · EM ORDEM DE CRIAÇÃO</span></div><div class="group">${Ps.map(P=>{const ow=U.find(u=>u.id===P.ownerUid)||{};const pro=P.state.pelada.plan==="pro";
       const d=idleDays(P);return `<div class="cell"><span class="code">${P.code}</span><span class="grow"><b>${esc(P.state.pelada.name)}</b><br><span class="status">${esc(ow.name||"—")} · ${P.state.players.length} peladeiros (${P.state.players.filter(p=>p.uid).length} com conta) · criada ${dmy(P.createdAt)}</span><br><span class="status" style="color:${d>=90?"var(--down)":d>=30?"var(--gold)":"var(--muted)"}">${P.lastDrawAt?"Último sorteio: "+(d===0?"hoje":"há "+d+(d===1?" dia":" dias")):"Nunca sorteou"}${P.lastSeenAt?" · último acesso "+dmy(P.lastSeenAt):""}</span></span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="pill ${pro?"gold":""}">${P.state.pelada.courtesy?"Acesso Total":pro?"Pro":"Grátis"}</span></span></div>`;}).join("")||`<div class="empty">Nenhuma pelada ainda.</div>`}</div>
       <p class="sf">O plano é do Dono de Pelada e vale para todas as peladas dele. Mude na aba Usuários.</p></div>`;
-  } else if(crSeg==="quadras"){
-    h+=`<div class="section"><div class="sh"><span>${Qs.length} QUADRAS</span></div><div class="group">${Qs.map(q=>{const ow=U.find(u=>u.id===q.ownerUid)||{},tr=q.trialEnds>Date.now();
-      return `<div class="cell"><span class="grow"><b>${esc(q.name)}</b><br><span class="status">${esc(ow.name||"—")} · ${q.campos.length} campos · ${q.fixas.length} mensalistas · desde ${dmy(q.createdAt)}</span></span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="pill gold">${G.cfg.tiers[q.tier].name}</span><span class="status">${tr?"em teste":brl(qMRR(q))+"/mês"}</span></span></div>`;}).join("")||`<div class="empty">Nenhuma quadra ainda.</div>`}</div></div>`;
   } else if(crSeg==="denuncias"){
     if(!crRepLoaded)loadReports();
     const RL=Object.fromEntries(REP_R);
@@ -2096,176 +2065,35 @@ function viewCreator(){
   } else if(crSeg==="usuarios"){
     const q=normTxt(crQ),list=U.filter(u=>!u._stub&&(!q||normTxt((u.name||"")+" "+(u.email||"")).includes(q)));
     h+=`<div class="section"><input class="search" id="crQ" type="search" placeholder="Buscar por nome ou e-mail" value="${esc(crQ)}" data-input="crq"></div>
-    <div class="section" style="margin-top:12px"><div class="sh"><span>CRM · ${list.length} USUÁRIOS</span></div><div class="group">${list.map(u=>{const own=ownedBy(u),mem=memberOf(u).filter(P=>P.ownerUid!==u.id),qd=G.quadras.find(x=>x.ownerUid===u.id);
-      const roles=[own.length?"Dono de Pelada":"",mem.length?"Peladeiro":"",qd?"Dono de Quadra":""].filter(Boolean).join(", ")||"Sem pelada ainda";
+    <div class="section" style="margin-top:12px"><div class="sh"><span>CRM · ${list.length} USUÁRIOS</span></div><div class="group">${list.map(u=>{const own=ownedBy(u),mem=memberOf(u).filter(P=>P.ownerUid!==u.id);
+      const roles=[own.length?"Dono de Pelada":"",mem.length?"Peladeiro":""].filter(Boolean).join(", ")||"Sem pelada ainda";
       return `<div class="cell" style="align-items:flex-start;padding-top:12px;padding-bottom:12px;flex-wrap:wrap"><span class="ava sm">${img(u.photo)?`<img src="${img(u.photo)}" alt="">`:esc(initials(u.name))}</span><span class="grow"><b>${esc(u.name)}</b>${u.email===CREATOR?' <span class="pill gold">criador</span>':""}<br><span class="status">${esc(u.email)}</span><br>
         <span class="status">${roles} · desde ${dmy(u.createdAt)}${u.lastLogin?" · último acesso "+dmy(u.lastLogin):""}</span><br>
-        <span class="status">${own.length?"Dono: "+own.map(P=>P.code).join(", "):""}${own.length&&mem.length?" · ":""}${mem.length?"Joga: "+mem.map(P=>P.code).join(", "):""}${qd?(own.length||mem.length?" · ":"")+"Quadra: "+esc(qd.name)+" ("+G.cfg.tiers[qd.tier].name+")":""}</span></span>
+        <span class="status">${own.length?"Dono: "+own.map(P=>P.code).join(", "):""}${own.length&&mem.length?" · ":""}${mem.length?"Joga: "+mem.map(P=>P.code).join(", "):""}</span></span>
         </div>${planSel(u)}`;}).join("")||`<div class="empty">Ninguém encontrado.</div>`}</div>
       <p class="sf"><b>Grátis</b> e <b>Pro</b> são os planos normais (o Pro entra na receita). <b>Acesso Total</b> libera tudo do Pro sem cobrança e não entra na receita. Para tirar, é só escolher outro plano.</p></div>`;
   } else {
-    const T=G.cfg.tiers,inp=(id,lbl,val,k,f,w=90,mode="decimal")=>`<div class="cell"><label class="lbl" for="${id}" style="width:auto;flex:1">${lbl}</label><input class="inl" id="${id}" inputmode="${mode}" value="${esc(val)}" data-input="cfgt" data-k="${k}" data-f="${f}" style="max-width:${w}px"></div>`;
-    h+=`<div class="section"><div class="sh"><span>OPELADEIRO (DONO DE PELADA)</span></div><div class="group">
+        h+=`<div class="section"><div class="sh"><span>OPELADEIRO (DONO DE PELADA)</span></div><div class="group">
       <div class="cell"><label class="lbl" for="cfP" style="width:auto;flex:1">Preço do Pro (R$/mês)</label><input class="inl" id="cfP" inputmode="decimal" value="${esc(G.cfg.price)}" data-input="cfgprice" style="max-width:110px"></div>
       <div class="cell"><label class="lbl" for="cfF" style="width:auto;flex:1">Peladeiros no Grátis</label><input class="inl" id="cfF" type="number" inputmode="numeric" value="${G.cfg.freePlayers}" data-input="cfgfree" style="max-width:90px"></div>
       <div class="cell"><label class="lbl" for="cfE" style="width:auto;flex:1">Peladas por dono no Grátis</label><input class="inl" id="cfE" type="number" inputmode="numeric" value="${G.cfg.freePeladas}" data-input="cfgpel" style="max-width:90px"></div>
       <div class="cell"><label class="lbl" for="cfC" style="width:auto;flex:1">Campeonato avulso (R$)</label><input class="inl" id="cfC" inputmode="decimal" value="${esc(G.cfg.campPrice)}" data-input="cfgcamp" style="max-width:110px"></div>
       <div class="cell" style="flex-direction:column;align-items:stretch;gap:6px"><span class="lbl" style="width:auto">E-mails com Acesso Total</span><textarea class="field" style="min-height:70px;font-size:15px" data-input="cfgvip" placeholder="um por linha">${esc(G.cfg.proEmails.join("\n"))}</textarea><span class="status">Quem criar conta com esses e-mails já entra com Acesso Total: tudo do Pro, sem cobrança e fora da receita. Não vira criador do app.</span></div></div></div>
-    ${["quadra","arena","complexo"].map(k=>`<div class="section"><div class="sh"><span>QUADRAS · NÍVEL ${T[k].name.toUpperCase()}</span></div><div class="group">
-      ${inp("cf_"+k+"_p","Preço (R$/mês)",T[k].price,k,"price",110)}
-      ${inp("cf_"+k+"_c","Campos inclusos",T[k].campos,k,"campos",90,"numeric")}
-      ${k==="complexo"?inp("cf_"+k+"_x","Campo extra (R$/mês)",T[k].extra,k,"extra",110):""}
-      ${k==="quadra"?inp("cf_"+k+"_f","Mensalistas (máx.)",T[k].fixas,k,"fixas",90,"numeric"):""}
-      ${k!=="complexo"?inp("cf_"+k+"_a","Acessos",T[k].acessos,k,"acessos",90,"numeric"):""}</div></div>`).join("")}
     <div class="section"><div class="group"><div class="cell"><label class="lbl" for="cfPix" style="width:auto;flex:1">Taxa por cobrança Pix paga (R$)</label><input class="inl" id="cfPix" inputmode="decimal" value="${esc(G.cfg.pixFee)}" data-input="cfgpix" style="max-width:110px"></div></div>
-      <p class="sf">Vale na hora para todo o app: limites, criação de peladas, preços do pop-up de upgrade e dos planos de quadra.</p></div>
+      <p class="sf">Vale na hora para todo o app: limites, criação de peladas, preços do pop-up de upgrade.</p></div>
     <div class="section"><div class="box testbox"><div class="note"><b>Teste dos alertas.</b> Cria duas peladas de exemplo paradas há 40 e 100 dias.</div><button class="btn ghost sm" data-act="crSimIdle">Simular peladas paradas</button></div></div>
-    <div class="section"><div class="box testbox"><div class="note"><b>Dados de teste.</b> Apaga todas as contas, peladas, quadras e fotos deste aparelho e volta ao início com a Fut dos Cria.</div><button class="btn ghost sm" style="color:var(--down)" data-act="wipe">${wipeArm?"Toque de novo para apagar tudo":"Apagar todos os dados do app"}</button></div></div>`;
+    <div class="section"><div class="box testbox"><div class="note"><b>Dados de teste.</b> Apaga todas as contas, peladas e fotos deste aparelho e volta ao início com a Fut dos Cria.</div><button class="btn ghost sm" style="color:var(--down)" data-act="wipe">${wipeArm?"Toque de novo para apagar tudo":"Apagar todos os dados do app"}</button></div></div>`;
   }
   return h+`<div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button></div></div>`;
 }
 
-/* ---------- Opeladeiro Quadras ---------- */
-const TIER_RANK={quadra:0,arena:1,complexo:2};
-const hasT=(q,min)=>TIER_RANK[q.tier]>=TIER_RANK[min];
-const TIER_FEATS={
-  quadra:["CRM dos mensalistas com WhatsApp do organizador","Mensalidades que renovam todo dia 1","Balanço do mês: previsto, recebido e a receber","Agenda semanal por campo","Cobrança por WhatsApp com mensagem pronta"],
-  arena:["Tudo do Quadra, com peladas ilimitadas","Cobrança automática por Pix com baixa automática (em breve)","Horários vagos publicados no app","Avulsos (day use, aniversário, campeonato)","Relatórios de ocupação e inadimplência, com exportação"],
-  complexo:["Tudo do Arena","Várias unidades, com comparativo","Permissões por acesso (recepção não vê o financeiro)","Destaque na busca de quadras","Logo da arena nos cards e Stories dos atletas","Torneios internos e suporte prioritário"]};
-function tierLimits(k){const t=G.cfg.tiers[k];return [`${k==="complexo"?t.campos+" campos + "+brl(num(t.extra))+" por campo extra":"até "+t.campos+" campos"}`,k==="quadra"?`até ${t.fixas} mensalistas`:"mensalistas ilimitados",k==="complexo"?"acessos ilimitados":`${t.acessos} ${t.acessos==1?"acesso":"acessos"}`];}
+/* meses */
 const mKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
 const curMK=()=>mKey(new Date());
 const mLabel=k=>{const [y,m]=k.split("-").map(Number);const t=new Date(y,m-1,15).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});return t[0].toUpperCase()+t.slice(1);};
 const mShift=(k,n)=>{const [y,m]=k.split("-").map(Number);return mKey(new Date(y,m-1+n,15));};
-function fixaStatus(q,f,mk){if(q.pays[f.id+"|"+mk])return "paga";const c=curMK();if(mk<c)return "atrasada";if(mk>c)return "avencer";return new Date().getDate()>10?"atrasada":"pendente";}
-const ST_L={paga:"Paga",pendente:"Pendente",atrasada:"Atrasada",avencer:"A vencer"};
-function monthItems(q,mk){const out=[];
-  q.fixas.forEach(f=>{if((f.since||"0000-00")<=mk)out.push({kind:"fixa",id:f.id,name:f.name,sub:`${campoName(q,f.campoId)} · ${WDs[f.weekday]} ${f.time} · ${f.org||"sem organizador"}`,phone:f.phone,org:f.org,valor:num(f.valor),status:fixaStatus(q,f,mk),pay:q.pays[f.id+"|"+mk]});});
-  q.avulsos.filter(a=>a.date.startsWith(mk)).forEach(a=>out.push({kind:"avulso",id:a.id,name:a.name+" (avulso)",sub:`${campoName(q,a.campoId)} · ${a.date.split("-").reverse().slice(0,2).join("/")} ${a.time}`,phone:a.phone,org:a.name,valor:num(a.valor),status:a.paid?"paga":(a.date<new Date().toISOString().slice(0,10)?"atrasada":"pendente"),pay:a.paid}));
-  return out;}
-function finOf(q,mk){const it=monthItems(q,mk);const sum=f=>it.filter(f).reduce((s,x)=>s+x.valor,0);return {it,prev:sum(()=>true),rec:sum(x=>x.status==="paga"),atr:sum(x=>x.status==="atrasada")};}
-const campoName=(q,id)=>(q.campos.find(c=>c.id===id)||{name:"Campo"}).name;
-const PISO={grama:["Grama","#3FCB78"],areia:["Areia","#E0A85E"],poli:["Poli","#8FD3FF"]};
-const pisoTag=c=>{const p=PISO[c.piso||"grama"];return `<span class="piso"><i style="background:${p[1]}"></i>${p[0]}</span>`;};
-function waLinkFor(q,x,mk){const digits=String(x.phone||"").replace(/\D/g,"");const msg=`Olá, ${x.org||""}! Aqui é da ${q.name}. Passando para lembrar da ${x.kind==="fixa"?"mensalidade da "+x.name+" de "+mLabel(mk):"reserva "+x.name}: ${brl(x.valor)}.${q.pix?" Pix: "+q.pix:""} Obrigado!`;
-  return `https://wa.me/${digits?(digits.length<=11?"55"+digits:digits):""}?text=${encodeURIComponent(msg)}`;}
-function lockRow(min,txt){return `<div class="cell"><span class="grow">${txt}</span><span class="lock">🔒 ${G.cfg.tiers[min].name}</span><button class="mini" data-act="qPlans">Ver planos</button></div>`;}
-function slotsOf(q){const a=parseInt((q.open||"08:00").slice(0,2)),b=parseInt((q.close||"23:00").slice(0,2));const out=[];for(let h=a;h<b;h++)out.push(String(h).padStart(2,"0")+":00");return out;}
-function occupancy(q){const slots=slotsOf(q).length*7*q.campos.length;return {used:q.fixas.length,total:slots,pct:slots?Math.round(q.fixas.length/slots*100):0};}
-function viewQSetup(){const d=qsDraft;
-  return `<button class="back" data-act="goMode" data-v="peladas">‹ Minhas peladas</button>
-  <div class="qhead" style="padding-top:6px"><div class="brand">${MARK}<span class="wm">opeladeiro <span class="qsub">Quadras</span></span></div></div>
-  <div class="hero"><h1>Sua quadra organizada</h1><p class="sub">Agenda, mensalistas, mensalidades e o financeiro do mês em um lugar só. 30 dias grátis para testar.</p></div>
-  <div class="section"><div class="group"><div class="cell"><label class="lbl" for="qsName">Nome</label><input class="inl" id="qsName" placeholder="Ex.: Arena da Vila" value="${esc(d.name)}" data-input="qsname"></div>
-    <div class="cell"><label class="lbl" for="qsB">Bairro</label><input class="inl" id="qsB" placeholder="Ex.: Santa Tereza, BH" value="${esc(d.bairro)}" data-input="qsbairro"></div>
-    <div class="cell"><span class="grow">Campos</span><div class="stepper"><output class="tnum">${d.campos}</output><div class="stp"><button data-act="qsCampos" data-v="-1" ${d.campos<=1?"disabled":""} aria-label="Menos um">−</button><i></i><button data-act="qsCampos" data-v="1" ${d.campos>=20?"disabled":""} aria-label="Mais um">+</button></div></div></div></div></div>
-  <div class="section"><div class="sh"><span>ESCOLHA O PLANO</span></div>${tiersHTML(d.tier,"qsTier",d.campos)}</div>
-  <div class="err" role="alert">${esc(authErr)}</div>
-  <div class="section"><button class="btn" data-act="qsCreate">Começar 30 dias grátis</button><p class="sf" style="text-align:center">Valores de teste. No plano anual, 2 meses grátis.</p></div>`;
-}
-function tiersHTML(cur,act,campos){const T=G.cfg.tiers;
-  return `<div class="tiers">${["quadra","arena","complexo"].map(k=>{const t=T[k],fits=k==="complexo"||campos==null||campos<=t.campos;
-    return `<button class="tier" data-act="${act}" data-v="${k}" aria-pressed="${cur===k}">${k==="arena"?'<span class="pill gold tag">Mais escolhido</span>':""}<h3>${t.name}</h3>
-      <span class="pr">${brl(num(t.price))}<small> /mês</small></span><span class="status">${tierLimits(k).join(" · ")}</span>
-      <ul>${TIER_FEATS[k].map(x=>`<li>${x}</li>`).join("")}</ul>${!fits?`<span class="lock">Seus ${campos} campos não cabem neste nível</span>`:""}${cur===k?`<span class="pill">${act==="qTier"?"Plano atual":"Selecionado"}</span>`:""}</button>`;}).join("")}</div>`;}
-function viewQuadras(){const q=myQuadra();if(!q){screen="home";return viewHome();}
-  const t=G.cfg.tiers[q.tier],tr=q.trialEnds>Date.now(),days=Math.ceil((q.trialEnds-Date.now())/864e5);
-  let h=`<div class="qhead"><div class="brand">${MARK}<span class="wm">opeladeiro <span class="qsub">Quadras</span></span></div><button class="mini" data-act="goMode" data-v="peladas">Minhas peladas ›</button></div>
-  <div class="hero" style="padding-top:12px"><div class="eyebrow">Plano ${t.name}${tr?` · teste grátis, ${days} ${days===1?"dia":"dias"}`:""}</div><h1>${esc(q.name)}</h1>${q.bairro?`<p class="sub">${esc(q.bairro)}</p>`:""}</div>`;
-  if(qtab==="agenda")h+=qAgenda(q);else if(qtab==="peladas")h+=qPeladas(q);else if(qtab==="financeiro")h+=qFin(q);else h+=qConfig(q);
-  return h;
-}
-function qAgenda(q){const today=new Date(),ds=[...Array(7).keys()].map(i=>{const d=new Date(today);d.setDate(today.getDate()+((qDay-today.getDay()+7)%7));return d;})[0];
-  const dateStr=ds.toISOString().slice(0,10),occ=occupancy(q);
-  return `<div class="section"><div class="chips">${WDs.map((x,i)=>`<button data-act="qDay" data-v="${i}" aria-pressed="${qDay===i}">${x}</button>`).join("")}</div>
-    <p class="sf">${WD[qDay]}, ${ds.toLocaleDateString("pt-BR",{day:"numeric",month:"long"})} · funcionamento ${q.open}–${q.close}</p></div>
-  <div class="section"><div class="qgrid">${q.campos.map(c=>{const fx=q.fixas.filter(f=>f.campoId===c.id&&f.weekday===qDay).map(f=>({t:f.time,n:f.name,s:f.org,av:false,id:f.id}));
-      const av=q.avulsos.filter(a=>a.campoId===c.id&&a.date===dateStr).map(a=>({t:a.time,n:a.name,s:"avulso",av:true}));const all=fx.concat(av).sort((a,b)=>a.t<b.t?-1:1);
-      const busy=new Set(all.map(x=>x.t.slice(0,2)));const free=slotsOf(q).filter(s=>!busy.has(s.slice(0,2)));
-      return `<div class="group"><div class="campo-h"><span style="display:flex;align-items:center;gap:8px">${esc(c.name)} ${pisoTag(c)}</span><span class="status">${all.length} ${all.length===1?"horário":"horários"}</span></div>
-        ${all.map(x=>`<div class="slot${x.av?" av":""}"><span class="t tnum">${x.t}</span><span class="grow"><b>${esc(x.n)}</b><br><span class="status">${esc(x.s||"")}</span></span>${x.av?'<span class="pill gold">Avulso</span>':""}</div>`).join("")||`<div class="slot"><span class="status">Nenhum horário marcado.</span></div>`}
-        <div class="frees">${free.map(f=>`<span>${f}</span>`).join("")||'<span style="background:none;color:var(--muted)">Lotado</span>'}</div></div>`;}).join("")}</div>
-    <p class="sf">Em verde, os horários livres do dia.</p></div>
-  <div class="section"><div class="group">
-    ${hasT(q,"arena")?`<div class="cell"><span class="grow"><b>Publicar horários vagos no app</b><br><span class="status">Quem procura quadra encontra seus horários livres.</span></span><button class="switch" role="switch" aria-checked="${!!q.vitrine}" aria-label="Publicar horários vagos" data-act="qVitrine"></button></div>
-      <button class="cell action" data-act="qNewAvulso"><span class="grow">+ Avulso</span>${CHEV}</button>`:lockRow("arena","Horários vagos no app e avulsos")}
-  </div></div>
-  <div class="section"><div class="group"><div class="stats3"><div><span class="l">Fixos na semana</span><span class="v">${occ.used}</span></div><div><span class="l">Horários possíveis</span><span class="v">${occ.total}</span></div><div><span class="l">Ocupação</span><span class="v">${occ.pct}%</span></div></div></div></div>`;
-}
-function qPeladas(q){const t=G.cfg.tiers[q.tier],lim=q.tier==="quadra"?+t.fixas:0,qq=normTxt(qQ),list=q.fixas.filter(f=>!qq||normTxt(f.name+" "+(f.org||"")).includes(qq)).sort((a,b)=>a.weekday-b.weekday||(a.time<b.time?-1:1)),mk=curMK();
-  return `<div class="section" style="display:flex;gap:10px;align-items:center"><input class="search" id="qQ" type="search" placeholder="Buscar mensalista ou organizador" value="${esc(qQ)}" data-input="qq"><button class="btn sm" style="width:auto;padding:0 16px;flex:none" data-act="qNewFixa">+ Nova</button></div>
-  <div class="section" style="margin-top:12px"><div class="sh"><span>MENSALISTAS · ${q.fixas.length}${lim?" DE "+lim:""}</span><span>${mLabel(mk).toUpperCase()}</span></div>
-    <div class="group">${list.map(f=>{const st=fixaStatus(q,f,mk),P=f.code&&pByCode(f.code);
-      return `<button class="qrow" data-act="qOpenFixa" data-id="${f.id}"><span class="grow"><b>${esc(f.name)}</b>${P?` <span class="code" style="font-size:12px">${P.code}</span>`:""}<br><span class="status">${esc(campoName(q,f.campoId))} · ${WDs[f.weekday]} ${f.time} · ${esc(f.org||"sem organizador")}</span></span>
-        <span class="r"><span class="val">${brl(num(f.valor))}</span><span class="st ${st}">${st!=="paga"&&(q.informed||{})[f.id+"|"+mk]?"Informado":ST_L[st]}</span></span></button>`;}).join("")||`<div class="empty">Nenhum mensalista cadastrado.<br><br><button class="btn ghost sm" data-act="qSeed" style="max-width:260px;margin:0 auto">Carregar exemplo (teste)</button></div>`}</div>
-    <p class="sf">A mensalidade renova todo dia 1. Fica pendente até o dia 10 e depois aparece como atrasada.</p></div>`;
-}
-function qFin(q){const mk=qMonth||curMK(),F=finOf(q,mk),pct=F.prev?Math.round(F.rec/F.prev*100):0;
-  const grp=(st,l)=>{const it=F.it.filter(x=>x.status===st);return it.length?`<div class="section"><div class="sh"><span>${l} · ${it.length}</span><span>${brl(it.reduce((s,x)=>s+x.valor,0))}</span></div><div class="group">${it.map(x=>`<div class="qrow"><span class="grow"><b>${esc(x.name)}</b><br><span class="status">${esc(x.sub)}${x.pay&&x.pay.via?" · pago via "+(x.pay.via==="pix"?"Pix automático":"baixa manual"):""}${(()=>{const inf=x.kind==="fixa"&&x.status!=="paga"&&(q.informed||{})[x.id+"|"+mk];return inf?" · organizador avisou que pagou"+(inf.via?" via "+VIA_L[inf.via]:"")+(inf.proof?` · <button class="mini" style="min-height:0;padding:0" data-act="proofView" data-k="${inf.proof}">ver comprovante</button>`:""):"";})()}</span></span>
-      <span class="r"><span class="val">${brl(x.valor)}</span><span style="display:flex;gap:6px">${st==="paga"?`<button class="mini" data-act="qUnpay" data-id="${x.id}" data-k="${x.kind}">Desfazer</button>`:`${x.phone?`<a class="mini" style="display:inline-flex;align-items:center;text-decoration:none" href="${waLinkFor(q,x,mk)}" target="_blank" rel="noopener">Cobrar</a>`:""}<button class="mini" data-act="qPay" data-id="${x.id}" data-k="${x.kind}">Recebi</button>`}</span></span></div>`).join("")}</div></div>`:"";};
-  const months=[...Array(6).keys()].map(i=>mShift(curMK(),i-5)),mx=Math.max(1,...months.map(m=>finOf(q,m).prev));
-  return `<div class="section"><div class="monthnav"><button data-act="qMonth" data-v="-1" aria-label="Mês anterior">‹</button><b>${mLabel(mk)}</b><button data-act="qMonth" data-v="1" aria-label="Próximo mês">›</button></div></div>
-  <div class="section"><div class="kpis"><div class="kpi"><span class="l">Previsto</span><span class="v tnum money">${brl(F.prev)}</span></div><div class="kpi"><span class="l">Recebido</span><span class="v tnum money" style="color:var(--lime)">${brl(F.rec)}</span></div>
-    <div class="kpi"><span class="l">A receber</span><span class="v tnum money">${brl(F.prev-F.rec)}</span></div><div class="kpi"><span class="l">Atrasado</span><span class="v tnum money" style="color:var(--down)">${brl(F.atr)}</span></div></div>
-    <div style="margin-top:12px"><div class="prog"><i style="width:${pct}%"></i></div><div class="status" style="margin-top:6px">${pct}% recebido</div></div></div>
-  <div class="section"><div class="group"><div class="cell"><span class="grow"><b>Cobrança automática por Pix</b><br><span class="status">Link Pix com baixa automática. Em breve.</span></span><span class="pill">Em breve</span></div></div></div>
-  <div class="qcols">${grp("atrasada","ATRASADAS")}${grp("pendente","PENDENTES")}${grp("avencer","A VENCER")}${grp("paga","PAGAS")}</div>
-  ${!F.it.length?`<div class="section"><div class="group"><div class="empty">Nada para receber neste mês.</div></div></div>`:""}
-  <div class="section"><div class="sh"><span>INADIMPLÊNCIA · ÚLTIMOS 6 MESES</span>${hasT(q,"arena")?`<button class="mini" data-act="qExport">Copiar planilha</button>`:""}</div>
-    ${hasT(q,"arena")?`<div class="group"><div class="bars">${months.map(m=>{const f=finOf(q,m);return `<div><i class="${f.atr?"":"ok"}" style="height:${Math.round((f.atr||f.rec)/mx*100)}%"></i><span>${mLabel(m).slice(0,3)}</span></div>`;}).join("")}</div><p class="sf" style="padding:4px 14px 12px">Vermelho: valor em atraso no mês. Verde: mês sem atraso.</p></div>`:`<div class="group">${lockRow("arena","Relatórios de inadimplência e ocupação")}</div>`}</div>`;
-}
-function qConfig(q){const t=G.cfg.tiers[q.tier],maxC=q.tier==="complexo"?99:+t.campos,maxA=q.tier==="complexo"?99:+t.acessos;
-  return `<div class="section"><div class="group">
-    <div class="cell"><label class="lbl" for="qN">Nome</label><input class="inl" id="qN" value="${esc(q.name)}" data-input="qname"></div>
-    <div class="cell"><label class="lbl" for="qB">Bairro</label><input class="inl" id="qB" value="${esc(q.bairro||"")}" data-input="qbairro"></div>
-    <div class="cell"><label class="lbl" for="qPix">Chave Pix</label><input class="inl" id="qPix" value="${esc(q.pix||"")}" placeholder="CNPJ, e-mail ou celular" data-input="qpix"></div>
-    <div class="cell"><label class="lbl" for="qO">Abre</label><input class="inl" type="time" id="qO" value="${esc(q.open)}" data-input="qopen"></div>
-    <div class="cell"><label class="lbl" for="qC">Fecha</label><input class="inl" type="time" id="qC" value="${esc(q.close)}" data-input="qclose"></div></div></div>
-  <div class="section"><div class="sh"><span>PLANO</span></div><div class="box"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><b style="font-family:var(--cond);font-size:30px;text-transform:uppercase">${t.name}</b><span class="tnum" style="font-weight:700">${brl(qMRR(q))}/mês</span></div>
-    <span class="status">${q.trialEnds>Date.now()?"Teste grátis até "+new Date(q.trialEnds).toLocaleDateString("pt-BR"):"Renova todo mês"} · ${tierLimits(q.tier).join(" · ")}</span>
-    <button class="btn ghost sm" data-act="qPlans">Ver planos e mudar</button></div></div>
-  <div class="section"><div class="sh"><span>CAMPOS E PISO · ${q.campos.length}${q.tier!=="complexo"?" DE "+maxC:""}</span></div><div class="group">${q.campos.map(c=>`<div class="cell"><input class="field" value="${esc(c.name)}" data-input="qcampo" data-id="${c.id}" aria-label="Nome do campo"><span class="pisosel" role="group" aria-label="Piso">${Object.entries(PISO).map(([k,v])=>`<button data-act="qPiso" data-id="${c.id}" data-v="${k}" aria-pressed="${(c.piso||"grama")===k}">${v[0]}</button>`).join("")}</span>${q.campos.length>1?`<button class="xbtn" data-act="qDelCampo" data-id="${c.id}" aria-label="Remover campo">×</button>`:""}</div>`).join("")}
-    <button class="cell action" data-act="qAddCampo">+ Adicionar campo${q.tier==="complexo"&&q.campos.length>=t.campos?` (${brl(num(t.extra))}/mês)`:""}</button></div></div>
-  <div class="section"><div class="sh"><span>ACESSOS · ${1+q.staff.length}${q.tier!=="complexo"?" DE "+maxA:""}</span></div><div class="group">
-    <div class="cell"><span class="ava sm">${esc(initials(meU().name))}</span><span class="grow">${esc(meU().email)}</span><span class="pill">Dono</span></div>
-    ${q.staff.map(e=>`<div class="cell"><span class="ava sm">${esc(initials(e))}</span><span class="grow">${esc(e)}</span>${hasT(q,"complexo")?'<span class="pill">Recepção</span>':""}<button class="xbtn" data-act="qDelStaff" data-v="${esc(e)}" aria-label="Remover acesso">×</button></div>`).join("")}
-    ${1+q.staff.length<maxA?`<div class="cell"><input class="field" id="qStaff" type="email" placeholder="E-mail de quem trabalha na quadra" style="font-size:15px"><button class="mini" data-act="qAddStaff">Adicionar</button></div>`:lockRow(q.tier==="quadra"?"arena":"complexo","Mais acessos para a equipe")}</div></div>
-  <div class="section"><div class="sh"><span>DO NÍVEL COMPLEXO</span></div><div class="group">${["Várias unidades, com comparativo","Permissões por acesso","Destaque na busca de quadras","Logo da arena nos cards dos atletas","Torneios internos","Suporte prioritário"].map(x=>`<div class="cell"><span class="grow">${x}</span>${hasT(q,"complexo")?'<span class="pill">Incluído</span>':`<span class="lock">🔒 Complexo</span>`}</div>`).join("")}</div></div>
-  ${modesOf().length>1?`<div class="section"><div class="sh"><span>TROCAR MODO</span></div>${modeSeg("quadras")}</div>`:""}
-  ${blockedSec()}<div class="section"><div class="sh"><span>NOTIFICAÇÕES</span></div><div class="group"><button class="cell action" data-act="pushToggle"><span class="grow">Avisos da pelada<br><span class="status">${Push.ok?"Times sorteados e lembretes no celular.":"Neste aparelho, instale o app na tela inicial para receber avisos."}</span></span><span class="pill ${Push.on?"gold":""}">${Push.on?"Ativado":"Ativar"}</span></button></div></div>
-  <div class="section"><div class="sh"><span>APARÊNCIA</span></div>${themeSeg()}</div>
-  <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button></div></div>`;
-}
-function sheetQFixa(){const q=myQuadra(),d=sheet.d,isNew=!sheet.id,P=d.code&&pByCode(d.code.toUpperCase()),mk=curMK(),st=!isNew?fixaStatus(q,q.fixas.find(f=>f.id===sheet.id),mk):null;
-  return `${bar(isNew?"Novo mensalista":"Mensalista","Cancelar","Salvar","qSaveFixa")}
-  <div class="section"><div class="group">
-    <div class="cell"><label class="lbl" for="fxCode">Código</label><input class="inl" id="fxCode" placeholder="OP0000 (opcional)" value="${esc(d.code||"")}" data-input="fxcode" autocapitalize="characters"></div>
-    ${P?`<div class="cell"><span class="grow status">Vinculada à <b style="color:var(--text)">${esc(P.state.pelada.name)}</b> no Opeladeiro. Dados preenchidos pelo app.</span></div>`:""}
-    <div class="cell"><label class="lbl" for="fxName">Pelada</label><input class="inl" id="fxName" value="${esc(d.name)}" placeholder="Nome da pelada" data-input="fxname"></div>
-    <div class="cell"><label class="lbl" for="fxOrg">Organizador</label><input class="inl" id="fxOrg" value="${esc(d.org)}" placeholder="Nome" data-input="fxorg"></div>
-    <div class="cell"><label class="lbl" for="fxPh">WhatsApp</label><input class="inl" id="fxPh" type="tel" inputmode="tel" value="${esc(d.phone)}" placeholder="(31) 99999-0000" data-input="fxphone"></div>
-    <div class="cell"><label class="lbl" for="fxV">Mensalidade</label><input class="inl" id="fxV" inputmode="decimal" value="${esc(d.valor)}" placeholder="R$" data-input="fxvalor"></div></div></div>
-  <div class="section"><div class="sh"><span>CAMPO</span></div><div class="chips">${q.campos.map(c=>`<button data-act="fxCampo" data-v="${c.id}" aria-pressed="${d.campoId===c.id}">${esc(c.name)}</button>`).join("")}</div></div>
-  <div class="section"><div class="sh"><span>DIA E HORÁRIO</span></div><div class="chips">${WDs.map((x,i)=>`<button data-act="fxWd" data-v="${i}" aria-pressed="${d.weekday===i}">${x}</button>`).join("")}</div>
-    <div class="group" style="margin-top:10px"><div class="cell"><label class="lbl" for="fxT">Horário</label><input class="inl" type="time" id="fxT" value="${esc(d.time)}" data-input="fxtime"></div></div></div>
-  ${!isNew?`<div class="section"><div class="sh"><span>${mLabel(mk).toUpperCase()}</span><span class="st ${st}">${ST_L[st]}</span></div><div class="group">
-    ${st==="paga"?`<button class="cell action" data-act="qUnpay" data-id="${sheet.id}" data-k="fixa">Desfazer pagamento</button>`:`<button class="cell action" data-act="qPay" data-id="${sheet.id}" data-k="fixa">Marcar como paga</button>${d.phone?`<a class="cell action" style="text-decoration:none" href="${waLinkFor(q,{kind:"fixa",name:d.name,org:d.org,phone:d.phone,valor:num(d.valor)},mk)}" target="_blank" rel="noopener">Cobrar no WhatsApp</a>`:""}`}</div></div>
-    <div class="section"><div class="group">${d.phone?`<a class="cell action" style="text-decoration:none" href="https://wa.me/${String(d.phone).replace(/\D/g,"").length<=11?"55":""}${String(d.phone).replace(/\D/g,"")}" target="_blank" rel="noopener">Conversar com ${esc(d.org||"o organizador")}</a>`:""}<button class="cell danger" data-act="qDelFixa">${sheet.delArm?"Toque de novo para excluir":"Excluir mensalista"}</button></div></div>`:""}`;
-}
-function sheetQAvulso(){const q=myQuadra(),d=sheet.d;
-  return `${bar("Avulso","Cancelar","Salvar","qSaveAvulso")}
-  <div class="section"><div class="group">
-    <div class="cell"><label class="lbl" for="avN">Nome</label><input class="inl" id="avN" value="${esc(d.name)}" placeholder="Ex.: Aniversário do Pedro" data-input="avname"></div>
-    <div class="cell"><label class="lbl" for="avP">WhatsApp</label><input class="inl" id="avP" type="tel" inputmode="tel" value="${esc(d.phone)}" data-input="avphone"></div>
-    <div class="cell"><label class="lbl" for="avD">Data</label><input class="inl" type="date" id="avD" value="${esc(d.date)}" data-input="avdate"></div>
-    <div class="cell"><label class="lbl" for="avT">Horário</label><input class="inl" type="time" id="avT" value="${esc(d.time)}" data-input="avtime"></div>
-    <div class="cell"><label class="lbl" for="avV">Valor</label><input class="inl" inputmode="decimal" id="avV" value="${esc(d.valor)}" placeholder="R$" data-input="avvalor"></div></div></div>
-  <div class="section"><div class="sh"><span>CAMPO</span></div><div class="chips">${q.campos.map(c=>`<button data-act="avCampo" data-v="${c.id}" aria-pressed="${d.campoId===c.id}">${esc(c.name)}</button>`).join("")}</div></div>`;
-}
-function sheetQPlans(){const q=myQuadra();return `${bar("Planos Opeladeiro Quadras")}
-  <div class="section">${tiersHTML(q.tier,"qTier",q.campos.length)}<p class="sf" style="text-align:center">30 dias grátis · no anual, 2 meses grátis · valores de teste</p></div>`;}
 
-function viewPerfil(){const u=meU(),mp=byId(S.me),ph=img(u.photo),own=ownedBy(u),all=myPeladas(u),q=myQuadra();
+function viewPerfil(){const u=meU(),mp=byId(S.me),ph=img(u.photo),own=ownedBy(u),all=myPeladas(u);
   return `<div class="hero"><div class="eyebrow">${roleIn(curP,u)} · ${esc(S.pelada.name)}</div><h1>Perfil</h1></div>
   <div class="section"><label class="pava">${ph?`<img src="${ph}" alt="Sua foto">`:esc(initials(u.name))}<span class="cam">${ph?"Trocar foto":"Adicionar foto"}</span><input class="hidden-file" type="file" accept="image/*" data-file="uphoto"></label></div>
   <div class="section"><div class="group"><div class="cell"><label class="lbl" for="uName">Nome</label><input class="inl" id="uName" value="${esc(u.name)}" data-input="uname" autocomplete="name"></div>
@@ -2285,7 +2113,6 @@ function viewPerfil(){const u=meU(),mp=byId(S.me),ph=img(u.photo),own=ownedBy(u)
   ${mp?`<div class="section"><div class="group"><button class="cell action" data-act="openPlayer" data-id="${mp.id}"><span class="grow">Ver meu card nesta pelada</span>${CHEV}</button></div></div>`:""}
   <div class="section"><div class="sh"><span>MINHAS PELADAS</span><span class="links"><button data-act="goMode" data-v="peladas">Ver início</button></span></div><div class="group">${all.map(P=>`<button class="cell" data-act="openPelada" data-v="${P.code}"><span class="code">${P.code}</span><span class="grow"><b>${esc(P.state.pelada.name)}</b><br><span class="status">${roleIn(P,u)} · ${P.state.players.length} ${P.state.players.length===1?"peladeiro":"peladeiros"}</span></span>${P===curP?'<span class="pill">aberta</span>':CHEV}</button>`).join("")}</div>
     <div class="group" style="margin-top:10px"><button class="cell action" data-act="newPelada"><span class="grow">Criar nova pelada</span>${userPro(u)||own.length<G.cfg.freePeladas?"":'<span class="pro">PRO</span>'}</button><button class="cell action" data-act="goJoin"><span class="grow">Entrar em outra pelada</span></button></div></div>
-  <div class="section"><div class="group">${q?`<button class="cell action" data-act="goMode" data-v="quadras"><span class="grow">Abrir Opeladeiro Quadras · ${esc(q.name)}</span>${CHEV}</button>`:`<button class="cell" data-act="goMode" data-v="qsetup"><span class="grow">Tem uma quadra? <span class="status">Conheça o Opeladeiro Quadras</span></span>${CHEV}</button>`}</div></div>
   ${modesOf().length>1?`<div class="section"><div class="sh"><span>TROCAR MODO</span></div>${modeSeg("peladas")}</div>`:""}
   ${blockedSec()}<div class="section"><div class="sh"><span>NOTIFICAÇÕES</span></div><div class="group">${[["vespera","Véspera da pelada","Lembrete no dia anterior"],["lista","Lista de presença","Abriu, perto de fechar, fechou e vaga aberta"],["times","Times sorteados","Avisa em qual time você caiu"],["resenha","Resenha e votação","Súmula do dia e votação do craque"],["caixinha","Caixinha","Mensalidade, diária e atrasos"],["pedidos","Convites e pedidos","Convites, transferências e pedidos de Pro"]].map(([k,l,d])=>`<div class="cell"><span class="grow">${l}<br><span class="status">${d}</span></span><button class="switch" role="switch" aria-checked="${notifOn(k)}" aria-label="${l}" data-act="notif" data-v="${k}"></button></div>`).join("")}</div></div>
   ${isCreator()?`<div class="section"><div class="sh"><span>TESTE · SÓ VOCÊ VÊ</span></div>
@@ -2709,17 +2536,17 @@ function sheetCxConfig(){const C=cx(),M=C.multa,m=num(C.mensal),d=num(C.diaria);
       <div class="box" style="margin-top:10px"><div class="note"><b style="color:var(--text)">Teto da multa, para ninguém pagar um valor injusto</b><br>Mensalista: até 50% da mensalidade (máximo de ${brl(m*.5)}, total ${brl(m*1.5)}).<br>Avulso: até 100% da diária (máximo de ${brl(d)}, total ${brl(d*2)}).<br>A multa para de crescer quando chega no teto.</div>
         <div class="note">Exemplo: mensalidade de ${brl(m)} paga 10 dias atrasada fica em <b style="color:var(--text)">${brl(m+Math.min(M.modo==="dia"?num(M.dia)*10:M.modo==="unica"?num(M.unica):m*(0.02+0.0033),m*.5))}</b>.</div></div>`:`<p class="sf">Desligada: quem atrasa paga só o valor normal.</p>`}
     <p class="sf">O app calcula e avisa, mas não cobra ninguém sozinho: a multa é uma regra da pelada, combinada com a galera.</p></div>
-  ${quadraLink()?"":`<div class="section"><div class="sh"><span>ALUGUEL DA QUADRA</span></div><div class="group">
+  ${`<div class="section"><div class="sh"><span>ALUGUEL DA QUADRA</span></div><div class="group">
     <div class="cell"><label class="lbl" for="cxAv">Valor/mês</label>${inp("cxAv","aluguel.valor",C.aluguel.valor,"R$")}</div>
     <div class="cell"><label class="lbl" for="cxAd">Vence dia</label>${inp("cxAd","aluguel.venc",C.aluguel.venc,"5","numeric")}</div></div>
-    <p class="sf">Para quadra que não usa o Opeladeiro Quadras. Entra nas despesas e você recebe lembrete no dia 1, no vencimento e nos dias de atraso.</p></div>`}`;}
+    <p class="sf">Entra nas despesas e você recebe lembrete no dia 1, no vencimento e nos dias de atraso.</p></div>`}`;}
 function sheetPay(){const s=sheet,ph=s.proof?img(s.proof):null;
   return `${bar("Já paguei","Cancelar")}
   <div class="section"><div class="box"><b style="font-size:17px">${esc(s.label)}</b><div class="kpi" style="box-shadow:none;padding:0;background:none"><span class="l">Valor</span><span class="v money">${brl(s.valor)}</span>${s.sub?`<span class="status">${esc(s.sub)}</span>`:""}</div></div></div>
   <div class="section"><div class="sh"><span>COMO VOCÊ PAGOU</span></div><div class="seg" role="group" aria-label="Forma de pagamento">${Object.entries(VIA_L).map(([k,l])=>`<button data-act="payVia" data-v="${k}" aria-pressed="${s.via===k}">${l}</button>`).join("")}</div></div>
   <div class="section"><div class="sh"><span>COMPROVANTE · OPCIONAL</span></div><div class="tiles" style="grid-template-columns:minmax(0,180px)"><label class="tile">${ph?`<img src="${ph}" alt="Comprovante">`:CAM+"Anexar print ou foto"}${ph?'<span class="cap">Trocar</span>':""}<input class="hidden-file" type="file" accept="image/*" data-file="proof"></label></div>
     <p class="sf">Print do Pix ou foto do recibo. Fica guardado por 90 dias e depois é apagado.</p></div>
-  <div class="section choice"><button class="btn" data-act="paySend" ${s.via?"":"disabled"}>${s.via?"Avisar "+(s.target==="quadra"?"a quadra":"o Dono de Pelada"):"Escolha como pagou"}</button></div>`;}
+  <div class="section choice"><button class="btn" data-act="paySend" ${s.via?"":"disabled"}>${s.via?"Avisar o Dono de Pelada":"Escolha como pagou"}</button></div>`;}
 function rcvCalc(it,iso){return withRef(iso,()=>({fee:itFee(it),due:itDue(it),late:itLate(it)}));}
 function sheetRcv(){const it=cxFind(sheet.key),p=byId(it.pid),iso=sheet.date||today(),k=rcvCalc(it,iso),val=sheet.val!=null?sheet.val:fmtN(k.due);return `${bar("Registrar pagamento","Cancelar")}
   <div class="section"><div class="box"><b style="font-size:17px">${esc(dn(p))} · ${esc(it.label)}</b><span class="status" id="rcvInfo">Valor original ${brl(it.base)}${k.fee>0?` + ${brl(k.fee)} de multa (${k.late} ${k.late===1?"dia":"dias"} de atraso)`:" · sem multa nessa data"}${itBaixa(it)>0?` − ${brl(itBaixa(it))} de baixa`:""}</span></div></div>
@@ -2831,15 +2658,6 @@ function viewPelada(){
       ${model?`<div class="tile sq" style="cursor:default"><img src="${model}" alt="Modelo 3D do uniforme"><span class="cap">Modelo 3D</span></div>`:""}
     </div></div>
 
-  ${(()=>{const L=quadraLink(),mk=curMK();if(L){const st=fixaStatus(L.q,L.f,mk),inf=(L.q.informed||{})[L.f.id+"|"+mk];
-      return `<div class="section"><div class="sh"><span>ONDE JOGAMOS</span><span class="pill">Opeladeiro Quadras</span></div><div class="box">
-        <div><b style="font-size:18px">${esc(L.q.name)}</b><br><span class="status">${esc(L.q.bairro||"")}${L.q.bairro?" · ":""}${esc(campoName(L.q,L.f.campoId))} · ${WD[L.f.weekday]} às ${L.f.time}</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>Mensalidade de ${mLabel(mk).toLowerCase()} · <b>${brl(num(L.f.valor))}</b></span><span class="st ${st}">${st!=="paga"&&inf?"Informado":ST_L[st]}</span></div>
-        ${isOwner()&&st!=="paga"?`${L.q.pix?`<div class="group" style="background:rgba(var(--ov),.04)"><div class="cell"><span class="lbl">Pix</span><span class="grow trunc" style="text-align:right">${esc(L.q.pix)}</span><button class="mini" data-act="qlPix">Copiar</button></div></div><button class="btn sm" data-act="qlPixQR">Pagar com Pix</button>`:""}
-          ${inf?`<span class="status">Você avisou o pagamento. Falta a quadra confirmar.</span>`:`<button class="btn sm" data-act="qlInform">Já paguei, avisar a quadra</button>`}`:""}
-        <span class="status">A mensalidade da quadra entra sozinha nas despesas da Caixinha.</span></div></div>`;}
-    return isOwner()?`<div class="section"><div class="sh"><span>ONDE JOGAMOS</span></div><div class="box"><div class="note">Sua quadra usa o <b>Opeladeiro Quadras</b>? Peça para ela cadastrar a pelada como mensalista com o código <b>${curP.code}</b>. Aí você vê aqui o local, o horário e se a mensalidade está paga.</div>
-      <a class="btn ghost sm" style="text-decoration:none" href="https://wa.me/?text=${encodeURIComponent(`Oi! Nossa pelada ${S.pelada.name} usa o Opeladeiro. Cadastra a gente como mensalista no Opeladeiro Quadras com o código ${curP.code}? Assim a gente acompanha a mensalidade por lá.`)}" target="_blank" rel="noopener">Enviar o código para a quadra</a></div></div>`:"";})()}
   ${isOwner()?`<div class="section"><div class="sh"><span>DONO DE PELADA</span></div><div class="group">${S.transfer?`<div class="cell"><span class="grow">Transferência pendente para <b>${esc(pname(S.transfer.to))}</b>. Esperando ele aceitar.</span><button class="mini" data-act="cancelTransfer">Cancelar</button></div>`:`<button class="cell action" data-act="transfer"><span class="grow">Transferir pelada para outro dono</span>${CHEV}</button>`}</div>
     <p class="sf">Para a pelada não morrer quando você sair. Você continua no elenco como peladeiro.</p></div>`:""}
   <div class="section"><div class="group">${isOwner()?`<button class="cell danger" data-act="delPelada">Excluir pelada</button>`:`<button class="cell danger" data-act="leavePelada">Sair desta pelada</button>`}</div></div>
@@ -3232,7 +3050,7 @@ document.addEventListener("click",e=>{
         else if(u.pass!==pw){fail("Senha incorreta.");break;}}
       if(G.cfg.proEmails.includes(u.email))setUserPlan(u,"pro");
       authVals={name:"",email:""};doLogin(u,false);break;}
-    case "goMode":if(v!=="qsetup"&&!modesOf().includes(v))break;goHome(v);break;
+    case "goMode":if(!modesOf().includes(v))break;goHome(v);break;
     case "obpos":obDraft.pos=v;render();break;
     case "obDone":{const u=meU();u.onboarded=1;u.name=(($("obFull")||{}).value||"").trim()||u.name;u.nick=(($("obName")||{}).value||"").trim();u.show=u.nick?obDraft.show:"name";u.pos=obDraft.pos;syncUserName(u);save();goHome("peladas");break;}
     case "obshow":obDraft.show=v;{const x=$("obShow");if(x){const u=meU();x.innerHTML=`<div class="sh"><span>NA CARTA E NA LISTA, APARECER COMO</span></div>`+showSeg({name:obDraft.full||u.name,nick:obDraft.name,show:v},"obshow");}}break;
@@ -3240,48 +3058,9 @@ document.addEventListener("click",e=>{
     case "joinBack":pendingCode="";goHome("peladas");break;
     case "setTheme":G.ui.theme=v;save();applyTheme();render();break;
     case "nudge":nudgeOwner();render();break;
-    case "qtab":qtab=v;render();window.scrollTo(0,0);break;
-    case "qsCampos":qsDraft.campos=Math.max(1,Math.min(20,qsDraft.campos+ +v));render();break;
-    case "qsTier":qsDraft.tier=v;render();break;
-    case "qsCreate":{const d=qsDraft;d.name=($("qsName").value||"").trim();d.bairro=($("qsB").value||"").trim();if(!d.name){authErr="Dê um nome para a quadra.";render();break;}
-      const lim=G.cfg.tiers[d.tier];if(d.tier!=="complexo"&&d.campos>+lim.campos){authErr=`O nível ${lim.name} vai até ${lim.campos} campos. Escolha outro nível ou menos campos.`;render();break;}
-      authErr="";const u=meU();G.quadras.push({id:"q_"+uid(),ownerUid:u.id,name:d.name,bairro:d.bairro,tier:d.tier,createdAt:Date.now(),trialEnds:Date.now()+30*864e5,campos:[...Array(d.campos).keys()].map(i=>({id:uid(),name:"Campo "+(i+1)})),
-        fixas:[],pays:{},avulsos:[],staff:[],autoPix:false,vitrine:false,pix:"",open:"08:00",close:"23:00"});save();qtab="peladas";goHome("quadras");hud("Quadra criada · 30 dias grátis");break;}
-    case "qDay":qDay=+v;render();break;
-    case "qPiso":{const q=myQuadra(),c=q.campos.find(x=>x.id===id);c.piso=v;save();render();break;}
-    case "qMonth":qMonth=mShift(qMonth||curMK(),+v);render();break;
-    case "qPlans":openSheet({type:"qplans"});break;
-    case "qTier":{const q=myQuadra(),lim=G.cfg.tiers[v];if(v!=="complexo"&&q.campos.length>+lim.campos){hud(`O ${lim.name} vai até ${lim.campos} campos`);break;}if(v==="quadra"&&q.fixas.length>+lim.fixas){hud(`O Quadra vai até ${lim.fixas} mensalistas`);break;}
-      q.tier=v;if(!hasT(q,"arena")){q.autoPix=false;q.vitrine=false;}save();closeSheet();render();hud("Plano "+lim.name);break;}
-    case "qVitrine":{const q=myQuadra();q.vitrine=!q.vitrine;save();render();hud(q.vitrine?"Horários vagos publicados no app":"Horários vagos escondidos");break;}
-    case "qAutoPix":{const q=myQuadra();if(!q.pix&&!q.autoPix){hud("Cadastre a chave Pix na aba Quadra");break;}q.autoPix=!q.autoPix;save();render();break;}
-    case "qSimPix":{const q=myQuadra(),mk=qMonth||curMK(),F=finOf(q,mk),x=F.it.find(i=>i.status!=="paga"&&i.kind==="fixa");if(!x){hud("Nada pendente para receber");break;}q.pays[x.id+"|"+mk]={at:Date.now(),via:"pix"};save();render();pushNotif("Pix recebido · "+brl(x.valor),x.name+" pagou a mensalidade. Baixa feita.");break;}
-    case "qPay":case "qUnpay":{const q=myQuadra(),mk=sheet&&sheet.type==="qfixa"?curMK():(qMonth||curMK());
-      if(el.dataset.k==="fixa"){const k=id+"|"+mk;if(a==="qPay")q.pays[k]={at:Date.now(),via:"manual"};else delete q.pays[k];}
-      else{const av=q.avulsos.find(x=>x.id===id);av.paid=a==="qPay"?{at:Date.now(),via:"manual"}:null;}
-      save();if(sheet&&sheet.type==="qfixa")renderSheet();render();hud(a==="qPay"?"Pagamento registrado":"Pagamento desfeito");break;}
-    case "qNewFixa":{const q=myQuadra(),t=G.cfg.tiers[q.tier];if(q.tier==="quadra"&&q.fixas.length>=+t.fixas){openSheet({type:"qplans"});hud(`O Quadra vai até ${t.fixas} mensalistas`);break;}
-      openSheet({type:"qfixa",id:null,d:{code:"",name:"",org:"",phone:"",valor:"",campoId:q.campos[0].id,weekday:new Date().getDay(),time:"20:00"}});break;}
-    case "qOpenFixa":{const q=myQuadra(),f=q.fixas.find(x=>x.id===id);openSheet({type:"qfixa",id,d:Object.assign({},f)});break;}
     case "fxCampo":sheet.d.campoId=v;renderSheet();break;
     case "fxWd":sheet.d.weekday=+v;renderSheet();break;
-    case "qSaveFixa":{const q=myQuadra(),d=sheet.d;if(!d.name.trim()){hud("Dê um nome para a pelada");break;}if(!num(d.valor)){hud("Coloque o valor da mensalidade");break;}
-      if(sheet.id)Object.assign(q.fixas.find(x=>x.id===sheet.id),d);else q.fixas.push(Object.assign({id:"f_"+uid(),since:curMK()},d,{code:(d.code||"").toUpperCase()}));save();closeSheet();render();hud("Mensalista salvo");break;}
-    case "qDelFixa":{if(!sheet.delArm){sheet.delArm=true;renderSheet();break;}const q=myQuadra();q.fixas=q.fixas.filter(x=>x.id!==sheet.id);save();closeSheet();render();hud("Mensalista excluído");break;}
-    case "qNewAvulso":{const q=myQuadra();openSheet({type:"qavulso",d:{name:"",phone:"",date:new Date().toISOString().slice(0,10),time:"18:00",valor:"",campoId:q.campos[0].id}});break;}
     case "avCampo":sheet.d.campoId=v;renderSheet();break;
-    case "qSaveAvulso":{const q=myQuadra(),d=sheet.d;if(!d.name.trim()||!num(d.valor)){hud("Preencha nome e valor");break;}q.avulsos.push(Object.assign({id:"a_"+uid(),paid:null},d));save();closeSheet();render();hud("Avulso salvo");break;}
-    case "qAddCampo":{const q=myQuadra(),t=G.cfg.tiers[q.tier];if(q.tier!=="complexo"&&q.campos.length>=+t.campos){openSheet({type:"qplans"});hud(`O ${t.name} vai até ${t.campos} campos`);break;}q.campos.push({id:uid(),name:"Campo "+(q.campos.length+1)});save();render();break;}
-    case "qDelCampo":{const q=myQuadra();if(q.fixas.some(f=>f.campoId===id)){hud("Tem mensalista nesse campo. Mude ele antes.");break;}q.campos=q.campos.filter(c=>c.id!==id);save();render();break;}
-    case "qAddStaff":{const q=myQuadra(),e=(($("qStaff")||{}).value||"").trim().toLowerCase();if(!/^\S+@\S+\.\S+$/.test(e)){hud("Digite um e-mail válido");break;}if(!q.staff.includes(e))q.staff.push(e);save();render();hud("Acesso adicionado");break;}
-    case "qDelStaff":{const q=myQuadra();q.staff=q.staff.filter(x=>x!==v);save();render();break;}
-    case "qExport":{const q=myQuadra(),months=[...Array(6).keys()].map(i=>mShift(curMK(),i-5));const rows=[["Mês","Pelada/Reserva","Organizador","Valor","Situação"]];
-      months.forEach(m=>monthItems(q,m).forEach(x=>rows.push([mLabel(m),x.name,x.org||"",x.valor.toFixed(2).replace(".",","),ST_L[x.status]])));
-      const tsv=rows.map(r=>r.join("\t")).join("\n");copyText(tsv);setTimeout(()=>hud("Planilha copiada: cole no Excel ou no Google Planilhas"),300);break;}
-    case "qSeed":{const q=myQuadra(),c=q.campos,mk=curMK(),prev=mShift(mk,-1);const ex=[["Fut dos Cria","Ivan","31999990001",3,"20:30","900"],["Racha da Firma","Paulo","31999990002",1,"19:00","750"],["Pelada dos Coroas","Seu Zé","31999990003",6,"08:00","800"],["Quinta dos Peladeiros","Bruno","31999990004",4,"21:00","850"],["Galera do Bairro","Lucas","31999990005",2,"20:00","700"]];
-      ex.forEach((e,i)=>{const f={id:"f_"+uid(),since:mShift(mk,-5),code:i===0?"OP0001":"",name:e[0],org:e[1],phone:e[2],weekday:e[3],time:e[4],valor:e[5],campoId:c[i%c.length].id};q.fixas.push(f);
-        for(let k=5;k>=1;k--){const m=mShift(mk,-k);if(!(k===1&&i===3))q.pays[f.id+"|"+m]={at:Date.now(),via:"manual"};}if(i<2)q.pays[f.id+"|"+mk]={at:Date.now(),via:i?"pix":"manual"};});
-      save();render();hud("Exemplo carregado");break;}
     case "logout":logout();break;
     case "openPelada":enterPelada(v);break;
     case "newPelada":{const u=meU();if(!userPro(u)&&ownedBy(u).length>=G.cfg.freePeladas){openSheet({type:"upsell",what:"Mais de uma pelada ao mesmo tempo",scope:"me",then:"create"});break;}
@@ -3367,7 +3146,6 @@ document.addEventListener("click",e=>{
     case "retroClose":retro=null;retroRender();break;
     case "retroShare":{const r=retro;(async()=>{const cv=await retroCard();retro=null;retroRender();openSheet({type:"rstory"});sheet.canvas=cv;const b=$("storyBox");if(b)b.innerHTML=`<img class="story" src="${cv.toDataURL("image/png")}" alt="Retrospectiva">`;})();break;}
     case "pixPay":{const it=cxFind(el.dataset.k),C=cx();if(!it)break;const o=ownerU();openSheet({type:"pixqr",key:C.pix,tipo:C.pixTipo,name:C.pixNome||(o?o.name:""),city:C.pixCidade,amount:itDue(it),txid:curP.code+it.mk.replace("-",""),label:it.label+" · "+S.pelada.name,next:{type:"pay",target:"cx",key:it.key,label:it.label,valor:itDue(it),sub:itFee(it)>0?itValTxt(it):"",via:"pix",proof:null}});break;}
-    case "qlPixQR":{const L=quadraLink(),mk=curMK();openSheet({type:"pixqr",key:L.q.pix,name:L.q.name,city:L.q.bairro||"",amount:num(L.f.valor),txid:"Q"+curP.code+mk.replace("-",""),label:"Mensalidade de "+mLabel(mk).toLowerCase()+" · "+L.q.name,next:{type:"pay",target:"quadra",key:L.f.id+"|"+mk,label:"Mensalidade de "+mLabel(mk).toLowerCase()+" · "+L.q.name,valor:num(L.f.valor),via:"pix",proof:null}});break;}
     case "cfPix":{const c=CP(),F=c.fin,o=G.users.find(x=>x.id===c.ownerUid);openSheet({type:"pixqr",key:F.pix,name:o?o.name:"",city:"",amount:num(F.taxa),txid:"CAMP"+c.id.slice(2,10),label:"Inscrição · "+c.name,next:{type:"pay",target:"camp",key:id,label:"Inscrição · "+c.name,valor:num(F.taxa),via:"pix",proof:null}});break;}
     case "pixCopy":copyText(pixPayload(sheet),"pixText","pixWrap");break;
     case "pixDone":openSheet(Object.assign({},sheet.next));break;
@@ -3448,8 +3226,7 @@ document.addEventListener("click",e=>{
     case "payVia":sheet.via=v;renderSheet();break;
     case "paySend":{const sh=sheet;if(!sh.via)break;const rec={at:Date.now(),via:sh.via,proof:sh.proof||null};
       if(sh.target==="camp"){const c=CP();c.fin.informed[sh.key]=rec;delete c.fin.refused[sh.key];save();closeSheet();render();hud("Avisamos o organizador");break;}
-      if(sh.target==="quadra"){const L=quadraLink();L.q.informed=L.q.informed||{};L.q.informed[sh.key]=rec;save();closeSheet();render();hud("Avisamos a "+L.q.name);}
-      else{const C=cx();C.informed[sh.key]=rec;delete C.refused[sh.key];save();closeSheet();render();hud("Avisamos o Dono de Pelada");}break;}
+      {const C=cx();C.informed[sh.key]=rec;delete C.refused[sh.key];save();closeSheet();render();hud("Avisamos o Dono de Pelada");}break;}
     case "proofView":openSheet({type:"proof",k:el.dataset.k});break;
     case "cxInad":if(!cxCan())break;openSheet({type:"inad"});break;
     case "inadAct":openSheet({type:"inadact",key:el.dataset.k});break;
@@ -3561,8 +3338,6 @@ document.addEventListener("click",e=>{
     case "cxGroup":{if(!cxCan())break;copyText(cxGroupMsg(cxMk||curMK()),"cxText","cxWrap");$("cxText").value=cxGroupMsg(cxMk||curMK());break;}
     case "cxCopyPix":copyText(cx().pix);break;
     case "cxInform":{const it=cxFind(el.dataset.k);if(!it)break;openSheet({type:"pay",target:"cx",key:it.key,label:it.label,valor:itDue(it),sub:itFee(it)>0?itValTxt(it):"",via:null,proof:null});break;}
-    case "qlPix":{const L=quadraLink();copyText(L.q.pix);break;}
-    case "qlInform":{const L=quadraLink(),mk=curMK();openSheet({type:"pay",target:"quadra",key:L.f.id+"|"+mk,label:"Mensalidade de "+mLabel(mk).toLowerCase()+" · "+L.q.name,valor:num(L.f.valor),via:null,proof:null});break;}
     case "transfer":if(!isOwner())break;openSheet({type:"transfer"});break;
     case "transferTo":{if(!isOwner())break;if(!el.dataset.ok){const p=byId(id);openSheet({type:"confirm",title:"Transferir pelada",head:"Passar a pelada para "+esc(dn(p))+"?",text:`${esc(dn(p))} recebe o convite e, ao aceitar, vira o Dono de Pelada. Você continua no elenco como peladeiro e perde a administração.`,btn:"Enviar convite",act:"transferTo"});sheet.pid=id;break;}
       S.transfer={to:sheet.pid,at:Date.now()};save();closeSheet();render();hud("Convite de transferência enviado");break;}
@@ -3579,8 +3354,8 @@ document.addEventListener("click",e=>{
       const nm=S.pelada.name;G.peladas=G.peladas.filter(P=>P!==curP);closeSheet();goHome("peladas");hud(nm+" excluída");break;}
     case "leavePelada":{if(isOwner())break;if(!el.dataset.ok){openSheet({type:"confirm",title:"Sair da pelada",head:"Sair de “"+esc(S.pelada.name)+"”?",text:"Seu card, níveis, gols e assistências nesta pelada serão apagados. Para voltar, você precisa do código ou de um novo convite.",btn:"Sair da pelada",act:"leavePelada"});break;}
       const nm=S.pelada.name,me=S.me;S.players=S.players.filter(p=>p.id!==me);if(S.tempAdminId===me)S.tempAdminId=null;closeSheet();goHome("peladas");hud("Você saiu de "+nm);break;}
-    case "delAccount":{const u=meU();if(!el.dataset.ok){openSheet({type:"confirm",title:"Excluir conta",head:"Excluir sua conta?",text:`Essa ação é definitiva. Apagamos seu perfil e suas fotos, as peladas em que você é Dono de Pelada${ownedBy(u).length?" ("+ownedBy(u).map(P=>esc(P.state.pelada.name)).join(", ")+")":""}${myQuadra()?", sua quadra no Opeladeiro Quadras":""} e seus cards nas outras peladas.`,btn:"Excluir minha conta",act:"delAccount"});break;}
-      closeSheet();if(CLOUD){hud("Excluindo…");cloudDeleteAccount().then(()=>{G.sess=null;screen="welcome";render();hud("Conta excluída");},()=>hud("Não deu para excluir agora. Confira a internet."));break;}G.peladas=G.peladas.filter(P=>P.ownerUid!==u.id);G.peladas.forEach(P=>{P.state.players=P.state.players.filter(p=>p.uid!==u.id);});G.quadras=G.quadras.filter(q=>q.ownerUid!==u.id);
+    case "delAccount":{const u=meU();if(!el.dataset.ok){openSheet({type:"confirm",title:"Excluir conta",head:"Excluir sua conta?",text:`Essa ação é definitiva. Apagamos seu perfil e suas fotos, as peladas em que você é Dono de Pelada${ownedBy(u).length?" ("+ownedBy(u).map(P=>esc(P.state.pelada.name)).join(", ")+")":""} e seus cards nas outras peladas.`,btn:"Excluir minha conta",act:"delAccount"});break;}
+      closeSheet();if(CLOUD){hud("Excluindo…");cloudDeleteAccount().then(()=>{G.sess=null;screen="welcome";render();hud("Conta excluída");},()=>hud("Não deu para excluir agora. Confira a internet."));break;}G.peladas=G.peladas.filter(P=>P.ownerUid!==u.id);G.peladas.forEach(P=>{P.state.players=P.state.players.filter(p=>p.uid!==u.id);});
       if(u.photo)setImg(u.photo,null);G.users=G.users.filter(x=>x.id!==u.id);logout();hud("Conta excluída");break;}
     case "copyDay":{const d=S.days.find(x=>x.id===id);copyText(sumulaText(d),"dayText","dayWrap");break;}
     case "myVote":{if(!S.session||!S.session.ids.includes(S.me))break;const prev=S.session.votes[S.me];openSheet({type:"vote",voter:S.me,draft:prev?JSON.parse(JSON.stringify(prev)):{t:{},mvp:null}});break;}
@@ -3663,15 +3438,6 @@ document.addEventListener("input",e=>{
   else if(k==="aname")authVals.name=val;
   else if(k==="jsearch"){joinQ=val;const L=$("jList"),P=pByCode(joinFound);if(L&&P)L.innerHTML=claimList(P);}
   else if(k==="obname"||k==="obfull"){if(k==="obname")obDraft.name=val;else obDraft.full=val;const x=$("obShow");if(x){const u=meU();x.innerHTML=`<div class="sh"><span>NA CARTA E NA LISTA, APARECER COMO</span></div>`+showSeg({name:obDraft.full||u.name,nick:obDraft.name,show:obDraft.show},"obshow");}}
-  else if(k==="qsname")qsDraft.name=val;
-  else if(k==="qsbairro")qsDraft.bairro=val;
-  else if(k==="qq"){qQ=val;const pos=e.target.selectionStart;render();const n=$("qQ");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}}
-  else if(["qname","qbairro","qpix","qopen","qclose"].includes(k)){const q=myQuadra(),f={qname:"name",qbairro:"bairro",qpix:"pix",qopen:"open",qclose:"close"}[k];q[f]=k==="qname"?(val.trim()||q.name):val.trim();save();}
-  else if(k==="qcampo"){const q=myQuadra(),c=q.campos.find(x=>x.id===e.target.dataset.id);if(c)c.name=val.trim()||c.name;save();}
-  else if(k.startsWith("fx")){const f={fxcode:"code",fxname:"name",fxorg:"org",fxphone:"phone",fxvalor:"valor",fxtime:"time"}[k];sheet.d[f]=val;
-    if(k==="fxcode"){const P=pByCode(val);if(P){const st=P.state,ow=G.users.find(x=>x.id===P.ownerUid);sheet.d.code=P.code;if(!sheet.d.name)sheet.d.name=st.pelada.name;if(!sheet.d.org&&ow)sheet.d.org=ow.name;if(st.pelada.weekday!=null)sheet.d.weekday=st.pelada.weekday;if(st.pelada.time)sheet.d.time=st.pelada.time;renderSheet();const n=$("fxCode");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}}}}
-  else if(k.startsWith("av")){const f={avname:"name",avphone:"phone",avdate:"date",avtime:"time",avvalor:"valor"}[k];sheet.d[f]=val;}
-  else if(k==="cfgt"){const t=G.cfg.tiers[e.target.dataset.k],f=e.target.dataset.f;t[f]=["campos","fixas","acessos"].includes(f)?Math.max(1,Math.round(+val)||1):(val.trim()||t[f]);save();}
   else if(k==="cfgpix"){G.cfg.pixFee=val.trim()||"0";save();}
   else if(k==="aemail")authVals.email=val;
   else if(k==="cname")createDraft.name=val;
