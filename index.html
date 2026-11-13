@@ -818,12 +818,24 @@ async function flushCfg(){const b=Cloud.base["cfg"],s=stableStr(G.cfg);if(!b||b.
   const {data,error}=await sb.from("app_config").update({doc:JSON.parse(s),version:b.v+1}).eq("id",1).select();
   if(error){const {data:d}=await sb.from("app_config").select("*").eq("id",1).maybeSingle();if(d){G.cfg=Object.assign(G.cfg,merge3(JSON.parse(b.s),JSON.parse(s),d.doc));Cloud.base["cfg"]={v:d.version,s:stableStr(d.doc)};schedule();}return;}
   if(data&&data[0])Cloud.base["cfg"]={v:data[0].version,s:stableStr(data[0].doc)};}
+const IMGB="img";
 async function flushImgs(){for(const k of Object.keys(Cloud.imgQ)){const d=Cloud.imgQ[k];
-  const {error}=d?await sb.from("images").upsert({key:k,data:d}):await sb.from("images").delete().eq("key",k);
-  if(error&&!/row-level security|violates/.test(error.message||""))throw error;delete Cloud.imgQ[k];}}
+  if(d){let ok=false;
+    try{const bl=dataToBlob(d);const {error:e1}=await sb.storage.from(IMGB).upload(k,bl,{upsert:true,contentType:bl.type||"image/jpeg",cacheControl:"3600"});
+      if(!e1){const {error:e2}=await sb.from("images").upsert({key:k,data:null});if(!e2||/row-level security|violates/.test(e2.message||""))ok=true;}}catch(_){}
+    if(!ok){const {error}=await sb.from("images").upsert({key:k,data:d});if(error&&!/row-level security|violates/.test(error.message||""))throw error;}
+  }else{try{await sb.storage.from(IMGB).remove([k]);}catch(_){}
+    const {error}=await sb.from("images").delete().eq("key",k);if(error&&!/row-level security|violates/.test(error.message||""))throw error;}
+  delete Cloud.imgQ[k];}}
+const blobToData=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b);});
+async function purgeMyImages(){try{const {data}=await sb.from("images").select("key").eq("owner",Cloud.uid).limit(1000);const ks=(data||[]).map(x=>x.key);for(let i=0;i<ks.length;i+=50)await sb.storage.from(IMGB).remove(ks.slice(i,i+50));}catch(_){}}
 function cloudImg(key,data){if(!CLOUD)return;Cloud.imgQ[key]=data||null;schedule(200);}
 function cloudImgFetch(key){if(!CLOUD||!Cloud.uid||Cloud.imgReq[key])return;Cloud.imgReq[key]=1;
-  sb.from("images").select("data").eq("key",key).maybeSingle().then(({data})=>{if(data&&data.data){imgCache[key]=data.data;lsSet("img:"+key,data.data);renderSoon();}},()=>{delete Cloud.imgReq[key];});}
+  const got=d=>{imgCache[key]=d;lsSet("img:"+key,d);renderSoon();};
+  (async()=>{try{const {data:bl,error}=await sb.storage.from(IMGB).download(key);if(!error&&bl){got(await blobToData(bl));return;}}catch(_){}
+    /* fotos antigas ainda guardadas na tabela: usa e, se forem minhas, passa para o armazenamento */
+    try{const {data}=await sb.from("images").select("data,owner").eq("key",key).maybeSingle();
+      if(data&&data.data){got(data.data);if(data.owner===Cloud.uid){Cloud.imgQ[key]=data.data;schedule(3000);}}else delete Cloud.imgReq[key];}catch(_){delete Cloud.imgReq[key];}})();}
 
 /* baixa tudo o que a pessoa pode ver */
 async function pull(){if(Cloud.pulling)return Cloud.pulling;Cloud.pulling=(async()=>{try{
@@ -927,7 +939,7 @@ async function cloudStart(){Cloud.started=true;
   screen="loading";render();
   try{await cloudSignedIn(session);}catch(e){cloudErr="Não consegui carregar seus dados. Confira a internet.";screen="offline";render();throw e;}}
 async function cloudLogout(){try{await sb.auth.signOut();}catch(e){}cloudReset();}
-async function cloudDeleteAccount(){const {error}=await sb.rpc("delete_my_account");if(error)throw error;await cloudLogout();}
+async function cloudDeleteAccount(){await purgeMyImages();const {error}=await sb.rpc("delete_my_account");if(error)throw error;await cloudLogout();}
 
 /* Registro de erros: manda para o banco (log_error), no máximo 5 por abertura do app e sem repetir a mesma mensagem */
 (function(){let n=0;const seen=new Set();
@@ -3376,7 +3388,7 @@ document.addEventListener("click",e=>{
     case "unblock":{const u=meU();if(!u)break;u.blocked=(u.blocked||[]).filter(b=>b.u!==id);save();render();hud("Desbloqueado");break;}
     case "repDone":case "repDismiss":{if(!isCreator())break;sb.from("reports").update({status:a==="repDone"?"resolved":"dismissed"}).eq("id",id).then(({error})=>{if(error)hud("Erro");else loadReports();});break;}
     case "repMedia":{if(!isCreator())break;if(!el.dataset.ok){openSheet({type:"confirm",title:"Apagar fotos",head:"Apagar as fotos desse usuário?",text:"Remove todas as fotos e imagens enviadas por ele. Não dá para desfazer.",btn:"Apagar fotos",act:"repMedia"});sheet.pid=id;break;}
-      const tu=sheet.pid;sb.rpc("mod_remove_media",{p_uid:tu}).then(({data,error})=>{closeSheet();hud(error?"Erro":data+" imagens apagadas");});break;}
+      const tu=sheet.pid;sb.rpc("mod_remove_media",{p_uid:tu}).then(async({data,error})=>{closeSheet();if(error){hud("Erro");return;}const ks=Array.isArray(data)?data:[];for(let i=0;i<ks.length;i+=50)await sb.storage.from(IMGB).remove(ks.slice(i,i+50));hud(ks.length+" imagens apagadas");});break;}
     case "openPlayer":openSheet({type:"player",id});break;
     case "newPlayer":if(!isOwner())break;if(!isPro()&&S.players.length>=G.cfg.freePlayers){openSheet({type:"upsell",what:"Mais de "+G.cfg.freePlayers+" peladeiros"});break;}openSheet({type:"edit",id:null,draft:{name:"",a:50,d:50,gk:50,pos:"AUTO",birth:"",h:null,w:null}});setTimeout(()=>$("eName")&&$("eName").focus(),350);break;
     case "editPlayer":{const p=byId(sheet.id);if(!canEdit(p))break;sheet={type:"edit",id:p.id,draft:{name:p.name,a:p.a,d:p.d,gk:p.gk??50,pos:p.pos||"AUTO",birth:p.birth||"",h:p.h,w:p.w}};renderSheet();break;}
