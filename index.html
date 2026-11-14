@@ -1914,7 +1914,7 @@ function sheetCStory(){const c=CP()||camps().find(q=>q.id===sheet.cid);const ks=
   return `${bar("Card para Stories")}<div class="section"><div class="chips">${ks.map(k=>`<button data-act="cStoryPick" data-v="${k}" aria-pressed="${sheet.k===k}">${AW_L[k]}</button>`).join("")}</div></div>
   <div class="section" id="storyBox"><div class="empty">Gerando o card…</div></div><div class="section choice"><button class="btn" data-act="storyShare">Compartilhar</button></div>`;}
 
-function sheetCBuy(){return `${bar("Campeonato avulso","Cancelar")}<div class="section"><div class="box"><b style="font-size:20px">${esc(cNew.name||"Novo campeonato")}</b><div class="kpi" style="box-shadow:none;padding:0;background:none"><span class="l">Pagamento único</span><span class="v money">R$ ${esc(G.cfg.campPrice)}</span></div><div class="note">Libera este campeonato sem contar no seu limite, com tudo do Pro só para ele: taça personalizada e 3D, cards para Stories, inscrições e prêmios.</div></div></div><div class="section choice"><button class="btn gold" data-act="cnBuy" data-ok="1">Pagar com Pix ou cartão</button><p class="sf" style="text-align:center">Protótipo: o pagamento é simulado.</p></div>`;}
+function sheetCBuy(){return `${bar("Campeonato avulso","Cancelar")}<div class="section"><div class="box"><b style="font-size:20px">${esc(cNew.name||"Novo campeonato")}</b><div class="kpi" style="box-shadow:none;padding:0;background:none"><span class="l">Pagamento único</span><span class="v money">R$ ${esc(G.cfg.campPrice)}</span></div><div class="note">Libera este campeonato sem contar no seu limite, com tudo do Pro só para ele: taça personalizada e 3D, cards para Stories, inscrições e prêmios.</div></div></div><div class="section choice">${Billing.avail?`<button class="btn gold" data-act="cnBuy" data-ok="1">Comprar por R$ ${esc(G.cfg.campPrice)}</button><p class="sf" style="text-align:center">Cobrança única na sua conta da loja.</p>`:isCreator()?`<button class="btn gold" data-act="cnBuy" data-ok="1">Criar (só você vê)</button>`:`<button class="btn gold" disabled>${Billing.native?"Compra em breve":"A compra é feita no app instalado"}</button>`}</div>`;}
 function sheetMWO(){const c=CP(),m=c.matches.find(x=>x.id===sheet.id);return `${bar("W.O.","Voltar")}<div class="section"><p class="sf" style="padding-top:0">Qual time não apareceu? O outro vence por ${c.rules.wo} a 0.</p><div class="choice"><button class="btn ghost" data-act="mWOdo" data-v="h">${esc(cTeam(c,m.h).name)} não veio</button><button class="btn ghost" data-act="mWOdo" data-v="a">${esc(cTeam(c,m.a).name)} não veio</button></div></div>`;}
 function athFromP(p){return {id:"a_"+uid(),src:p.id,name:p.name,uid:p.uid||null,a:p.a,d:p.d,pos:p.pos==="GOL"?"GOL":(p.pos&&p.pos!=="AUTO"?p.pos:autoPos(p)),photo:p.photo||null};}
 
@@ -3014,7 +3014,8 @@ function sheetUpsell(){
     <div class="note">${sheet.what?`<b>${esc(sheet.what)}</b> é do Plano Pro.`:""}</div></div>
   <div class="section"><div class="group">${["Peladeiros ilimitados","Votação do craque e nível que evolui","Lista automática com espera","Caixinha com comprovantes e multas","Campeonato todo mês, com taça e cards","Personagem e uniforme 3D por IA"].map(t=>`<div class="cell"><span style="color:var(--gold);font-weight:800">✓</span><span class="grow">${t}</span></div>`).join("")}</div>
     <p class="sf">R$ ${esc(G.cfg.price)} por mês, para todas as suas peladas. Dividido pela galera, sai por menos de R$ 1 cada.</p></div>
-  <div class="section" style="display:flex;flex-direction:column;gap:10px"><button class="btn gold" data-act="plan" data-v="pro" data-close="1" data-scope="${sheet.scope||""}" data-then="${sheet.then||""}">Assinar Plano Pro (teste)</button><button class="btn ghost" data-act="closeSheet">Agora não</button></div>`;
+  <div class="section" style="display:flex;flex-direction:column;gap:10px">${Billing.avail?`<button class="btn gold" data-act="buyPro">Assinar por R$ ${esc(G.cfg.price)}/mês</button><button class="btn ghost" data-act="restoreBuy">Restaurar compras</button>`:isCreator()?`<button class="btn gold" data-act="plan" data-v="pro" data-close="1" data-scope="${sheet.scope||""}" data-then="${sheet.then||""}">Ativar Pro (só você vê)</button>`:`<button class="btn gold" disabled>${Billing.native?"Assinatura em breve":"A assinatura é feita no app instalado"}</button>`}<button class="btn ghost" data-act="closeSheet">Agora não</button></div>
+  ${Billing.avail?`<p class="sf">A assinatura é cobrada na sua conta da ${Billing.plat==="ios"?"App Store":"Google Play"} e renova sozinha todo mês até você cancelar, pelo menos 24 horas antes da renovação, nos ajustes da loja. <a href="/termos/" target="_blank" rel="noopener" style="color:inherit">Termos de uso</a> · <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit">Privacidade</a></p>`:""}`;
 }
 
 /* ---------- actions ---------- */
@@ -3308,7 +3309,9 @@ document.addEventListener("click",e=>{
     case "cnP":cNew.passam=+v;render();break;
     case "cnCreate":case "cnBuy":{const u=meU(),d=cNew;d.name=((($("cnName")||{}).value)||d.name||"").trim();if(!d.name){authErr="Dê um nome para o campeonato.";closeSheet();render();break;}
       const ck=campCheck(u,d.pel);if(a==="cnCreate"&&!ck.ok)break;if(a==="cnBuy"&&!el.dataset.ok){openSheet({type:"cbuy"});break;}
-      const c=newCamp(d,a==="cnBuy"?"pago":ck.pro?"pro":"free");closeSheet();authErr="";cid=c.id;cseg="tabela";screen="camp";render();window.scrollTo(0,0);hud(a==="cnBuy"?"Pagamento aprovado (simulado). Campeonato criado!":"Campeonato criado");break;}
+      const make=()=>{const c=newCamp(d,a==="cnBuy"?"pago":ck.pro?"pro":"free");closeSheet();authErr="";cid=c.id;cseg="tabela";screen="camp";render();window.scrollTo(0,0);hud("Campeonato criado");};
+      if(a==="cnBuy"&&!isCreator()){if(!Billing.avail){hud("A compra é feita no app instalado");break;}Billing.buyCamp().then(ok=>{if(ok)make();});break;}
+      make();break;}
     case "caAll":{const c=CP(),P=pByCode(c.pel);if(!campOrg(c)||!P)break;c.athletes=v==="1"?P.state.players.map(athFromP):[];c.teams=[];save();render();break;}
     case "caPick":{const c=CP(),P=pByCode(c.pel);if(!campOrg(c)||!P)break;const i=c.athletes.findIndex(x=>x.src===id);if(i>=0)c.athletes.splice(i,1);else c.athletes.push(athFromP(P.state.players.find(x=>x.id===id)));c.teams=[];save();render();break;}
     case "caAdd":{const c=CP(),n=(($("caName")||{}).value||"").trim();if(!n)break;c.athletes.push({id:"a_"+uid(),name:n,uid:null,a:60,d:60,pos:"MEI",photo:null});c.teams=[];save();render();setTimeout(()=>{const x=$("caName");if(x)x.focus();},50);break;}
@@ -3397,6 +3400,8 @@ document.addEventListener("click",e=>{
     case "copyDay":{const d=S.days.find(x=>x.id===id);copyText(sumulaText(d),"dayText","dayWrap");break;}
     case "myVote":{if(!S.session||!S.session.ids.includes(S.me))break;const prev=S.session.votes[S.me];openSheet({type:"vote",voter:S.me,draft:prev?JSON.parse(JSON.stringify(prev)):{t:{},mvp:null}});break;}
     case "forceClose":{if(!S.session)break;S.session.closesAt=Date.now()-1;const before=S.rounds.length;render();if(S.rounds.length>before)openSheet({type:"round",id:S.rounds[0].id});break;}
+    case "buyPro":Billing.buyPro().then(ok=>{if(ok)closeSheet();});break;
+    case "restoreBuy":Billing.restore();break;
     case "upsell":openSheet({type:"upsell",what:el.dataset.what||""});break;
     case "openInbox":inboxPull().then(()=>{if(sheet&&sheet.type==="inbox")renderSheet();});openSheet({type:"inbox"});break;
     case "inboxRead":inboxReadAll();renderSheet();break;
@@ -3455,7 +3460,7 @@ document.addEventListener("click",e=>{
     case "applySession":applySession();break;
     case "openRound":openSheet({type:"round",id});break;
     case "goPro":setTab("pelada");break;
-    case "plan":{const u=el.dataset.scope==="me"||!curP?meU():ownerU();setUserPlan(u,v);save();if(el.dataset.close)closeSheet();hud(v==="pro"?"Pro ativado (teste)":"Plano Grátis");
+    case "plan":{const u=el.dataset.scope==="me"||!curP?meU():ownerU();setUserPlan(u,v);save();if(el.dataset.close)closeSheet();hud(v==="pro"?"Pro ativado":"Plano Grátis");
       if(el.dataset.then==="create"){closeSheet();curP=null;S=null;G.sess.mode="peladas";createDraft={name:"",weekday:null,time:"",base:5};screen="create";save();}render();break;}
     case "utype":S.uniform.type=v;save();render();break;
     case "analyzeU":analyzeUniform();break;
@@ -3535,6 +3540,30 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();
 setInterval(()=>{if(S&&screen==="app"&&S.session&&!sheet&&(tab==="avaliar"||Date.now()>=S.session.closesAt))render();},30000);
 setInterval(()=>{if(!S||!S.live)return;if(checkCap()){hud("Tempo esgotado!");try{navigator.vibrate&&navigator.vibrate([300,150,300]);}catch(e){}if(screen==="app"&&tab==="jogo"&&jogoSeg==="aovivo"&&!sheet)render();else fsRender();return;}const el=$("liveClock");if(el)el.textContent=mmss(liveElapsed());const e2=$("fsClock");if(e2&&!$("fs").hidden)e2.textContent=mmss(liveElapsed());},500);
 /* ===== Notificações push (web push) ===== */
+/* Assinaturas e compras dentro do app (Apple e Google, via RevenueCat). No navegador não existe compra. */
+const Billing=(function(){
+  const KEYS={ios:"",android:""}; /* chaves públicas do RevenueCat: preencher quando a conta existir */
+  const PRO_PKG="$rc_monthly",CAMP_ID="opeladeiro_campeonato_avulso";
+  const cap=window.Capacitor,native=!!(cap&&cap.isNativePlatform&&cap.isNativePlatform());
+  const plat=native&&cap.getPlatform?cap.getPlatform():"web";
+  const P=()=>native&&cap.Plugins&&cap.Plugins.Purchases;
+  const key=plat==="ios"?KEYS.ios:KEYS.android;
+  const o={native:native,plat:plat,ready:false,busy:false,avail:!!(native&&key)};
+  o.init=async function(uid){if(!o.avail||!P()||!uid)return;try{if(!o.ready){await P().configure({apiKey:key,appUserID:uid});o.ready=true;}else await P().logIn({appUserID:uid});}catch(e){}};
+  const cancelled=e=>!!(e&&(e.userCancelled||/cancel/i.test(e.message||"")));
+  o.buyPro=async function(){if(!o.avail||o.busy)return false;o.busy=true;
+    try{await o.init(Cloud.uid);const of=await P().getOfferings();const cur=of&&of.current;const pk=cur&&(cur.availablePackages||[]).find(x=>x.identifier===PRO_PKG)||(cur&&cur.availablePackages||[])[0];
+      if(!pk){hud("Assinatura indisponível agora");return false;}
+      await P().purchasePackage({aPackage:pk});hud("Assinatura confirmada. O Pro ativa em instantes.");return true;
+    }catch(e){if(!cancelled(e))hud("Não deu para concluir a compra");return false;}finally{o.busy=false;}};
+  o.buyCamp=async function(){if(!o.avail||o.busy)return false;o.busy=true;
+    try{await o.init(Cloud.uid);const r=await P().getProducts({productIdentifiers:[CAMP_ID],type:"INAPP"});const pr=r&&r.products&&r.products[0];
+      if(!pr){hud("Compra indisponível agora");return false;}
+      await P().purchaseStoreProduct({product:pr});return true;
+    }catch(e){if(!cancelled(e))hud("Não deu para concluir a compra");return false;}finally{o.busy=false;}};
+  o.restore=async function(){if(!o.avail||o.busy)return;o.busy=true;try{await o.init(Cloud.uid);await P().restorePurchases();hud("Compras restauradas. O Pro ativa em instantes.");}catch(e){hud("Não encontrei compras para restaurar");}finally{o.busy=false;}};
+  return o;
+})();
 const Push=(function(){
   const PUB="BKQlIsvlNM_wrJauHrF5M4BsMTB-JdYva50F9gkOtzQJBG0d4J9pVzVwQGQBcvwexvCLKwa4PuJ-VFQYG1ojO70";
   const ok=!!(CLOUD&&"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window);
@@ -3564,7 +3593,7 @@ const Push=(function(){
 })();
 Push.refresh();
 (async function boot(){const m=(location.pathname+" "+location.hash).match(/convite\/?((?:SP|OP)\d{4,6})/i);if(m)pendingCode=normCode(m[1]);try{pendingClaim=new URLSearchParams(location.search).get("eu")||"";}catch(e){}applyTheme();
-  if(CLOUD){try{await cloudStart();}catch(e){return;}if(screen==="offline"||screen==="newpass")return;inboxPull();}
+  if(CLOUD){try{await cloudStart();}catch(e){return;}if(screen==="offline"||screen==="newpass")return;inboxPull();try{Billing.init(Cloud.uid);}catch(e){}}
   const u=meU();
   if(u&&pendingCode){goHome("peladas");return;}
   if(u){if(G.sess.code&&pByCode(G.sess.code)){enterPelada(G.sess.code);return;}goHome(G.sess.mode||"peladas");return;}
