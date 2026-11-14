@@ -42,12 +42,16 @@ export function tick(doc: any, now: number): { changed: boolean; events: Ev[] } 
   const name = P.name || "Pelada";
   const active = () => !!S.lst && S.lst.status !== "encerrada";
 
-  // 0) encerrar a lista da pelada que já passou (8h depois do início), como o app faz ao fechar o dia
-  if (S.lst && S.lst.status !== "encerrada" && now > startTs(S.lst.date, P.time) + 8 * 36e5) {
-    const C = (S.cx = S.cx || {}); C.multas = C.multas || [];
-    const nm = (v: any) => parseFloat(String(v ?? "").replace(/\./g, "").replace(",", ".")) || 0;
-    (S.lst.fines || []).filter((f: any) => f.state === "prov").forEach((f: any) => { f.state = "ativa"; C.multas.push({ id: f.id, pid: f.pid, date: S.lst.date, kind: "desist", valor: (Math.round(nm(C.diaria) * .5 * 100) / 100).toFixed(2).replace(".", ",") }); });
-    S.lst.status = "encerrada"; changed = true;
+  // 0) encerrar a lista quando a pelada termina. O app já faz isso ao tocar em "Encerrar pelada";
+  //    aqui só cobrimos o caso de a pelada ser encerrada fora do app: encerra às 6h do dia seguinte.
+  if (S.lst && S.lst.status !== "encerrada") {
+    const ended = S.closedDate === S.lst.date || (S.session && S.session.date === S.lst.date) || now > startTs(addDays(S.lst.date, 1), "06:00");
+    if (ended) {
+      const C = (S.cx = S.cx || {}); C.multas = C.multas || [];
+      const nm = (v: any) => parseFloat(String(v ?? "").replace(/\./g, "").replace(",", ".")) || 0;
+      (S.lst.fines || []).filter((f: any) => f.state === "prov").forEach((f: any) => { f.state = "ativa"; C.multas.push({ id: f.id, pid: f.pid, date: S.lst.date, kind: "desist", valor: (Math.round(nm(C.diaria) * .5 * 100) / 100).toFixed(2).replace(".", ",") }); });
+      S.lst.status = "encerrada"; changed = true;
+    }
   }
   // 1) abrir a lista sozinho
   if (c.modo === "auto" && !active() && L.wd === c.abreWd && L.min >= hm(c.abreH)) {

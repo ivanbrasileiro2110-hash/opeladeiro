@@ -5,7 +5,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 // Troque de motor mudando os segredos: AI_PROVIDER ("gemini"), GEMINI_API_KEY e AI_MODEL.
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type" };
 const j = (o: unknown, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
-const DAILY = { char: 4, u3d: 6 } as Record<string, number>;
+const DAILY = { char: 4, u3d: 4 } as Record<string, number>;
 
 async function gemini(prompt: string, images: { mime: string; b64: string }[]) {
   const key = Deno.env.get("GEMINI_API_KEY");
@@ -49,10 +49,13 @@ Deno.serve(async (req) => {
   if (p.doc?.state?.pelada?.plan !== "pro") return j({ error: "pro_only" }, 402);
   if (kind === "u3d" && uid !== p.owner) return j({ error: "forbidden" }, 403);
   const since = new Date(Date.now() - 24 * 36e5).toISOString();
-  const { count } = await admin.from("ai_gen_log").select("id", { count: "exact", head: true }).eq("user_id", uid).eq("kind", kind).gt("created_at", since);
+  // uniforme: 4/dia por pelada (dono); personagem: 4/dia por usuário
+  let q = admin.from("ai_gen_log").select("id", { count: "exact", head: true }).eq("kind", kind).gt("created_at", since);
+  q = kind === "u3d" ? q.eq("pelada_code", code) : q.eq("user_id", uid);
+  const { count } = await q;
   if ((count || 0) >= DAILY[kind]) return j({ error: "daily_limit" }, 429);
   const out = await gemini(prompt, images);
   if (out.error) return j({ error: out.error }, out.error === "not_configured" ? 503 : 502);
-  await admin.from("ai_gen_log").insert({ user_id: uid, kind });
+  await admin.from("ai_gen_log").insert({ user_id: uid, kind, pelada_code: code });
   return j({ image: out.image });
 });
