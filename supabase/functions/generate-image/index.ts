@@ -5,8 +5,8 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 // Troque de motor mudando os segredos: AI_PROVIDER ("gemini"), GEMINI_API_KEY e AI_MODEL.
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type" };
 const j = (o: unknown, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
-const DAILY = { char: 4, u3d: 4 } as Record<string, number>;
-const MONTHLY = { char: 12, u3d: 12 } as Record<string, number>; // mês de Brasília (renova dia 1)
+const DAILY = { char: 2, u3d: 4 } as Record<string, number>;
+const MONTHLY = { char: 2, u3d: 8 } as Record<string, number>; // mês de Brasília (renova dia 1)
 
 async function gemini(prompt: string, images: { mime: string; b64: string }[]) {
   const key = Deno.env.get("GEMINI_API_KEY");

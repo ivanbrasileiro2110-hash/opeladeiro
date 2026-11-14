@@ -2695,7 +2695,7 @@ function viewPelada(){
 
   <div class="section"><div class="sh"><span>UNIFORMES DA PELADA</span>${isPro()?"":`<span class="pro">PRO</span>`}</div>
     <div class="box">
-      <div class="note">Envie a frente e as costas do colete ou da camisa. A IA cria o uniforme em 3D e veste o personagem de cada atleta com o uniforme marcado aqui. Sua pelada usa mais de um? Cadastre todos (até 6).</div>
+      <div class="note">Envie a frente e as costas do colete ou da camisa. A IA cria o uniforme em 3D e veste o personagem de cada atleta com o uniforme marcado aqui. Sua pelada usa mais de um? Cadastre todos (até 4).</div>
       <div class="chips">${S.unis.map((x,i)=>`<button data-act="uniSel" data-v="${i}" aria-pressed="${i===S.uniI}">${esc(x.name)}</button>`).join("")}<button data-act="uniNew">+ Novo</button></div>
       <div class="group"><div class="cell"><label class="lbl" for="uName">Nome</label><input class="inl" id="uName" data-input="uname" value="${esc(U.name)}" maxlength="30" autocomplete="off"></div></div>
       <div class="utypes" role="group" aria-label="Modelo do uniforme">${types.map(t=>`<button data-act="utype" data-v="${t[0]}" aria-pressed="${U.type===t[0]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">${t[2]}</svg>${t[1]}</button>`).join("")}</div>
@@ -2703,13 +2703,12 @@ function viewPelada(){
         <label class="tile">${front?`<img src="${front}" alt="Frente">`:CAM+"Frente"}${front?`<span class="cap">Frente</span>`:""}<input class="hidden-file" type="file" accept="image/*" data-file="uFront"></label>
         <label class="tile">${back?`<img src="${back}" alt="Costas">`:CAM+"Costas"}${back?`<span class="cap">Costas</span>`:""}<input class="hidden-file" type="file" accept="image/*" data-file="uBack"></label>
       </div>
-      ${sampleFn&&sampleImages?`<button class="btn ghost sm" data-act="analyzeU" ${front?"":"disabled"}>Descrever uniforme com IA</button><span class="status" id="uStatus"></span>`:""}
       <div><div class="sh" style="padding:0 0 6px"><span>DESCRIÇÃO PARA A IA</span></div>
       <div class="group"><div class="cell" style="align-items:stretch"><textarea class="field" data-input="udesc" placeholder="Ex.: colete sem manga verde-bandeira, gola redonda preta, escudo branco no peito com taça e bola, costas lisas.">${esc(U.desc)}</textarea></div></div></div>
       <button class="btn ${isPro()?"":"gold"}" data-act="gen3d" ${front&&back?"":"disabled"}>${isPro()?(model?"Ver modelo 3D":"Gerar modelo 3D"):"Desbloquear com Pro"}</button>
       ${model?`<div class="tile sq" style="cursor:default"><img src="${model}" alt="Modelo 3D do uniforme"><span class="cap">Modelo 3D</span></div>`:""}
-      <span class="status">Limite de 12 gerações 3D por mês na pelada (renova no dia 1) e 4 por dia.</span>
-      ${S.unis.length>1?`<button class="btn ghost sm" data-act="uniDel">Excluir este uniforme</button>`:""}
+      <span class="status">Limite de 8 gerações 3D por mês na pelada (renova no dia 1) e 4 por dia.</span>
+      ${S.unis.length>1&&(isOwner()||isAdmin())?`<button class="btn ghost sm" data-act="uniDel">Excluir este uniforme</button><span class="status">Excluir libera uma vaga para criar outro. O limite de gerações do mês continua valendo.</span>`:""}
     </div></div>
 
   ${isOwner()?`<div class="section"><div class="sh"><span>DONO DE PELADA</span></div><div class="group">${S.transfer?`<div class="cell"><span class="grow">Transferência pendente para <b>${esc(pname(S.transfer.to))}</b>. Esperando ele aceitar.</span><button class="mini" data-act="cancelTransfer">Cancelar</button></div>`:`<button class="cell action" data-act="transfer"><span class="grow">Transferir pelada para outro dono</span>${CHEV}</button>`}</div>
@@ -2892,7 +2891,7 @@ async function aiGen(kind,prompt,images){if(!CLOUD||!curP)return {error:"offline
     if(error){let m="";try{m=(await error.context.json()).error;}catch(_){}return {error:m||"failed"};}
     return data&&data.image?{image:data.image}:{error:(data&&data.error)||"failed"};}catch(e){return {error:"failed"};}}
 const uKey=k=>{const U=S.uniform,sfx=U===S.unis[0]?"":"_"+U.id;return (["SP0001","OP0001"].includes(curP.code)?"u_"+k:"u_"+curP.code+"_"+k)+sfx;};
-const aiMsg=e=>e==="not_configured"?"A geração por IA ainda não está ligada. Em breve.":e==="daily_limit"?"Limite de gerações de hoje atingido. Tente amanhã.":e==="monthly_limit"?"Limite de 12 gerações do mês atingido. Renova no dia 1.":e==="pro_only"?"Recurso do Plano Pro.":e==="offline"?"Sem conexão.":"Não deu certo desta vez. Tente de novo em instantes.";
+const aiMsg=e=>e==="not_configured"?"A geração por IA ainda não está ligada. Em breve.":e==="daily_limit"?"Limite de gerações de hoje atingido. Tente amanhã.":e==="monthly_limit"?"Limite de gerações do mês atingido. Renova no dia 1.":e==="pro_only"?"Recurso do Plano Pro.":e==="offline"?"Sem conexão.":"Não deu certo desta vez. Tente de novo em instantes.";
 function charPrompt(p,w){
   const U=S.uniform,[ut,sl]=UTYPE[U.type]||UTYPE.colete,pose=POSES.find(x=>x[0]===w.pose)||POSES[0];const body=(BODY.find(b=>b[0]===w.body)||BODY[1])[1].toLowerCase();
   return `Crie um personagem 3D realista desta pessoa usando as fotos de rosto anexadas. Ele precisa ser reconhecível como a mesma pessoa: preserve fielmente formato do rosto e da cabeça, olhos, sobrancelhas, nariz, boca, orelhas, cabelo, barba e tom de pele.
@@ -2956,7 +2955,7 @@ function sheetChar(){
       ${uni?"":`<p class="sf">O organizador ainda não cadastrou o uniforme em Ajustes. Sem ele, a IA inventa a roupa.</p>`}</div>
     ${w.busy?`<div class="section"><div class="box"><div class="note"><b>Gerando seu personagem…</b> Leva até 1 minuto. Não feche esta tela.</div></div></div>`:
     w.done?`<div class="section"><div class="box" style="align-items:center"><img src="${img(p.art)||""}" alt="Seu personagem" style="max-width:70%;border-radius:12px"><div class="note"><b>Pronto!</b> Seu personagem já aparece no seu card.</div></div><button class="btn" data-act="closeSheet" style="margin-top:12px">Concluir</button></div>`:
-    `<div class="section"><button class="btn" data-act="charGen">Gerar personagem</button>${w.err?`<p class="sf" style="color:var(--down)">${aiMsg(w.err)}</p>`:`<p class="sf">Cada atleta gera um personagem. Limite de 4 por dia.</p>`}</div>
+    `<div class="section"><button class="btn" data-act="charGen">Gerar personagem</button>${w.err?`<p class="sf" style="color:var(--down)">${aiMsg(w.err)}</p>`:`<p class="sf">Cada atleta pode gerar até 2 personagens por mês.</p>`}</div>
     ${isCreator()&&w.err?`<div class="section"><div class="box testbox"><div class="note"><b>Só você vê (teste manual).</b> Copie o pedido, gere no Gemini ou no ChatGPT com as fotos e envie a imagem aqui.</div>
       <div class="prompt" id="charPrompt">${esc(charPrompt(p,w))}</div>
       <button class="btn ghost sm" data-act="copyPrompt" data-src="charPrompt">Copiar pedido</button>
@@ -3510,7 +3509,7 @@ document.addEventListener("click",e=>{
       if(el.dataset.then==="create"){closeSheet();curP=null;S=null;G.sess.mode="peladas";createDraft={name:"",weekday:null,time:"",base:5,vagas:10,vEd:false,gk:false,mensal:"",diaria:""};screen="create";save();}render();break;}
     case "utype":S.uniform.type=v;save();render();break;
     case "uniSel":S.uniI=+v;S.uniform=S.unis[S.uniI];save();render();break;
-    case "uniNew":{if(S.unis.length>=6){hud("Máximo de 6 uniformes");break;}const n=S.unis.length+1;S.unis.push({id:"u"+Date.now().toString(36),name:"Uniforme "+n,type:"colete",front:null,back:null,model:null,desc:""});S.uniI=S.unis.length-1;S.uniform=S.unis[S.uniI];save();render();break;}
+    case "uniNew":{if(S.unis.length>=4){hud("Máximo de 4 uniformes. Exclua um para criar outro");break;}const n=S.unis.length+1;S.unis.push({id:"u"+Date.now().toString(36),name:"Uniforme "+n,type:"colete",front:null,back:null,model:null,desc:""});S.uniI=S.unis.length-1;S.uniform=S.unis[S.uniI];save();render();break;}
     case "uniDel":{if(S.unis.length<2||!confirm("Excluir este uniforme?"))break;const U=S.uniform;["front","back","model"].forEach(k=>{if(U[k])setImg(U[k],null);});S.unis.splice(S.uniI,1);S.uniI=0;S.uniform=S.unis[0];save();render();break;}
     case "analyzeU":analyzeUniform();break;
     case "gen3d":if(!isPro()){openSheet({type:"upsell",what:"Uniforme 3D por IA"});break;}openSheet({type:"gen3d"});break;
