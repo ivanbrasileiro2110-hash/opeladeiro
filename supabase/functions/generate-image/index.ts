@@ -6,6 +6,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type" };
 const j = (o: unknown, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 const DAILY = { char: 4, u3d: 4 } as Record<string, number>;
+const MONTHLY = { char: 12, u3d: 12 } as Record<string, number>; // mês de Brasília (renova dia 1)
 
 async function gemini(prompt: string, images: { mime: string; b64: string }[]) {
   const key = Deno.env.get("GEMINI_API_KEY");
@@ -48,12 +49,16 @@ Deno.serve(async (req) => {
   if (!members.has(uid)) return j({ error: "forbidden" }, 403);
   if (p.doc?.state?.pelada?.plan !== "pro") return j({ error: "pro_only" }, 402);
   if (kind === "u3d" && uid !== p.owner) return j({ error: "forbidden" }, 403);
-  const since = new Date(Date.now() - 24 * 36e5).toISOString();
-  // uniforme: 4/dia por pelada (dono); personagem: 4/dia por usuário
-  let q = admin.from("ai_gen_log").select("id", { count: "exact", head: true }).eq("kind", kind).gt("created_at", since);
-  q = kind === "u3d" ? q.eq("pelada_code", code) : q.eq("user_id", uid);
-  const { count } = await q;
-  if ((count || 0) >= DAILY[kind]) return j({ error: "daily_limit" }, 429);
+  const count = async (sinceIso: string) => {
+    // uniforme: limites por pelada (dono); personagem: limites por usuário
+    let q = admin.from("ai_gen_log").select("id", { count: "exact", head: true }).eq("kind", kind).gt("created_at", sinceIso);
+    q = kind === "u3d" ? q.eq("pelada_code", code) : q.eq("user_id", uid);
+    return (await q).count || 0;
+  };
+  if (await count(new Date(Date.now() - 24 * 36e5).toISOString()) >= DAILY[kind]) return j({ error: "daily_limit" }, 429);
+  const br = new Date(Date.now() - 3 * 36e5);
+  const monthStart = new Date(Date.UTC(br.getUTCFullYear(), br.getUTCMonth(), 1) + 3 * 36e5).toISOString();
+  if (await count(monthStart) >= MONTHLY[kind]) return j({ error: "monthly_limit" }, 429);
   const out = await gemini(prompt, images);
   if (out.error) return j({ error: out.error }, out.error === "not_configured" ? 503 : 502);
   await admin.from("ai_gen_log").insert({ user_id: uid, kind, pelada_code: code });

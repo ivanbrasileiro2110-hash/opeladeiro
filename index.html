@@ -721,6 +721,9 @@ if(!S.me||!S.players.some(p=>p.id===S.me))S.me=S.ownerId;
 if(S.pelada.matchMin===undefined)S.pelada.matchMin=null;if(S.pelada.weekday===undefined)S.pelada.weekday=null;if(S.pelada.time===undefined)S.pelada.time="";
 if(S.pelada.waLink===undefined)S.pelada.waLink="";
 if(S.tempAdminId&&!S.players.some(p=>p.id===S.tempAdminId))S.tempAdminId=null;
+if(!S.unis||!S.unis.length)S.unis=[Object.assign({type:"colete",front:null,back:null,model:null,desc:""},S.uniform||{})];
+S.unis.forEach((u,i)=>{if(!u.id)u.id="u"+(i+1);if(!u.name)u.name="Uniforme "+(i+1);});
+if(S.uniI==null||!S.unis[S.uniI])S.uniI=0;S.uniform=S.unis[S.uniI];
 if(S.live&&(!S.lastDraw||!S.lastDraw.teams))S.live=null;
 if(S.live&&!S.live.rosters){S.live.rosters=buildRosters(S.lastDraw);S.live.loans=[];S.live.full=Math.max(...S.live.rosters.map(r=>r.length));}
 }
@@ -1161,8 +1164,8 @@ function doLogin(u,isNew){G.sess={uid:u.id,mode:"peladas",code:null};u.lastLogin
 function logout(){if(CLOUD)cloudLogout();G.sess=null;closeSheet();curP=null;S=null;screen="welcome";authErr="";save();render();window.scrollTo(0,0);}
 function newCode(){let c;do{G.seq++;c="OP"+String(G.seq).padStart(4,"0");}while(pByCode(c));return c;}
 function peladaState(d){const u=meU();const owner=newPlayer({name:dispName(u),pos:u.pos||"AUTO",photo:u.photo,uid:u.id});
-  const st={scale:99,pelada:{name:d.name,base:d.base,plan:u.plan,fixedGK:false,matchMin:null,weekday:d.weekday,time:d.time,waLink:""},uniform:{type:"colete",front:null,back:null,model:null,desc:""},
-    players:[owner],rounds:[],session:null,lastDraw:null,ownerId:owner.id,me:owner.id,tempAdminId:null,live:null,nudges:[]};
+  const st={scale:99,pelada:{name:d.name,base:d.base,plan:u.plan,fixedGK:!!d.gk,matchMin:null,weekday:d.weekday,time:d.time,waLink:"",lista:{vagas:d.vagas||d.base*2}},uniform:{type:"colete",front:null,back:null,model:null,desc:""},
+    players:[owner],rounds:[],session:null,lastDraw:null,ownerId:owner.id,me:owner.id,tempAdminId:null,live:null,nudges:[],cx:{pix:"",mensal:String(d.mensal||"60"),diaria:String(d.diaria||"20"),venc:10,types:{},pays:{},dpays:{},informed:{},desp:[]}};
   fixState(st);return st;}
 function createPelada(d){const u=meU();const code=newCode();const st=peladaState(d);G.peladas.push({id:uid(),code,ownerUid:u.id,createdAt:Date.now(),state:st});save();return code;}
 function joinPelada(){const u=meU(),P=pByCode(joinFound);if(!u||!P)return;const st=P.state;
@@ -2022,17 +2025,27 @@ function viewHome(){const u=meU(),all=myPeladas(u);
   <div class="section"><div class="sh"><span>APARÊNCIA</span></div>${themeSeg()}</div>
   <div class="section"><div class="group"><button class="cell danger" data-act="logout">Sair da conta</button>${isCreator()?"":`<button class="cell danger" data-act="delAccount" style="font-weight:500;font-size:15px">Excluir minha conta</button>`}</div></div><p class="sf" style="text-align:center;margin-top:10px"><a href="/termos/" target="_blank" rel="noopener" style="color:inherit">Termos de uso</a> · <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit">Política de privacidade</a></p>`;
 }
-function viewCreate(){const d=createDraft||{name:"",weekday:null,time:"",base:5};
+function viewCreate(){const d=createDraft||{name:"",weekday:null,time:"",base:5,vagas:10,vEd:false,gk:false,mensal:"",diaria:""};
+  const stp=(act,val,lo,hi)=>`<div class="stepper"><output class="tnum">${val}</output><div class="stp"><button data-act="${act}" data-v="-1" ${val<=lo?"disabled":""} aria-label="Menos um">−</button><i></i><button data-act="${act}" data-v="1" ${val>=hi?"disabled":""} aria-label="Mais um">+</button></div></div>`;
   return `<button class="back" data-act="goMode" data-v="peladas">‹ Minhas peladas</button>
-  <div class="hero" style="padding-top:6px"><div class="eyebrow">Você vai ser o Dono de Pelada</div><h1>Criar pelada</h1><p class="sub">Leva 30 segundos. Depois é só mandar o convite no grupo.</p></div>
+  <div class="hero" style="padding-top:6px"><div class="eyebrow">Você vai ser o Dono de Pelada</div><h1>Criar pelada</h1><p class="sub">Preencha com calma: é com esses dados que a lista abre sozinha, os avisos saem na hora certa e a caixinha cobra o valor certo. Dá para mudar depois em Ajustes.</p></div>
   <div class="section"><div class="group"><div class="cell"><label class="lbl" for="cName">Nome</label><input class="inl" id="cName" placeholder="Ex.: Fut de quarta" value="${esc(d.name)}" data-input="cname" autocomplete="off"></div></div></div>
-  <div class="section"><div class="sh"><span>QUANDO ACONTECE</span></div><div class="box">
+  <div class="section"><div class="sh"><span>QUANDO ACONTECE (OBRIGATÓRIO)</span></div><div class="box">
     <div class="chips">${WDs.map((x,i)=>`<button data-act="cWd" data-v="${i}" aria-pressed="${d.weekday===i}">${x}</button>`).join("")}</div>
-    <div class="group" style="background:rgba(var(--ov),.04)"><div class="cell"><label class="lbl" for="cTime">Horário</label><input class="inl" type="time" id="cTime" value="${esc(d.time)}" data-input="ctime"></div></div></div></div>
-  <div class="section"><div class="group"><div class="cell"><span class="grow">Jogadores por time</span><div class="stepper"><output class="tnum">${d.base}</output><div class="stp"><button data-act="cBase" data-v="-1" ${d.base<=2?"disabled":""} aria-label="Menos um">−</button><i></i><button data-act="cBase" data-v="1" ${d.base>=11?"disabled":""} aria-label="Mais um">+</button></div></div></div></div>
-    <p class="sf">Você entra como o primeiro peladeiro da lista.</p></div>
+    <div class="group" style="background:rgba(var(--ov),.04)"><div class="cell"><label class="lbl" for="cTime">Horário</label><input class="inl" type="time" id="cTime" value="${esc(d.time)}" data-input="ctime"></div></div>
+    <span class="status">Horário de Brasília. A lista, os lembretes e o encerramento automático seguem esse dia e hora.</span></div></div>
+  <div class="section"><div class="sh"><span>TIMES E VAGAS</span></div><div class="group">
+    <div class="cell"><span class="grow">Jogadores por time</span>${stp("cBase",d.base,2,11)}</div>
+    <div class="cell"><span class="grow">Vagas na lista</span>${stp("cVag",d.vagas,2,60)}</div>
+    <div class="cell"><span class="grow">Goleiro fixo em cada time</span><button class="pill ${d.gk?"gold":""}" data-act="cGk" aria-pressed="${d.gk}">${d.gk?"Sim":"Não"}</button></div></div>
+    <p class="sf">Vagas padrão: dois times cheios (${d.base*2}). Goleiro fixo faz o sorteio reservar um goleiro por time.</p></div>
+  <div class="section"><div class="sh"><span>CAIXINHA (R$)</span></div><div class="group">
+    <div class="cell"><label class="lbl" for="cMensal">Mensalidade</label><input class="inl" id="cMensal" inputmode="decimal" placeholder="Ex.: 60" value="${esc(d.mensal)}" data-input="cmensal" autocomplete="off"></div>
+    <div class="cell"><label class="lbl" for="cDiaria">Diária (avulso)</label><input class="inl" id="cDiaria" inputmode="decimal" placeholder="Ex.: 20" value="${esc(d.diaria)}" data-input="cdiaria" autocomplete="off"></div></div>
+    <p class="sf">As multas e as cobranças usam esses valores. Não cobra? Coloque 0.</p></div>
   <div class="err" role="alert">${esc(authErr)}</div>
-  <button class="btn" data-act="doCreate">Criar pelada</button>`;
+  <button class="btn" data-act="doCreate">Criar pelada</button>
+  <p class="sf" style="text-align:center">Você entra como o primeiro peladeiro da lista.</p>`;
 }
 function viewJoin(){const u=meU(),back=`<button class="back" data-act="joinBack">‹ Minhas peladas</button>`;
   if(!joinFound)return `${back}<div class="hero" style="padding-top:6px"><div class="eyebrow">Olá, ${esc(u.nick||u.name.split(" ")[0])}</div><h1>Entrar em uma pelada</h1><p class="sub">Peça o código para o Dono de Pelada. Ele começa com OP e tem 4 números.</p></div>
@@ -2170,6 +2183,7 @@ function viewJogo(){
   if(jogoSeg==="aovivo")return h+viewLive();
   if(S.transfer&&S.transfer.to===S.me){const o=ownerU();h+=`<div class="banner info"><span class="grow"><b>${esc(o?dispName(o):"O dono")}</b> quer passar a pelada para você. Você vira o Dono de Pelada.</span><span style="display:flex;gap:6px"><button class="pill gold" data-act="acceptTransfer">Aceitar</button><button class="pill" data-act="declineTransfer">Recusar</button></span></div>`;}
   if(isOwner()&&!isPro()&&(S.nudges||[]).length){const n=S.nudges.length;h+=`<div class="banner info"><span class="grow"><b>${n===1?"1 peladeiro pediu":n+" peladeiros pediram"} o Plano Pro</b> nesta pelada: ${S.nudges.map(id=>esc((byId(id)||{}).name||"")).filter(Boolean).join(", ")}.</span><button class="pill gold" data-act="upsell" data-what="">Ver Pro</button></div>`;}
+  if((isOwner()||isAdmin())&&(S.pelada.weekday==null||!S.pelada.time))h+=`<div class="banner info"><span class="grow"><b>Faltam dados da pelada.</b> Sem o dia e o horário, a lista não abre sozinha e os avisos não saem.</span><button class="pill gold" data-act="goPro">Completar</button></div>`;
   if(!S.session&&S.closedDate===today())h+=`<div class="banner info"><span class="grow"><b>Pelada de hoje encerrada.</b> A súmula está na Resenha.</span><button class="pill gold" data-act="goVote">Ver</button></div>`;
   if(S.session){const t=new Date(S.session.closesAt).toLocaleString("pt-BR",{weekday:"short",hour:"2-digit",minute:"2-digit"});h+=`<div class="banner info"><span class="grow"><b>Pelada encerrada.</b> Votação aberta até ${esc(t)}.</span><button class="pill gold" data-act="goVote">Votar</button></div>`;}
   if(isOwner()&&S.players.length<=1&&jogoSeg==="presenca")h+=`<div class="section"><div class="box"><div class="note"><b>Pelada criada! Agora chame a galera.</b> Mande o convite no grupo ou cole a lista que vocês já usam no WhatsApp.</div>
@@ -2671,7 +2685,7 @@ function viewPelada(){
       `<span class="status">${S.tempAdminId?`Admin da vez: <b>${esc(adminName())}</b>.`:""} Só o Dono de Pelada escolhe o admin da vez.</span>`}
   </div></div>
 
-  ${isOwner()?`<div class="section"><div class="sh"><span>PLANO</span></div>
+  ${isOwner()&&isCreator()?`<div class="section"><div class="sh"><span>PLANO (só você vê)</span></div>
     <div class="seg" role="group" aria-label="Plano" style="margin-top:0"><button data-act="plan" data-v="free" aria-pressed="${!isPro()}">Grátis</button><button data-act="plan" data-v="pro" aria-pressed="${isPro()}">Pro (teste)</button></div>
     <div class="box" style="margin-top:12px"><div class="feat">
       <div>Recurso</div><div class="c" style="color:var(--muted)">Grátis</div><div class="c" style="color:var(--gold)">Pro</div>
@@ -2679,9 +2693,11 @@ function viewPelada(){
     </div></div>
     <p class="sf">Nesta versão de teste você troca de plano livremente para ver as duas experiências. O plano vale para todas as suas peladas.</p></div>`:""}
 
-  <div class="section"><div class="sh"><span>UNIFORME DA PELADA</span>${isPro()?"":`<span class="pro">PRO</span>`}</div>
+  <div class="section"><div class="sh"><span>UNIFORMES DA PELADA</span>${isPro()?"":`<span class="pro">PRO</span>`}</div>
     <div class="box">
-      <div class="note">Envie a frente e as costas do colete ou da camisa. A IA cria o uniforme em 3D e veste o personagem de cada atleta com ele.</div>
+      <div class="note">Envie a frente e as costas do colete ou da camisa. A IA cria o uniforme em 3D e veste o personagem de cada atleta com o uniforme marcado aqui. Sua pelada usa mais de um? Cadastre todos (até 6).</div>
+      <div class="chips">${S.unis.map((x,i)=>`<button data-act="uniSel" data-v="${i}" aria-pressed="${i===S.uniI}">${esc(x.name)}</button>`).join("")}<button data-act="uniNew">+ Novo</button></div>
+      <div class="group"><div class="cell"><label class="lbl" for="uName">Nome</label><input class="inl" id="uName" data-input="uname" value="${esc(U.name)}" maxlength="30" autocomplete="off"></div></div>
       <div class="utypes" role="group" aria-label="Modelo do uniforme">${types.map(t=>`<button data-act="utype" data-v="${t[0]}" aria-pressed="${U.type===t[0]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">${t[2]}</svg>${t[1]}</button>`).join("")}</div>
       <div class="tiles">
         <label class="tile">${front?`<img src="${front}" alt="Frente">`:CAM+"Frente"}${front?`<span class="cap">Frente</span>`:""}<input class="hidden-file" type="file" accept="image/*" data-file="uFront"></label>
@@ -2692,6 +2708,8 @@ function viewPelada(){
       <div class="group"><div class="cell" style="align-items:stretch"><textarea class="field" data-input="udesc" placeholder="Ex.: colete sem manga verde-bandeira, gola redonda preta, escudo branco no peito com taça e bola, costas lisas.">${esc(U.desc)}</textarea></div></div></div>
       <button class="btn ${isPro()?"":"gold"}" data-act="gen3d" ${front&&back?"":"disabled"}>${isPro()?(model?"Ver modelo 3D":"Gerar modelo 3D"):"Desbloquear com Pro"}</button>
       ${model?`<div class="tile sq" style="cursor:default"><img src="${model}" alt="Modelo 3D do uniforme"><span class="cap">Modelo 3D</span></div>`:""}
+      <span class="status">Limite de 12 gerações 3D por mês na pelada (renova no dia 1) e 4 por dia.</span>
+      ${S.unis.length>1?`<button class="btn ghost sm" data-act="uniDel">Excluir este uniforme</button>`:""}
     </div></div>
 
   ${isOwner()?`<div class="section"><div class="sh"><span>DONO DE PELADA</span></div><div class="group">${S.transfer?`<div class="cell"><span class="grow">Transferência pendente para <b>${esc(pname(S.transfer.to))}</b>. Esperando ele aceitar.</span><button class="mini" data-act="cancelTransfer">Cancelar</button></div>`:`<button class="cell action" data-act="transfer"><span class="grow">Transferir pelada para outro dono</span>${CHEV}</button>`}</div>
@@ -2873,7 +2891,8 @@ async function aiGen(kind,prompt,images){if(!CLOUD||!curP)return {error:"offline
     const {data,error}=await sb.functions.invoke("generate-image",{body:{kind,code:curP.code,prompt,images:ims}});
     if(error){let m="";try{m=(await error.context.json()).error;}catch(_){}return {error:m||"failed"};}
     return data&&data.image?{image:data.image}:{error:(data&&data.error)||"failed"};}catch(e){return {error:"failed"};}}
-const aiMsg=e=>e==="not_configured"?"A geração por IA ainda não está ligada. Em breve.":e==="daily_limit"?"Você chegou ao limite de gerações de hoje. Tente amanhã.":e==="pro_only"?"Recurso do Plano Pro.":e==="offline"?"Sem conexão.":"Não deu certo desta vez. Tente de novo em instantes.";
+const uKey=k=>{const U=S.uniform,sfx=U===S.unis[0]?"":"_"+U.id;return (["SP0001","OP0001"].includes(curP.code)?"u_"+k:"u_"+curP.code+"_"+k)+sfx;};
+const aiMsg=e=>e==="not_configured"?"A geração por IA ainda não está ligada. Em breve.":e==="daily_limit"?"Limite de gerações de hoje atingido. Tente amanhã.":e==="monthly_limit"?"Limite de 12 gerações do mês atingido. Renova no dia 1.":e==="pro_only"?"Recurso do Plano Pro.":e==="offline"?"Sem conexão.":"Não deu certo desta vez. Tente de novo em instantes.";
 function charPrompt(p,w){
   const U=S.uniform,[ut,sl]=UTYPE[U.type]||UTYPE.colete,pose=POSES.find(x=>x[0]===w.pose)||POSES[0];const body=(BODY.find(b=>b[0]===w.body)||BODY[1])[1].toLowerCase();
   return `Crie um personagem 3D realista desta pessoa usando as fotos de rosto anexadas. Ele precisa ser reconhecível como a mesma pessoa: preserve fielmente formato do rosto e da cabeça, olhos, sobrancelhas, nariz, boca, orelhas, cabelo, barba e tom de pele.
@@ -2963,10 +2982,10 @@ function sheetVote(){
   <div class="section"><button class="btn" data-act="saveVote">${dr.mvp?"Salvar meus votos":"Escolha o craque (estrela) e salve"}</button></div>`;
 }
 function sheetRound(){
-  const r=S.rounds.find(x=>x.id===sheet.id);if(!r){closeSheet();return"";}const m=byId(r.mvp);
+  const r=S.rounds.find(x=>x.id===sheet.id);if(!r){closeSheet();return"";}const ms=(r.mvps&&r.mvps.length?r.mvps:[r.mvp]).map(byId).filter(Boolean),m=ms[0];
   const dl=c=>c.gk0!=null?(c.gk1-c.gk0):(c.a1-c.a0+c.d1-c.d0);const rows=[...r.changes].sort((x,y)=>dl(y)-dl(x));
   return `${bar("Pelada de "+dateBR(r.date))}
-  ${m?`<div class="section"><div class="box" style="flex-direction:row;align-items:center"><span class="ava" style="width:56px;height:56px">${img(m.art)||img(m.photo)?`<img src="${img(m.art)||img(m.photo)}" alt="">`:esc(initials(m.name))}</span><div class="grow"><div class="status">Craque da pelada</div><div style="font-size:20px;font-weight:800">${esc(m.name)}</div></div><span style="color:var(--gold);width:28px">${STAR}</span></div></div>`:""}
+  ${m?`<div class="section"><div class="box" style="flex-direction:row;align-items:center"><span class="ava" style="width:56px;height:56px">${img(m.art)||img(m.photo)?`<img src="${img(m.art)||img(m.photo)}" alt="">`:esc(initials(m.name))}</span><div class="grow"><div class="status">${ms.length>1?"Craques da pelada (empate)":"Craque da pelada"}</div><div style="font-size:20px;font-weight:800">${ms.map(x=>esc(dn(x))).join(" e ")}</div></div><span style="color:var(--gold);width:28px">${STAR}</span></div></div>`:""}
   <div class="section"><div class="sh"><span>${r.evolved?"COMO FICOU O NÍVEL":"PARTICIPANTES"}</span><span>${r.voters} votantes</span></div><div class="group">
   ${rows.map(c=>{const p=byId(c.id)||{name:c.name,photo:null,art:null};const da=c.a1-c.a0,dd=c.d1-c.d0,dg=(c.gk1??0)-(c.gk0??0);return `<div class="cell av">${ava(p)}<span class="grow trunc">${esc(dn(p))}</span>${r.evolved?(c.gk0!=null?`<span class="delta ${cls(dg)}">GOL ${f1(c.gk1)} ${dg?arrow(dg):""}</span>`:`<span style="text-align:right;line-height:1.3"><span class="delta ${cls(da)}">ATQ ${f1(c.a1)} ${da?arrow(da):""}</span><br><span class="delta ${cls(dd)}">DEF ${f1(c.d1)} ${dd?arrow(dd):""}</span></span>`):""}</div>`}).join("")}
   </div>${r.evolved?`<p class="sf">Quem teve menos de 2 votos manteve o nível.</p>`:""}</div>`;
@@ -3051,15 +3070,15 @@ function copyText(txt,boxId,wrapId){
 function applySession(silent){
   const ses=S.session,voters=Object.keys(ses.votes),pro=isPro();
   const cnt={};voters.forEach(v=>{const m=ses.votes[v].mvp;if(m)cnt[m]=(cnt[m]||0)+1;});
-  let mvp=null,best=0;Object.entries(cnt).forEach(([id,c])=>{if(c>best){best=c;mvp=id;}});
+  let best=0;Object.values(cnt).forEach(c=>{if(c>best)best=c;});const mvps=best>0?Object.keys(cnt).filter(id=>cnt[id]===best&&byId(id)):[];const mvp=mvps[0]||null;
   const changes=[];
   ses.ids.forEach(id=>{const p=byId(id);if(!p)return;const ps=posOf(p);const c={id,name:p.name,pos:ps,a0:p.a,d0:p.d,a1:p.a,d1:p.d};
     const keys=ps==="GOL"?["gk"]:["a","d"],cap=MAXSTEP[ps]||MAXSTEP.MEI;if(ps==="GOL"){c.gk0=p.gk??50;c.gk1=c.gk0;}
     if(pro)keys.forEach(k=>{const vals=voters.filter(v=>v!==id).map(v=>((ses.votes[v].t||{})[id]||{})[k]??0);
       if(vals.length>=2){vals.sort((x,y)=>x-y);const use=vals.length>=5?vals.slice(1,-1):vals;const m=use.reduce((s,x)=>s+x,0)/use.length;p[k]=clampL((p[k]??50)+m*cap[k]);c[k+"1"]=p[k];}});
     changes.push(c);});
-  if(mvp){const p=byId(mvp);if(p)p.mvp=(p.mvp||0)+1;}
-  const r={id:ses.id?"r_"+ses.id:uid(),date:ses.date,voters:voters.length,mvp,evolved:pro,changes};
+  mvps.forEach(id=>{const p=byId(id);if(p)p.mvp=(p.mvp||0)+1;});
+  const r={id:ses.id?"r_"+ses.id:uid(),date:ses.date,voters:voters.length,mvp,mvps,evolved:pro,changes};
   S.rounds.unshift(r);S.session=null;save();if(!silent){render();openSheet({type:"round",id:r.id});}return r;
 }
 async function analyzeUniform(){
@@ -3117,10 +3136,16 @@ document.addEventListener("click",e=>{
     case "logout":logout();break;
     case "openPelada":enterPelada(v);break;
     case "newPelada":{const u=meU();if(!userPro(u)&&ownedBy(u).length>=G.cfg.freePeladas){openSheet({type:"upsell",what:"Mais de uma pelada ao mesmo tempo",scope:"me",then:"create"});break;}
-      closeSheet();curP=null;S=null;G.sess.mode="peladas";G.sess.code=null;createDraft={name:"",weekday:null,time:"",base:5};authErr="";screen="create";save();render();window.scrollTo(0,0);break;}
+      closeSheet();curP=null;S=null;G.sess.mode="peladas";G.sess.code=null;createDraft={name:"",weekday:null,time:"",base:5,vagas:10,vEd:false,gk:false,mensal:"",diaria:""};authErr="";screen="create";save();render();window.scrollTo(0,0);break;}
     case "cWd":createDraft.weekday=createDraft.weekday===+v?null:+v;render();break;
-    case "cBase":createDraft.base=Math.max(2,Math.min(11,createDraft.base+ +v));render();break;
-    case "doCreate":{const d=createDraft;d.name=($("cName").value||"").trim();d.time=$("cTime").value||"";if(!d.name){authErr="Dê um nome para a pelada.";render();$("cName").focus();break;}
+    case "cBase":createDraft.base=Math.max(2,Math.min(11,createDraft.base+ +v));if(!createDraft.vEd)createDraft.vagas=createDraft.base*2;render();break;
+    case "cVag":createDraft.vagas=Math.max(2,Math.min(60,createDraft.vagas+ +v));createDraft.vEd=true;render();break;
+    case "cGk":createDraft.gk=!createDraft.gk;render();break;
+    case "doCreate":{const d=createDraft;d.name=($("cName").value||"").trim();d.time=$("cTime").value||"";d.mensal=($("cMensal").value||"").trim();d.diaria=($("cDiaria").value||"").trim();
+      if(!d.name){authErr="Dê um nome para a pelada.";render();$("cName").focus();break;}
+      if(d.weekday==null){authErr="Escolha o dia da semana da pelada.";render();break;}
+      if(!d.time){authErr="Escolha o horário da pelada.";render();break;}
+      if(d.mensal===""||d.diaria===""){authErr="Informe a mensalidade e a diária. Se não cobra, coloque 0.";render();break;}
       authErr="";if(CLOUD){if(authBusy)break;authBusy=true;render();cloudCreatePelada(peladaState(d)).then(code=>{authBusy=false;enterPelada(code);setTimeout(()=>hud("Pelada criada · código "+code),200);},()=>{authBusy=false;authErr="Sem conexão. Confira a internet e tente de novo.";render();});break;}const code=createPelada(d);enterPelada(code);setTimeout(()=>hud("Pelada criada · código "+code),200);break;}
     case "goJoin":closeSheet();curP=null;S=null;G.sess.mode="peladas";G.sess.code=null;joinFound=null;joinDraft=null;joinErr="";screen="join";save();render();window.scrollTo(0,0);break;
     case "findPelada":{const raw=($("jCode").value||"").toUpperCase().replace(/\s/g,""),dg=raw.replace(/\D/g,"");
@@ -3466,7 +3491,7 @@ document.addEventListener("click",e=>{
     case "wpose":sheet.w.pose=v;renderSheet();break;
     case "u3dGen":{if(!isOwner()||sheet.busy)break;sheet.busy=true;sheet.err="";renderSheet();const sh=sheet;
       aiGen("u3d",u3dPrompt(),[img(S.uniform.front),img(S.uniform.back)]).then(async r=>{if(sheet!==sh)return;sh.busy=false;
-        if(r.image){try{const d=await shrinkData(r.image,1000,.88);S.uniform.model=["SP0001","OP0001"].includes(curP.code)?"u_model":"u_"+curP.code+"_model";setImg(S.uniform.model,d);save();render();hud("Uniforme 3D pronto");}catch(e){sh.err="failed";}}else sh.err=r.error;renderSheet();});break;}
+        if(r.image){try{const d=await shrinkData(r.image,1000,.88);S.uniform.model=uKey("model");setImg(S.uniform.model,d);save();render();hud("Uniforme 3D pronto");}catch(e){sh.err="failed";}}else sh.err=r.error;renderSheet();});break;}
     case "charGen":{const w=sheet.w,p=byId(w.id);if(w.busy)break;p.birth=w.birth;p.h=w.h;p.w=w.w;p.artPose=w.pose;w.busy=true;w.err="";save();renderSheet();
       const uni=img(S.uniform.model)||img(S.uniform.front),prm=charPrompt(p,w).replace(/Fundo: TRANSPARENTE[\s\S]*?(?=\nFormato)/,"Fundo: verde chroma sólido (#00FF00), liso e uniforme, sem sombra no chão e sem nenhum verde no personagem ou no uniforme.");
       aiGen("char",prm,[...w.selfies.filter(Boolean),uni]).then(async r=>{if(!sheet||sheet.w!==w)return;w.busy=false;
@@ -3482,8 +3507,11 @@ document.addEventListener("click",e=>{
     case "openRound":openSheet({type:"round",id});break;
     case "goPro":setTab("pelada");break;
     case "plan":{const u=el.dataset.scope==="me"||!curP?meU():ownerU();setUserPlan(u,v);save();if(el.dataset.close)closeSheet();hud(v==="pro"?"Pro ativado":"Plano Grátis");
-      if(el.dataset.then==="create"){closeSheet();curP=null;S=null;G.sess.mode="peladas";createDraft={name:"",weekday:null,time:"",base:5};screen="create";save();}render();break;}
+      if(el.dataset.then==="create"){closeSheet();curP=null;S=null;G.sess.mode="peladas";createDraft={name:"",weekday:null,time:"",base:5,vagas:10,vEd:false,gk:false,mensal:"",diaria:""};screen="create";save();}render();break;}
     case "utype":S.uniform.type=v;save();render();break;
+    case "uniSel":S.uniI=+v;S.uniform=S.unis[S.uniI];save();render();break;
+    case "uniNew":{if(S.unis.length>=6){hud("Máximo de 6 uniformes");break;}const n=S.unis.length+1;S.unis.push({id:"u"+Date.now().toString(36),name:"Uniforme "+n,type:"colete",front:null,back:null,model:null,desc:""});S.uniI=S.unis.length-1;S.uniform=S.unis[S.uniI];save();render();break;}
+    case "uniDel":{if(S.unis.length<2||!confirm("Excluir este uniforme?"))break;const U=S.uniform;["front","back","model"].forEach(k=>{if(U[k])setImg(U[k],null);});S.unis.splice(S.uniI,1);S.uniI=0;S.uniform=S.unis[0];save();render();break;}
     case "analyzeU":analyzeUniform();break;
     case "gen3d":if(!isPro()){openSheet({type:"upsell",what:"Uniforme 3D por IA"});break;}openSheet({type:"gen3d"});break;
     case "wipe":if(!isCreator())break;if(!wipeArm){wipeArm=true;render();setTimeout(()=>{wipeArm=false;render();},4000);break;}
@@ -3507,6 +3535,8 @@ document.addEventListener("input",e=>{
   else if(k==="aemail")authVals.email=val;
   else if(k==="cname")createDraft.name=val;
   else if(k==="ctime")createDraft.time=val;
+  else if(k==="cmensal")createDraft.mensal=val;
+  else if(k==="cdiaria")createDraft.diaria=val;
   else if(k==="jname")joinDraft.name=val;
   else if(k==="uphone"){const u=meU();u.phone=val.trim();save();}
   else if(k==="uname"||k==="unick"){const u=meU();if(k==="uname")u.name=val.trim()||u.name;else{u.nick=val.trim();if(!u.nick)u.show="name";}syncUserName(u);save();const x=$("uShow");if(x)x.innerHTML=`<div class="sh"><span>NA CARTA E NA LISTA, APARECER COMO</span></div>${showSeg(u,"ushow")}<p class="sf">Vale para todas as suas peladas.</p>`;}
@@ -3516,6 +3546,7 @@ document.addEventListener("input",e=>{
   else if(k==="cfgfree"){G.cfg.freePlayers=Math.max(1,Math.round(+val)||20);save();}
   else if(k==="cfgpel"){G.cfg.freePeladas=Math.max(1,Math.round(+val)||1);save();}
   else if(k==="udesc"){S.uniform.desc=val;save();}
+  else if(k==="uname"){S.uniform.name=val.slice(0,30);save();}
   else if(k==="cxf"){const C=cx(),f=e.target.dataset.k;if(f.startsWith("multa."))C.multa[f.slice(6)]=val.trim();else if(f.startsWith("aluguel."))C.aluguel[f.slice(8)]=val.trim();else C[f]=val.trim();save();}
   else if(k==="labreh"){lraw().abreH=val||"12:00";save();}
   else if(k==="cnname")cNew.name=val;
@@ -3549,9 +3580,9 @@ document.addEventListener("change",async e=>{
     else if(f==="art"){const p=byId(e.target.dataset.id);const d=await compress(file,720,.75,.9,"image/png");p.art=p.art||"art_"+p.id;setImg(p.art,d);
       if(sheet&&sheet.w){sheet.w.selfies=[null,null,null];}save();render();openSheet({type:"player",id:p.id});hud("Personagem salvo · fotos do rosto descartadas");}
     else if(f==="selfie"){sheet.w.selfies[+e.target.dataset.i]=await compress(file,900);renderSheet();}
-    else if(f==="uFront"||f==="uBack"){const key=f==="uFront"?"front":"back";const d=await compress(file,900);const ik=["SP0001","OP0001"].includes(curP.code)?"u_"+key:"u_"+curP.code+"_"+key;S.uniform[key]=ik;setImg(ik,d);save();render();}
+    else if(f==="uFront"||f==="uBack"){const key=f==="uFront"?"front":"back";const d=await compress(file,900);const ik=uKey(key);S.uniform[key]=ik;setImg(ik,d);save();render();}
     else if(f==="proof"){const d=await compress(file,1100);const key="pf_"+uid();setImg(key,d);if(sheet){if(sheet.proof)setImg(sheet.proof,null);sheet.proof=key;renderSheet();}}
-    else if(f==="uModel"){const d=await compress(file,1000);S.uniform.model=["SP0001","OP0001"].includes(curP.code)?"u_model":"u_"+curP.code+"_model";setImg(S.uniform.model,d);save();render();renderSheet();hud("Uniforme 3D salvo");}
+    else if(f==="uModel"){const d=await compress(file,1000);S.uniform.model=uKey("model");setImg(S.uniform.model,d);save();render();renderSheet();hud("Uniforme 3D salvo");}
   }catch(err){hud("Não consegui abrir essa imagem");}
   e.target.value="";
 });

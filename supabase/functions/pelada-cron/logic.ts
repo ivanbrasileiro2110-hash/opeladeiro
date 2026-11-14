@@ -33,20 +33,79 @@ function nextGameDate(P: any, now: number) {
 }
 const role = (p: any) => (p && p.pos === "GOL" ? "gol" : "linha");
 
+const MAXSTEP: any = { DEF: { a: 1.5, d: 2.5 }, MEI: { a: 2, d: 2 }, ATA: { a: 2.5, d: 1.5 }, GOL: { gk: 2.5 } };
+const clampL = (v: number) => Math.max(1, Math.min(99, Math.round(v * 100) / 100));
+const autoPos = (p: any) => (p.a - p.d >= 15 ? "ATA" : p.d - p.a >= 15 ? "DEF" : "MEI");
+const posOf = (p: any, S: any) => { const ps = p.pos && p.pos !== "AUTO" ? p.pos : autoPos(p); return ps === "GOL" && !S.pelada.fixedGK ? autoPos(p) : ps; };
+const rid = () => Math.random().toString(36).slice(2, 10);
+
+// Mesma regra do applySession do app: nota sobe/desce com a média dos votos (mín. 2 votantes), craque = mais estrelas (empate: todos).
+function applyVotes(S: any, now: number): Ev[] {
+  const ses = S.session, voters = Object.keys(ses.votes || {}), pro = S.pelada.plan === "pro";
+  const byId = (id: string) => (S.players || []).find((p: any) => p.id === id);
+  const cnt: any = {}; voters.forEach((v) => { const m = ses.votes[v].mvp; if (m) cnt[m] = (cnt[m] || 0) + 1; });
+  let best = 0; Object.values(cnt).forEach((c: any) => { if (c > best) best = c; });
+  const mvps = best > 0 ? Object.keys(cnt).filter((id) => cnt[id] === best && byId(id)) : [];
+  const changes: any[] = [];
+  for (const id of ses.ids) {
+    const p = byId(id); if (!p) continue; const ps = posOf(p, S);
+    const c: any = { id, name: p.name, pos: ps, a0: p.a, d0: p.d, a1: p.a, d1: p.d };
+    const keys = ps === "GOL" ? ["gk"] : ["a", "d"], cap = MAXSTEP[ps] || MAXSTEP.MEI;
+    if (ps === "GOL") { c.gk0 = p.gk ?? 50; c.gk1 = c.gk0; }
+    if (pro) for (const k of keys) {
+      const vals = voters.filter((v) => v !== id).map((v) => ((ses.votes[v].t || {})[id] || {})[k] ?? 0);
+      if (vals.length >= 2) { vals.sort((x: number, y: number) => x - y); const use = vals.length >= 5 ? vals.slice(1, -1) : vals; const m = use.reduce((a: number, x: number) => a + x, 0) / use.length; p[k] = clampL((p[k] ?? 50) + m * cap[k]); c[k + "1"] = p[k]; }
+    }
+    changes.push(c);
+  }
+  mvps.forEach((id) => { const p = byId(id); if (p) p.mvp = (p.mvp || 0) + 1; });
+  S.rounds = S.rounds || [];
+  S.rounds.unshift({ id: ses.id ? "r_" + ses.id : rid(), date: ses.date, voters: voters.length, mvp: mvps[0] || null, mvps, evolved: pro, changes });
+  const uids = ses.ids.map((id: string) => byId(id)?.uid).filter(Boolean);
+  S.session = null;
+  return [{ type: "resenha", title: "Votação encerrada · " + (S.pelada.name || "Pelada"), body: mvps.length ? "Os níveis foram atualizados. Veja quem foi o craque." : "Resultado da resenha disponível.", to: uids }];
+}
+
+// Pelada que ninguém encerrou: encerra como o botão "Encerrar pelada" do app (súmula + votação se Pro).
+function autoEnd(S: any, date: string, now: number): Ev[] {
+  const byId = (id: string) => (S.players || []).find((p: any) => p.id === id);
+  const D = S.lastDraw;
+  const ids: string[] = D && D.date === date && D.teams ? D.teams.flat().concat((D.gks || []).filter(Boolean)).filter(byId) : [];
+  if (ids.length >= 2) {
+    S.days = S.days || [];
+    S.days.unshift({ id: rid(), date, ids, games: S.live ? S.live.games : [] });
+    ids.forEach((id) => { const p = byId(id); p.games = (p.games || 0) + 1; });
+  }
+  S.closedDate = date; S.live = null;
+  if (ids.length < 2) return [];
+  const uids = ids.map((id) => byId(id)?.uid).filter(Boolean);
+  if (S.pelada.plan === "pro") {
+    S.session = { id: rid(), date, ids, votes: {}, openedAt: now, closesAt: now + 24 * 36e5 };
+    return [{ type: "resenha", title: "Chegou a hora da resenha · " + (S.pelada.name || "Pelada"), body: "Avalie quem jogou. A votação fica aberta por 24h.", to: uids }];
+  }
+  return [{ type: "resenha", title: "Súmula · " + (S.pelada.name || "Pelada"), body: "Placar, gols e assistências do dia já estão na Resenha.", to: uids }];
+}
+
 export function tick(doc: any, now: number): { changed: boolean; events: Ev[] } {
   const S = doc?.state, ev: Ev[] = [];
-  if (!S || !S.pelada || S.pelada.weekday == null || !S.pelada.time) return { changed: false, events: ev };
+  if (!S || !S.pelada) return { changed: false, events: ev };
+  let changed = false;
+  // votação da resenha: fecha no servidor quando passam as 24h
+  if (S.session && now >= S.session.closesAt) { ev.push(...applyVotes(S, now)); changed = true; }
+  if (S.pelada.weekday == null || !S.pelada.time) return { changed, events: ev };
   const P = S.pelada, c = cfg(P), L = localParts(now);
-  S.srv = S.srv || {}; const mk = S.srv; let changed = false;
+  S.srv = S.srv || {}; const mk = S.srv;
   const byId = (id: string) => (S.players || []).find((p: any) => p.id === id);
   const name = P.name || "Pelada";
   const active = () => !!S.lst && S.lst.status !== "encerrada";
 
-  // 0) encerrar a lista quando a pelada termina. O app já faz isso ao tocar em "Encerrar pelada";
-  //    aqui só cobrimos o caso de a pelada ser encerrada fora do app: encerra às 6h do dia seguinte.
+  // 0) encerrar a lista junto com a pelada. O app já faz isso ao tocar em "Encerrar pelada".
+  //    Se ninguém encerrou, às 6h do dia seguinte ao jogo o servidor encerra a pelada e a lista.
   if (S.lst && S.lst.status !== "encerrada") {
-    const ended = S.closedDate === S.lst.date || (S.session && S.session.date === S.lst.date) || now > startTs(addDays(S.lst.date, 1), "06:00");
-    if (ended) {
+    const appEnded = S.closedDate === S.lst.date || (S.session && S.session.date === S.lst.date);
+    const late = now > startTs(addDays(S.lst.date, 1), "06:00");
+    if (appEnded || late) {
+      if (!appEnded) ev.push(...autoEnd(S, S.lst.date, now));
       const C = (S.cx = S.cx || {}); C.multas = C.multas || [];
       const nm = (v: any) => parseFloat(String(v ?? "").replace(/\./g, "").replace(",", ".")) || 0;
       (S.lst.fines || []).filter((f: any) => f.state === "prov").forEach((f: any) => { f.state = "ativa"; C.multas.push({ id: f.id, pid: f.pid, date: S.lst.date, kind: "desist", valor: (Math.round(nm(C.diaria) * .5 * 100) / 100).toFixed(2).replace(".", ",") }); });
