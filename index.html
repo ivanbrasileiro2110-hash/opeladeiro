@@ -955,8 +955,8 @@ sb.rpc("log_error",{p_msg:msg,p_stack:String(stack||"").slice(0,3000),p_ctx:Obje
 window.addEventListener("error",e=>rep(e.message,e.error&&e.error.stack,{src:(e.filename||"").split("/").pop()+":"+e.lineno}));
 window.addEventListener("unhandledrejection",e=>{const r=e.reason;rep(r&&r.message||r,r&&r.stack,{kind:"promise"});});})();
 const LSG="opeladeiro-v3",CREATOR="ivanbrasileiro2110@gmail.com";
-function emptyG(){return {v:4,seq:0,users:[],peladas:[],camps:[],sess:null,cfg:{price:"19,90",freePlayers:20,freePeladas:1,proEmails:[],vipSeeded:{}},ui:{theme:"auto"}};}
-function cfgDefaults(){if(!G.cfg)G.cfg={};if(!G.cfg.proEmails)G.cfg.proEmails=[];if(!G.cfg.vipSeeded)G.cfg.vipSeeded={};if(G.cfg.price==null)G.cfg.price="19,90";if(G.cfg.freePlayers==null)G.cfg.freePlayers=20;if(G.cfg.freePeladas==null)G.cfg.freePeladas=1;
+function emptyG(){return {v:4,seq:0,users:[],peladas:[],camps:[],sess:null,cfg:{price:"24,90",freePlayers:20,freePeladas:1,proEmails:[],vipSeeded:{}},ui:{theme:"auto"}};}
+function cfgDefaults(){if(!G.cfg)G.cfg={};if(!G.cfg.proEmails)G.cfg.proEmails=[];if(!G.cfg.vipSeeded)G.cfg.vipSeeded={};if(G.cfg.price==null||G.cfg.price==="19,90")G.cfg.price="24,90";if(G.cfg.freePlayers==null)G.cfg.freePlayers=20;if(G.cfg.freePeladas==null)G.cfg.freePeladas=1;
 delete G.quadras;if(!G.ui)G.ui={theme:"auto"};
 
 if(G.cfg.pixFee==null)G.cfg.pixFee="1,49";
@@ -974,7 +974,7 @@ if(!G||!Array.isArray(G.users)){
   const iv={id:"u_ivan",email:CREATOR,name:"Ivan",pass:null,pos:"AUTO",photo:null,plan:old.pelada.plan||"pro",roles:["dono"],createdAt:Date.now()};
   const ip=old.players.find(p=>normTxt(p.name)==="ivan")||old.players[0];
   if(ip){ip.uid=iv.id;old.ownerId=ip.id;old.me=ip.id;iv.pos=ip.pos||"AUTO";iv.photo=ip.photo||null;}
-  G={v:3,seq:1,users:[iv],peladas:[{id:uid(),code:"OP0001",ownerUid:iv.id,createdAt:Date.now(),state:old}],sess:null,cfg:{price:"19,90",freePlayers:20,freePeladas:1}};
+  G={v:3,seq:1,users:[iv],peladas:[{id:uid(),code:"OP0001",ownerUid:iv.id,createdAt:Date.now(),state:old}],sess:null,cfg:{price:"24,90",freePlayers:20,freePeladas:1}};
 }
 G.peladas.forEach(P=>fixState(P.state));
 
@@ -1917,7 +1917,7 @@ function sheetCStory(){const c=CP()||camps().find(q=>q.id===sheet.cid);const ks=
   return `${bar("Card para Stories")}<div class="section"><div class="chips">${ks.map(k=>`<button data-act="cStoryPick" data-v="${k}" aria-pressed="${sheet.k===k}">${AW_L[k]}</button>`).join("")}</div></div>
   <div class="section" id="storyBox"><div class="empty">Gerando o card…</div></div><div class="section choice"><button class="btn" data-act="storyShare">Compartilhar</button></div>`;}
 
-function sheetCBuy(){return `${bar("Campeonato avulso","Cancelar")}<div class="section"><div class="box"><b style="font-size:20px">${esc(cNew.name||"Novo campeonato")}</b><div class="kpi" style="box-shadow:none;padding:0;background:none"><span class="l">Pagamento único</span><span class="v money">R$ ${esc(G.cfg.campPrice)}</span></div><div class="note">Libera este campeonato sem contar no seu limite, com tudo do Pro só para ele: taça personalizada e 3D, cards para Stories, inscrições e prêmios.</div></div></div><div class="section choice">${Billing.avail?`<button class="btn gold" data-act="cnBuy" data-ok="1">Comprar por R$ ${esc(G.cfg.campPrice)}</button><p class="sf" style="text-align:center">Cobrança única na sua conta da loja.</p>`:isCreator()?`<button class="btn gold" data-act="cnBuy" data-ok="1">Criar (só você vê)</button>`:`<button class="btn gold" disabled>${Billing.native?"Compra em breve":"A compra é feita no app instalado"}</button>`}</div>`;}
+function sheetCBuy(){return `${bar("Campeonato avulso","Cancelar")}<div class="section"><div class="box"><b style="font-size:20px">${esc(cNew.name||"Novo campeonato")}</b><div class="kpi" style="box-shadow:none;padding:0;background:none"><span class="l">Pagamento único</span><span class="v money">R$ ${esc(G.cfg.campPrice)}</span></div><div class="note">Libera este campeonato sem contar no seu limite, com tudo do Pro só para ele: taça personalizada e 3D, cards para Stories, inscrições e prêmios.</div></div></div><div class="section choice">${Billing.avail?`<button class="btn gold" data-act="cnBuy" data-ok="1">Comprar por R$ ${esc(G.cfg.campPrice)}</button><p class="sf" style="text-align:center">Compra única na sua conta da loja, sem renovação. Reembolso, se cabível, é pedido à loja.</p>`:isCreator()?`<button class="btn gold" data-act="cnBuy" data-ok="1">Criar (só você vê)</button>`:`<button class="btn gold" disabled>${Billing.native?"Compra em breve":"A compra é feita no app instalado"}</button>`}</div>`;}
 function sheetMWO(){const c=CP(),m=c.matches.find(x=>x.id===sheet.id);return `${bar("W.O.","Voltar")}<div class="section"><p class="sf" style="padding-top:0">Qual time não apareceu? O outro vence por ${c.rules.wo} a 0.</p><div class="choice"><button class="btn ghost" data-act="mWOdo" data-v="h">${esc(cTeam(c,m.h).name)} não veio</button><button class="btn ghost" data-act="mWOdo" data-v="a">${esc(cTeam(c,m.a).name)} não veio</button></div></div>`;}
 function athFromP(p){return {id:"a_"+uid(),src:p.id,name:p.name,uid:p.uid||null,a:p.a,d:p.d,pos:p.pos==="GOL"?"GOL":(p.pos&&p.pos!=="AUTO"?p.pos:autoPos(p)),photo:p.photo||null};}
 
@@ -2685,6 +2685,7 @@ function viewPelada(){
       `<span class="status">${S.tempAdminId?`Admin da vez: <b>${esc(adminName())}</b>.`:""} Só o Dono de Pelada escolhe o admin da vez.</span>`}
   </div></div>
 
+  ${isOwner()&&isPro()&&Billing.avail?`<div class="section"><div class="sh"><span>ASSINATURA</span></div><div class="box"><div class="note">Renova sozinha todo mês. Para cancelar ou ver a cobrança, use os ajustes de assinatura da ${Billing.plat==="ios"?"App Store":"Google Play"}. O Pro segue até o fim do período pago.</div><a class="btn ghost sm" href="${Billing.plat==="ios"?"https://apps.apple.com/account/subscriptions":"https://play.google.com/store/account/subscriptions"}" target="_blank" rel="noopener">Gerenciar assinatura</a></div></div>`:""}
   ${isOwner()&&isCreator()?`<div class="section"><div class="sh"><span>PLANO (só você vê)</span></div>
     <div class="seg" role="group" aria-label="Plano" style="margin-top:0"><button data-act="plan" data-v="free" aria-pressed="${!isPro()}">Grátis</button><button data-act="plan" data-v="pro" aria-pressed="${isPro()}">Pro (teste)</button></div>
     <div class="box" style="margin-top:12px"><div class="feat">
@@ -2888,8 +2889,13 @@ async function chromaKey(src,maxH=1000){const i=await loadImg(src),k=Math.min(1,
 async function aiGen(kind,prompt,images){if(!CLOUD||!curP)return {error:"offline"};
   try{const ims=[];for(const s of images)if(s)ims.push(await shrinkData(s));
     const {data,error}=await sb.functions.invoke("generate-image",{body:{kind,code:curP.code,prompt,images:ims}});
-    if(error){let m="";try{m=(await error.context.json()).error;}catch(_){}return {error:m||"failed"};}
-    return data&&data.image?{image:data.image}:{error:(data&&data.error)||"failed"};}catch(e){return {error:"failed"};}}
+    if(error){let m="";try{m=(await error.context.json()).error;}catch(_){}aiQuota();return {error:m||"failed"};}
+    aiQuota();return data&&data.image?{image:data.image}:{error:(data&&data.error)||"failed"};}catch(e){return {error:"failed"};}}
+let AIQ=null;
+async function aiQuota(){if(!CLOUD||!curP)return;try{const {data}=await sb.functions.invoke("generate-image",{body:{kind:"quota",code:curP.code}});if(data&&data.char){AIQ=data;if(sheet&&(sheet.type==="gen3d"||(sheet.type==="char"&&sheet.w&&sheet.w.step===5)))renderSheet();}}catch(e){}}
+const aiLeft=k=>{const q=AIQ&&AIQ[k];return q?Math.min(q.day,q.month):null;};
+const aiLine=k=>{const q=AIQ&&AIQ[k];if(!q)return "";const l=Math.min(q.day,q.month),per=k==="u3d"?"na pelada":"para você";
+  return `<p class="sf"><b style="color:${l?"var(--text)":"var(--down)"}">${l?`Restam ${q.month} de ${q.monthMax} gerações este mês ${per}`:q.month?`Limite de hoje atingido. Restam ${q.month} de ${q.monthMax} no mês`:`Acabaram as ${q.monthMax} gerações do mês ${per}. Renova no dia 1`}</b>${l&&q.day<q.month?` (hoje: ${q.day})`:""}. Cada geração conta, mesmo que você não goste do resultado.</p>`;};
 const uKey=k=>{const U=S.uniform,sfx=U===S.unis[0]?"":"_"+U.id;return (["SP0001","OP0001"].includes(curP.code)?"u_"+k:"u_"+curP.code+"_"+k)+sfx;};
 const aiMsg=e=>e==="not_configured"?"A geração por IA ainda não está ligada. Em breve.":e==="daily_limit"?"Limite de gerações de hoje atingido. Tente amanhã.":e==="monthly_limit"?"Limite de gerações do mês atingido. Renova no dia 1.":e==="pro_only"?"Recurso do Plano Pro.":e==="offline"?"Sem conexão.":"Não deu certo desta vez. Tente de novo em instantes.";
 function charPrompt(p,w){
@@ -2955,7 +2961,7 @@ function sheetChar(){
       ${uni?"":`<p class="sf">O organizador ainda não cadastrou o uniforme em Ajustes. Sem ele, a IA inventa a roupa.</p>`}</div>
     ${w.busy?`<div class="section"><div class="box"><div class="note"><b>Gerando seu personagem…</b> Leva até 1 minuto. Não feche esta tela.</div></div></div>`:
     w.done?`<div class="section"><div class="box" style="align-items:center"><img src="${img(p.art)||""}" alt="Seu personagem" style="max-width:70%;border-radius:12px"><div class="note"><b>Pronto!</b> Seu personagem já aparece no seu card.</div></div><button class="btn" data-act="closeSheet" style="margin-top:12px">Concluir</button></div>`:
-    `<div class="section"><button class="btn" data-act="charGen">Gerar personagem</button>${w.err?`<p class="sf" style="color:var(--down)">${aiMsg(w.err)}</p>`:`<p class="sf">Cada atleta pode gerar até 2 personagens por mês.</p>`}</div>
+    `<div class="section"><button class="btn" data-act="charGen" ${aiLeft("char")===0?"disabled":""}>Gerar personagem</button>${w.err?`<p class="sf" style="color:var(--down)">${aiMsg(w.err)}</p>`:""}${aiLine("char")||`<p class="sf">Cada atleta pode gerar até 2 personagens por mês.</p>`}</div>
     ${isCreator()&&w.err?`<div class="section"><div class="box testbox"><div class="note"><b>Só você vê (teste manual).</b> Copie o pedido, gere no Gemini ou no ChatGPT com as fotos e envie a imagem aqui.</div>
       <div class="prompt" id="charPrompt">${esc(charPrompt(p,w))}</div>
       <button class="btn ghost sm" data-act="copyPrompt" data-src="charPrompt">Copiar pedido</button>
@@ -2993,7 +2999,7 @@ function sheetGen3d(){
   const model=img(S.uniform.model);
   return `${bar("Uniforme 3D")}
   ${model?`<div class="section"><div class="tile sq" style="cursor:default"><img src="${model}" alt="Modelo 3D"></div></div>`:""}
-  <div class="section">${!img(S.uniform.front)?`<div class="note">Cadastre a foto da frente do uniforme em Ajustes para gerar o modelo 3D.</div>`:sheet.busy?`<div class="box"><div class="note"><b>Gerando o uniforme 3D…</b> Leva até 1 minuto. Não feche esta tela.</div></div>`:`<button class="btn" data-act="u3dGen">${model?"Gerar de novo":"Gerar uniforme 3D"}</button>${sheet.err?`<p class="sf" style="color:var(--down)">${aiMsg(sheet.err)}</p>`:`<p class="sf">Usa as fotos de frente e costas do uniforme. Limite de 6 por dia.</p>`}`}</div>
+  <div class="section">${!img(S.uniform.front)?`<div class="note">Cadastre a foto da frente do uniforme em Ajustes para gerar o modelo 3D.</div>`:sheet.busy?`<div class="box"><div class="note"><b>Gerando o uniforme 3D…</b> Leva até 1 minuto. Não feche esta tela.</div></div>`:`<button class="btn" data-act="u3dGen" ${aiLeft("u3d")===0?"disabled":""}>${model?"Gerar de novo":"Gerar uniforme 3D"}</button>${sheet.err?`<p class="sf" style="color:var(--down)">${aiMsg(sheet.err)}</p>`:""}${aiLine("u3d")||`<p class="sf">Usa as fotos de frente e costas do uniforme. Até 8 gerações por mês na pelada.</p>`}`}</div>
   ${isCreator()&&sheet.err?`<div class="section"><div class="box testbox"><div class="note"><b>Só você vê (teste manual).</b> Copie o pedido, gere no Gemini ou no ChatGPT e envie a imagem aqui.</div>
     <div class="prompt" id="u3dPrompt">${esc(u3dPrompt())}</div>
     <button class="btn ghost sm" data-act="copyPrompt" data-src="u3dPrompt">Copiar pedido</button>
@@ -3046,9 +3052,10 @@ function sheetUpsell(){
   <div class="section"><h2 style="margin:4px 0 6px;font-size:26px;font-weight:800;letter-spacing:-.02em">Leve sua pelada para o Plano Pro</h2>
     <div class="note">${sheet.what?`<b>${esc(sheet.what)}</b> é do Plano Pro.`:""}</div></div>
   <div class="section"><div class="group">${["Peladeiros ilimitados","Votação do craque e nível que evolui","Lista automática com espera","Caixinha com comprovantes e multas","Campeonato todo mês, com taça e cards","Personagem e uniforme 3D por IA"].map(t=>`<div class="cell"><span style="color:var(--gold);font-weight:800">✓</span><span class="grow">${t}</span></div>`).join("")}</div>
-    <p class="sf">R$ ${esc(G.cfg.price)} por mês, para todas as suas peladas. Dividido pela galera, sai por menos de R$ 1 cada.</p></div>
+    <p class="sf">R$ ${esc(G.cfg.price)} por mês, para todas as suas peladas. Dividido entre 15 pessoas, sai por cerca de R$ 1,70 cada.</p>
+    <p class="sf">Inclui, por mês: personagem 3D (até 2 por pessoa) e uniforme 3D (até 8 por pelada). Cada geração conta, mesmo que você não goste do resultado.</p></div>
   <div class="section" style="display:flex;flex-direction:column;gap:10px">${Billing.avail?`<button class="btn gold" data-act="buyPro">Assinar por R$ ${esc(G.cfg.price)}/mês</button><button class="btn ghost" data-act="restoreBuy">Restaurar compras</button>`:isCreator()?`<button class="btn gold" data-act="plan" data-v="pro" data-close="1" data-scope="${sheet.scope||""}" data-then="${sheet.then||""}">Ativar Pro (só você vê)</button>`:`<button class="btn gold" disabled>${Billing.native?"Assinatura em breve":"A assinatura é feita no app instalado"}</button>`}<button class="btn ghost" data-act="closeSheet">Agora não</button></div>
-  ${Billing.avail?`<p class="sf">A assinatura é cobrada na sua conta da ${Billing.plat==="ios"?"App Store":"Google Play"} e renova sozinha todo mês até você cancelar, pelo menos 24 horas antes da renovação, nos ajustes da loja. <a href="/termos/" target="_blank" rel="noopener" style="color:inherit">Termos de uso</a> · <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit">Privacidade</a></p>`:""}`;
+  ${Billing.avail?`<p class="sf">A assinatura é cobrada na sua conta da ${Billing.plat==="ios"?"App Store":"Google Play"} e renova sozinha todo mês até você cancelar. Cancele quando quiser, pelo menos 24 horas antes da renovação, nos ajustes da loja; o Pro segue até o fim do período já pago. Sem multa. <a href="/termos/" target="_blank" rel="noopener" style="color:inherit">Termos de uso</a> · <a href="/privacidade/" target="_blank" rel="noopener" style="color:inherit">Privacidade</a></p>`:""}`;
 }
 
 /* ---------- actions ---------- */
@@ -3484,7 +3491,7 @@ document.addEventListener("click",e=>{
     case "startChar":{const p=byId(sheet.id);if(!canPhoto(p))break;
       if(!isPro()){openSheet({type:"upsell",what:"Personagem 3D com IA"});break;}
       openSheet({type:"char",w:{id:p.id,step:p.art?5:1,birth:p.birth||"",consent:false,selfies:[null,null,null],h:p.h,w:p.w,body:null,pose:p.artPose,generated:!!p.art}});break;}
-    case "charNext":sheet.w.step++;renderSheet();$("sheet").scrollTop=0;break;
+    case "charNext":sheet.w.step++;if(sheet.w.step===5)aiQuota();renderSheet();$("sheet").scrollTop=0;break;
     case "charBack":if(sheet.w.step>1){sheet.w.step--;renderSheet();}else closeSheet();break;
     case "wbody":sheet.w.body=v;renderSheet();break;
     case "wpose":sheet.w.pose=v;renderSheet();break;
@@ -3512,7 +3519,7 @@ document.addEventListener("click",e=>{
     case "uniNew":{if(S.unis.length>=4){hud("Máximo de 4 uniformes. Exclua um para criar outro");break;}const n=S.unis.length+1;S.unis.push({id:"u"+Date.now().toString(36),name:"Uniforme "+n,type:"colete",front:null,back:null,model:null,desc:""});S.uniI=S.unis.length-1;S.uniform=S.unis[S.uniI];save();render();break;}
     case "uniDel":{if(S.unis.length<2||!confirm("Excluir este uniforme?"))break;const U=S.uniform;["front","back","model"].forEach(k=>{if(U[k])setImg(U[k],null);});S.unis.splice(S.uniI,1);S.uniI=0;S.uniform=S.unis[0];save();render();break;}
     case "analyzeU":analyzeUniform();break;
-    case "gen3d":if(!isPro()){openSheet({type:"upsell",what:"Uniforme 3D por IA"});break;}openSheet({type:"gen3d"});break;
+    case "gen3d":if(!isPro()){openSheet({type:"upsell",what:"Uniforme 3D por IA"});break;}openSheet({type:"gen3d"});aiQuota();break;
     case "wipe":if(!isCreator())break;if(!wipeArm){wipeArm=true;render();setTimeout(()=>{wipeArm=false;render();},4000);break;}
       try{Object.keys(localStorage).filter(k=>k===LS||k===LSG||k.startsWith("img:")).forEach(lsDel);}catch(e){}
       location.reload();break;
@@ -3541,7 +3548,7 @@ document.addEventListener("input",e=>{
   else if(k==="uname"||k==="unick"){const u=meU();if(k==="uname")u.name=val.trim()||u.name;else{u.nick=val.trim();if(!u.nick)u.show="name";}syncUserName(u);save();const x=$("uShow");if(x)x.innerHTML=`<div class="sh"><span>NA CARTA E NA LISTA, APARECER COMO</span></div>${showSeg(u,"ushow")}<p class="sf">Vale para todas as suas peladas.</p>`;}
   else if(k==="walink"){if(!isOwner())return;S.pelada.waLink=val.trim();save();const st=$("waStatus");if(st)st.innerHTML=waStatus();}
   else if(k==="crq"){crQ=val;const pos=e.target.selectionStart;render();const n=$("crQ");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}}
-  else if(k==="cfgprice"){G.cfg.price=val.trim()||"19,90";save();}
+  else if(k==="cfgprice"){G.cfg.price=val.trim()||"24,90";save();}
   else if(k==="cfgfree"){G.cfg.freePlayers=Math.max(1,Math.round(+val)||20);save();}
   else if(k==="cfgpel"){G.cfg.freePeladas=Math.max(1,Math.round(+val)||1);save();}
   else if(k==="udesc"){S.uniform.desc=val;save();}

@@ -33,6 +33,26 @@ Deno.serve(async (req) => {
   const uid = u?.user?.id;
   if (!uid) return j({ error: "unauthorized" }, 401);
   let b: any; try { b = await req.json(); } catch { return j({ error: "bad_json" }, 400); }
+  const monthStartIso = () => { const br = new Date(Date.now() - 3 * 36e5); return new Date(Date.UTC(br.getUTCFullYear(), br.getUTCMonth(), 1) + 3 * 36e5).toISOString(); };
+  const used = async (k: string, code: string, sinceIso: string) => {
+    // uniforme: por pelada; personagem: por usuário
+    let q = admin.from("ai_gen_log").select("id", { count: "exact", head: true }).eq("kind", k).gt("created_at", sinceIso);
+    q = k === "u3d" ? q.eq("pelada_code", code) : q.eq("user_id", uid);
+    return (await q).count || 0;
+  };
+  if (b.kind === "quota") { // quanto ainda dá para gerar (a tela mostra antes de gerar)
+    const qc = String(b.code || "");
+    const { data: pq } = await admin.from("peladas").select("owner,doc").eq("code", qc).maybeSingle();
+    if (!pq) return j({ error: "not_found" }, 404);
+    const mem = new Set<string>([pq.owner, ...(pq.doc?.state?.players || []).map((x: any) => x.uid).filter(Boolean)]);
+    if (!mem.has(uid)) return j({ error: "forbidden" }, 403);
+    const out: any = {};
+    for (const k of ["char", "u3d"]) {
+      const d = await used(k, qc, new Date(Date.now() - 24 * 36e5).toISOString()), m = await used(k, qc, monthStartIso());
+      out[k] = { day: Math.max(0, DAILY[k] - d), month: Math.max(0, MONTHLY[k] - m), dayMax: DAILY[k], monthMax: MONTHLY[k] };
+    }
+    return j(out);
+  }
   const kind = String(b.kind || ""), code = String(b.code || ""), prompt = String(b.prompt || "").slice(0, 5000);
   if (!DAILY[kind] || !code || prompt.length < 40) return j({ error: "bad_request" }, 400);
   const imgs: string[] = Array.isArray(b.images) ? b.images.slice(0, 5) : [];
@@ -49,16 +69,8 @@ Deno.serve(async (req) => {
   if (!members.has(uid)) return j({ error: "forbidden" }, 403);
   if (p.doc?.state?.pelada?.plan !== "pro") return j({ error: "pro_only" }, 402);
   if (kind === "u3d" && uid !== p.owner) return j({ error: "forbidden" }, 403);
-  const count = async (sinceIso: string) => {
-    // uniforme: limites por pelada (dono); personagem: limites por usuário
-    let q = admin.from("ai_gen_log").select("id", { count: "exact", head: true }).eq("kind", kind).gt("created_at", sinceIso);
-    q = kind === "u3d" ? q.eq("pelada_code", code) : q.eq("user_id", uid);
-    return (await q).count || 0;
-  };
-  if (await count(new Date(Date.now() - 24 * 36e5).toISOString()) >= DAILY[kind]) return j({ error: "daily_limit" }, 429);
-  const br = new Date(Date.now() - 3 * 36e5);
-  const monthStart = new Date(Date.UTC(br.getUTCFullYear(), br.getUTCMonth(), 1) + 3 * 36e5).toISOString();
-  if (await count(monthStart) >= MONTHLY[kind]) return j({ error: "monthly_limit" }, 429);
+  if (await used(kind, code, new Date(Date.now() - 24 * 36e5).toISOString()) >= DAILY[kind]) return j({ error: "daily_limit" }, 429);
+  if (await used(kind, code, monthStartIso()) >= MONTHLY[kind]) return j({ error: "monthly_limit" }, 429);
   const out = await gemini(prompt, images);
   if (out.error) return j({ error: out.error }, out.error === "not_configured" ? 503 : 502);
   await admin.from("ai_gen_log").insert({ user_id: uid, kind, pelada_code: code });
