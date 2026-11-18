@@ -18,7 +18,8 @@ Deno.serve(async () => {
       const doc = structuredClone(r.doc);
       const { changed, events } = tick(doc, now);
       if (changed) {
-        const { data: ok } = await admin.from("peladas").update({ doc }).eq("id", r.id).eq("version", r.version).select("id");
+        const { data: ok, error: ue } = await admin.from("peladas").update({ doc, version: r.version + 1 }).eq("id", r.id).eq("version", r.version).select("id");
+        if (ue) { console.error("update", r.code, ue.message); continue; }
         if (!ok || !ok.length) continue; // alguém salvou no meio: tenta de novo no próximo ciclo
         saved++;
       }
