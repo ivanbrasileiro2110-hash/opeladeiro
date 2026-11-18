@@ -1165,7 +1165,7 @@ function logout(){if(CLOUD)cloudLogout();G.sess=null;closeSheet();curP=null;S=nu
 function newCode(){let c;do{G.seq++;c="OP"+String(G.seq).padStart(4,"0");}while(pByCode(c));return c;}
 function peladaState(d){const u=meU();const owner=newPlayer({name:dispName(u),pos:u.pos||"AUTO",photo:u.photo,uid:u.id});
   const st={scale:99,pelada:{name:d.name,base:d.base,plan:u.plan,fixedGK:!!d.gk,matchMin:null,weekday:d.weekday,time:d.time,waLink:"",lista:{vagas:d.vagas||d.base*2}},uniform:{type:"colete",front:null,back:null,model:null,desc:""},
-    players:[owner],rounds:[],session:null,lastDraw:null,ownerId:owner.id,me:owner.id,tempAdminId:null,live:null,nudges:[],cx:{pix:"",mensal:String(d.mensal||"60"),diaria:String(d.diaria||"20"),venc:10,types:{},pays:{},dpays:{},informed:{},desp:[]}};
+    players:[owner],rounds:[],session:null,lastDraw:null,ownerId:owner.id,me:owner.id,tempAdminId:null,live:null,nudges:[],cx:{pix:"",mensal:String(d.mensal||"60"),diaria:String(d.diaria||"20"),venc:10,types:{},pays:{},dpays:{},informed:{},desp:[],ent:[]}};
   fixState(st);return st;}
 function createPelada(d){const u=meU();const code=newCode();const st=peladaState(d);G.peladas.push({id:uid(),code,ownerUid:u.id,createdAt:Date.now(),state:st});save();return code;}
 function joinPelada(){const u=meU(),P=pByCode(joinFound);if(!u||!P)return;const st=P.state;
@@ -1196,8 +1196,8 @@ if(mqDark&&mqDark.addEventListener)mqDark.addEventListener("change",()=>{if(G.ui
 function themeSeg(){return `<div class="seg" role="group" aria-label="Aparência" style="margin-top:0">${[["auto","Automático"],["dark","Escuro"],["light","Claro"]].map(([k,l])=>`<button data-act="setTheme" data-v="${k}" aria-pressed="${G.ui.theme===k}">${l}</button>`).join("")}</div>`;}
 
 /* ---------- caixinha ---------- */
-function cx(){if(!S.cx)S.cx={pix:"",mensal:"60",diaria:"20",venc:10,types:{},pays:{},dpays:{},informed:{},desp:[]};const C=S.cx;
-  ["refused","baixas","qpays","dpays","informed","pays","types"].forEach(k=>{if(!C[k])C[k]={};});if(!C.multas)C.multas=[];if(!C.desp)C.desp=[];
+function cx(){if(!S.cx)S.cx={pix:"",mensal:"60",diaria:"20",venc:10,types:{},pays:{},dpays:{},informed:{},desp:[],ent:[]};const C=S.cx;
+  ["refused","baixas","qpays","dpays","informed","pays","types"].forEach(k=>{if(!C[k])C[k]={};});if(!C.multas)C.multas=[];if(!C.desp)C.desp=[];if(!C.ent)C.ent=[];
   if(!C.multa)C.multa={on:false,modo:"padrao",dia:"1",unica:"10"};if(!C.prazoAv)C.prazoAv="1";if(!C.aluguel)C.aluguel={valor:"",venc:5};
   Object.keys(C.informed).forEach(k=>{if(typeof C.informed[k]==="number")C.informed[k]={at:C.informed[k],via:null,proof:null};});return C;}
 const cxType=p=>cx().types[p.id]||"m";
@@ -1235,13 +1235,13 @@ function itSt(it){const C=cx();if(C.pays[it.key]||it.legacy)return "paga";if(itB
 const ST_X={paga:"Pago",baixa:"Baixa",informado:"Aguardando",pendente:"Pendente",atrasada:"Atrasado",avencer:"A vencer"};
 function itValTxt(it){const f=itFee(it),b=itBaixa(it),d=itLate(it);let t=brl(it.base);if(f>0)t+=` + ${brl(f)} de multa (${d} ${d===1?"dia":"dias"})`;if(b>0)t+=` − ${brl(b)} de baixa`;return t;}
 function cxMonth(mk){const C=cx(),rows=cxItemsMonth(mk).map(it=>({it,p:byId(it.pid),st:itSt(it),v:itGross(it),due:itDue(it)})).filter(r=>r.p);
-  const desp=C.desp.filter(d=>d.date.startsWith(mk)).map(d=>({...d,v:num(d.valor)}));
+  const desp=C.desp.filter(d=>d.date.startsWith(mk)).map(d=>({...d,v:num(d.valor)})),ent=C.ent.filter(d=>d.date.startsWith(mk)).map(d=>({...d,v:num(d.valor)}));
   if(num(C.aluguel.valor)>0&&mk>=cxStartMK()){const vc=mk+"-"+String(Math.max(1,Math.min(28,+C.aluguel.venc||5))).padStart(2,"0");
     desp.unshift({id:"aluguel",desc:"Aluguel da quadra",v:num(C.aluguel.valor),aluguel:true,venc:vc,mk,st:C.qpays[mk]?"paga":mk>curMK()?"avencer":today()>vc?"atrasada":"pendente"});}
   const prev=rows.reduce((s,r)=>s+r.v,0),rec=rows.filter(r=>r.st==="paga").reduce((s,r)=>{const pd=C.pays[r.it.key];return s+(pd&&pd.valor!=null?pd.valor:r.v);},0),
-    bx=rows.reduce((s,r)=>s+itBaixa(r.it),0),dsp=desp.reduce((s,d)=>s+d.v,0);
-  return {rows,desp,prev,rec,bx,falta:Math.max(0,prev-rec-bx),dsp,saldo:rec-dsp};}
-function cxSaldoTotal(){const ms=new Set(cxMonthsUpTo());cx().desp.forEach(d=>ms.add(d.date.slice(0,7)));let t=0;ms.forEach(m=>{if(m<=curMK())t+=cxMonth(m).saldo;});return t;}
+    bx=rows.reduce((s,r)=>s+itBaixa(r.it),0),dsp=desp.reduce((s,d)=>s+d.v,0),ents=ent.reduce((s,d)=>s+d.v,0);
+  return {rows,desp,ent,ents,prev,rec,bx,falta:Math.max(0,prev-rec-bx),dsp,saldo:rec+ents-dsp};}
+function cxSaldoTotal(){const ms=new Set(cxMonthsUpTo());cx().desp.concat(cx().ent).forEach(d=>ms.add(d.date.slice(0,7)));let t=0;ms.forEach(m=>{if(m<=curMK())t+=cxMonth(m).saldo;});return t;}
 function cxMsg(it){const C=cx(),p=byId(it.pid),f=itFee(it);return `Fala, ${p.name}! ${it.label} da ${S.pelada.name}: ${brl(itDue(it))}${f>0?` (já com ${brl(f)} de multa por atraso)`:""}.${C.pix?" Pix: "+C.pix:""} Depois é só tocar em "Já paguei" na Caixinha do Opeladeiro.`;}
 function cxGroupMsg(mk){const M=cxMonth(mk),pend=M.rows.filter(r=>!["paga","baixa"].includes(r.st));return `*Caixinha da ${S.pelada.name} · ${mLabel(mk)}*\n\nFaltam pagar:\n`+pend.map(r=>`• ${r.p.name}: ${r.it.label.replace(/^Mensalidade de .*/,"mensalidade")} · ${brl(r.due)}`).join("\n")+(cx().pix?`\n\nPix: ${cx().pix}`:"")+"\n\nCaixinha no Opeladeiro";}
 function cxOverdue(){return cxAll().filter(it=>itSt(it)==="atrasada").map(it=>({it,p:byId(it.pid)})).filter(r=>r.p).sort((a,b)=>a.it.venc<b.it.venc?-1:1);}
@@ -2527,7 +2527,7 @@ function cxRowOwner(r,pro){const it=r.it,C=cx(),pd=C.pays[it.key],inf=C.informed
     <span class="r"><span class="val">${brl(r.st==="paga"&&pd&&pd.valor!=null?pd.valor:r.due)}</span><span style="display:flex;gap:6px">${r.st==="paga"?`<button class="mbtn l" data-act="${pro?"cxUnpay":"upsell"}" data-what="Caixinha da pelada" data-k="${it.key}">Desfazer</button>`:r.st==="baixa"?"":`${pro&&r.st!=="avencer"?`<a class="mbtn l" style="text-decoration:none;display:inline-flex;align-items:center" href="https://wa.me/${waNumP(r.p)}?text=${encodeURIComponent(cxMsg(it))}" target="_blank" rel="noopener">Cobrar</a>`:""}<button class="mbtn" data-act="${pro?"cxRcv":"upsell"}" data-what="Caixinha da pelada" data-k="${it.key}">${pro?"Recebi":"🔒 Recebi"}</button>`}</span></span></div>`;}
 const waNumP=p=>{const u=p.uid&&G.users.find(x=>x.id===p.uid);const d=u&&u.phone?String(u.phone).replace(/\D/g,""):"";return d?(d.length<=11?"55"+d:d):"";};
 function viewCaixinha(){const own=isOwner(),pro=isPro(),mk=cxMk||curMK(),C=cx(),M=cxMonth(mk),me=byId(S.me);
-  let h=`<div class="hero"><div class="eyebrow">Gestão financeira</div><h1>Caixinha</h1><p class="sub">Mensalidades, diárias, multas, despesas e o saldo da pelada.</p></div>`;
+  let h=`<div class="hero"><div class="eyebrow">Gestão financeira</div><h1>Caixinha</h1><p class="sub">Mensalidades, diárias, multas, despesas, entradas extras e o saldo da pelada.</p></div>`;
   if(!own){
     if(!pro)return h+`<div class="lockbar"><span class="grow"><b>A Caixinha é do Plano Pro.</b> Quando o Dono de Pelada assina, você vê aqui se está em dia e paga pelo Pix.</span></div><div class="section"><button class="btn gold" data-act="upsell" data-what="Caixinha da pelada">Quero a Caixinha nesta pelada</button></div>`;
     const mine=cxAll().concat(cxItemsOf(me,mShift(curMK(),1))).filter(it=>it.pid===me.id),open=mine.filter(it=>!["paga","baixa"].includes(itSt(it))),done=mine.filter(it=>["paga","baixa"].includes(itSt(it))).reverse().slice(0,6);
@@ -2549,7 +2549,7 @@ function viewCaixinha(){const own=isOwner(),pro=isPro(),mk=cxMk||curMK(),C=cx(),
   const mens=M.rows.filter(r=>r.it.kind==="mensal"),dia=M.rows.filter(r=>r.it.kind==="diaria"),mul=M.rows.filter(r=>r.it.kind==="desist"||r.it.kind==="noshow");
   return h+`<div class="section"><div class="monthnav"><button data-act="cxMonth" data-v="-1" aria-label="Mês anterior">‹</button><b>${mLabel(mk)}</b><button data-act="cxMonth" data-v="1" aria-label="Próximo mês">›</button></div></div>
   <div class="section"><div class="kpis"><div class="kpi"><span class="l">A arrecadar</span><span class="v tnum money">${brl(M.prev)}</span></div><div class="kpi"><span class="l">Recebido</span><span class="v tnum money" style="color:var(--lime)">${brl(M.rec)}</span></div>
-    <div class="kpi"><span class="l">Despesas</span><span class="v tnum money" style="color:var(--down)">${brl(M.dsp)}</span></div><div class="kpi"><span class="l">Saldo do mês</span><span class="v tnum money">${brl(M.saldo)}</span></div>
+    <div class="kpi"><span class="l">Entradas extras</span><span class="v tnum money" style="color:var(--lime)">${brl(M.ents)}</span></div><div class="kpi"><span class="l">Despesas</span><span class="v tnum money" style="color:var(--down)">${brl(M.dsp)}</span></div><div class="kpi" style="grid-column:span 2"><span class="l">Saldo do mês</span><span class="v tnum money">${brl(M.saldo)}</span></div>
     <div class="kpi gold" style="grid-column:span 2"><span class="l">Saldo da caixinha (acumulado)</span><span class="v tnum">${brl(cxSaldoTotal())}</span></div></div>
     <div style="margin-top:12px"><div class="prog"><i style="width:${M.prev?Math.round(M.rec/M.prev*100):0}%"></i></div><div class="status" style="margin-top:6px">${M.prev?Math.round(M.rec/M.prev*100):0}% recebido · faltam ${brl(M.falta)}${M.bx>0?` · ${brl(M.bx)} em baixas`:""}</div></div></div>
   <div class="section"><div class="group"><button class="cell action" data-act="${pro?"cxInad":"upsell"}" data-what="Caixinha da pelada"><span class="grow">Inadimplentes<br><span class="status">${od.length?`${od.length} ${od.length===1?"cobrança atrasada":"cobranças atrasadas"} · ${brl(odT)}`:"Ninguém em atraso"}</span></span>${lk||CHEV}</button>
@@ -2560,6 +2560,7 @@ function viewCaixinha(){const own=isOwner(),pro=isPro(),mk=cxMk||curMK(),C=cx(),
   <div class="section"><div class="sh"><span>AVULSOS · ${dia.length}</span><span>${brl(dia.reduce((s,r)=>s+r.v,0))}</span></div><div class="group">${dia.map(r=>cxRowOwner(r,pro)).join("")||`<div class="empty">Nenhuma diária neste mês.</div>`}</div>
     <p class="sf">Avulso paga a diária de cada pelada que jogou (conta pelas súmulas). Prazo: ${PRAZO[C.prazoAv][0].toLowerCase()} da pelada.</p></div></div>
   ${mul.length?`<div class="section"><div class="sh"><span>MULTAS DA LISTA · ${mul.length}</span><span>${brl(mul.reduce((s,r)=>s+r.v,0))}</span></div><div class="group">${mul.map(r=>cxRowOwner(r,pro)).join("")}</div></div>`:""}
+  <div class="section"><div class="sh"><span>ENTRADAS EXTRAS</span><button class="mini" data-act="${pro?"cxNewEnt":"upsell"}" data-what="Caixinha da pelada">${pro?"+ Entrada":"🔒 + Entrada"}</button></div><div class="group">${M.ent.map(d=>`<div class="qrow"><span class="grow"><b>${esc(d.desc)}</b><br><span class="status">${d.date.split("-").reverse().join("/")}</span></span><span class="r"><span class="val" style="color:var(--lime)">+ ${brl(d.v)}</span>${pro?`<button class="mbtn l" data-act="cxDelEnt" data-id="${d.id}">Remover</button>`:""}</span></div>`).join("")||`<div class="empty">Sem entradas extras neste mês. Patrocínio, rifa, venda de camisa, doação…</div>`}</div></div>
   <div class="section"><div class="sh"><span>DESPESAS</span><button class="mini" data-act="${pro?"cxNewDesp":"upsell"}" data-what="Caixinha da pelada">${pro?"+ Despesa":"🔒 + Despesa"}</button></div><div class="group">${M.desp.map(d=>`<div class="qrow"><span class="grow"><b>${esc(d.desc)}</b><br><span class="status">${d.auto?"Pelo Opeladeiro Quadras · "+ST_L[d.st].toLowerCase():d.aluguel?`Vence ${dBR(d.venc)} · ${ST_X[d.st].toLowerCase()}`:d.date.split("-").reverse().join("/")}</span></span><span class="r"><span class="val" style="color:var(--down)">− ${brl(d.v)}</span>${!d.auto&&!d.aluguel&&pro?`<button class="mbtn l" data-act="cxDelDesp" data-id="${d.id}">Remover</button>`:""}${d.aluguel&&pro?(d.st==="paga"?`<button class="mbtn l" data-act="cxAlug" data-v="${d.mk}">Desfazer</button>`:`<button class="mbtn" data-act="cxAlug" data-v="${d.mk}">Paguei</button>`):""}</span></div>`).join("")||`<div class="empty">Sem despesas neste mês. Aluguel da quadra, bola, colete, juiz…</div>`}</div></div>
   <div class="section"><div class="sh"><span>QUEM PAGA COMO</span></div><div class="group">${S.players.map(p=>`<div class="cell"><span class="grow">${esc(dn(p))}</span><span class="pisosel"><button data-act="${pro?"cxType":"upsell"}" data-what="Caixinha da pelada" data-id="${p.id}" data-v="m" aria-pressed="${cxType(p)==="m"}">Mensal</button><button data-act="${pro?"cxType":"upsell"}" data-what="Caixinha da pelada" data-id="${p.id}" data-v="d" aria-pressed="${cxType(p)==="d"}">Avulso</button></span></div>`).join("")}</div></div>
   <div class="section"><div class="sh"><span>LEMBRETES AUTOMÁTICOS</span></div><div class="box"><div class="note"><b style="color:var(--text)">Mensalista:</b> dia 1 (mensalidade nova), no vencimento e, se atrasar, todo dia na primeira semana e depois a cada 3 dias.<br><b style="color:var(--text)">Avulso:</b> logo depois da pelada, no vencimento e nos dias de atraso, do mesmo jeito.<br>O lembrete para quando a pessoa toca em “Já paguei”. Nada é enviado à noite.</div>
@@ -2635,6 +2636,11 @@ function sheetCxDesp(){return `${bar("Nova despesa","Cancelar","Salvar","cxSaveD
     <div class="cell"><label class="lbl" for="dsV">Valor</label><input class="inl" id="dsV" inputmode="decimal" placeholder="R$"></div>
     <div class="cell"><label class="lbl" for="dsT">Data</label><input class="inl" id="dsT" type="date" value="${new Date().toISOString().slice(0,10)}"></div></div></div>
   <div class="section"><div class="chips">${["Aluguel da quadra","Bola","Colete","Juiz","Água","Churrasco"].map(x=>`<button data-act="dsPick" data-v="${x}">${x}</button>`).join("")}</div></div>`;}
+function sheetCxEnt(){return `${bar("Nova entrada","Cancelar","Salvar","cxSaveEnt")}
+  <div class="section"><div class="group"><div class="cell"><label class="lbl" for="enD">Descrição</label><input class="inl" id="enD" placeholder="Ex.: rifa da pelada"></div>
+    <div class="cell"><label class="lbl" for="enV">Valor</label><input class="inl" id="enV" inputmode="decimal" placeholder="R$"></div>
+    <div class="cell"><label class="lbl" for="enT">Data</label><input class="inl" id="enT" type="date" value="${new Date().toISOString().slice(0,10)}"></div></div></div>
+  <div class="section"><div class="chips">${["Rifa","Patrocínio","Venda de camisa","Doação","Troco do mês anterior","Bar / cantina"].map(x=>`<button data-act="enPick" data-v="${x}">${x}</button>`).join("")}</div></div>`;}
 function sheetStory(){return `${bar("Card para Stories")}
   <div class="section"><div class="chips">${sheet.opts.map(o=>`<button data-act="storyPick" data-v="${o.k}" aria-pressed="${sheet.k===o.k}">${o.l}</button>`).join("")}</div></div>
   <div class="section" id="storyBox"><div class="empty">Gerando o card…</div></div>
@@ -2748,6 +2754,7 @@ function renderSheet(){
   else if(t==="qfixa")E.innerHTML=sheetQFixa();
   else if(t==="cxcfg")E.innerHTML=sheetCxConfig();
   else if(t==="cxdesp")E.innerHTML=sheetCxDesp();
+  else if(t==="cxent")E.innerHTML=sheetCxEnt();
   else if(t==="story")E.innerHTML=sheetStory();
   else if(t==="transfer")E.innerHTML=sheetTransfer();
   else if(t==="day")E.innerHTML=sheetDay();
@@ -3417,6 +3424,10 @@ document.addEventListener("click",e=>{
     case "cxType":{if(!isOwner())break;cx().types[id]=v;save();render();if(sheet)renderSheet();break;}
     case "cxConfig":if(!cxCan())break;openSheet({type:"cxcfg"});break;
     case "cxSaveCfg":{const C=cx();C.pix=$("cxPix").value.trim();C.mensal=$("cxM").value.trim()||"0";C.diaria=$("cxD").value.trim()||"0";C.venc=Math.max(1,Math.min(28,+$("cxV").value||10));save();closeSheet();render();hud("Caixinha atualizada");break;}
+    case "cxNewEnt":if(!cxCan())break;openSheet({type:"cxent"});break;
+    case "enPick":$("enD").value=el.dataset.v;break;
+    case "cxSaveEnt":{const d=$("enD").value.trim(),vv=$("enV").value.trim();if(!d||!num(vv)){hud("Preencha descrição e valor");break;}cx().ent.push({id:uid(),desc:d,valor:vv,date:$("enT").value||new Date().toISOString().slice(0,10)});save();closeSheet();render();hud("Entrada salva");break;}
+    case "cxDelEnt":{if(!cxCan())break;cx().ent=cx().ent.filter(x=>x.id!==id);save();render();break;}
     case "cxNewDesp":if(!cxCan())break;openSheet({type:"cxdesp"});break;
     case "dsPick":$("dsD").value=v;break;
     case "cxSaveDesp":{const d=$("dsD").value.trim(),vv=$("dsV").value.trim();if(!d||!num(vv)){hud("Preencha descrição e valor");break;}cx().desp.push({id:uid(),desc:d,valor:vv,date:$("dsT").value||new Date().toISOString().slice(0,10)});save();closeSheet();render();hud("Despesa salva");break;}
