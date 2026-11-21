@@ -164,3 +164,26 @@ export function tick(doc: any, now: number): { changed: boolean; events: Ev[] } 
   }
   return { changed, events: ev };
 }
+
+// Próximo instante em que tick() pode ter algo a fazer (conservador: nunca depois do real). O cron só abre a pelada quando chegar a hora.
+export function nextDue(doc: any, now: number): number {
+  const cap = now + 6 * 36e5; let best = cap;
+  const S = doc?.state; if (!S || !S.pelada) return cap;
+  const take = (t: number) => { if (t > now && t < best) best = t; };
+  if (S.session && S.session.closesAt) take(S.session.closesAt);
+  const P = S.pelada;
+  if (P.weekday == null || !P.time) return best;
+  const c = cfg(P);
+  if (S.lst && S.lst.status !== "encerrada") {
+    const closeTs = startTs(S.lst.date, P.time) - c.fechaH * 36e5;
+    take(closeTs); take(closeTs - 36e5); take(startTs(addDays(S.lst.date, 1), "06:00") + 1000);
+  }
+  const L = localParts(now);
+  for (let i = 0; i <= 8; i++) {
+    const d = addDays(L.iso, i), wd = new Date(d + "T12:00:00Z").getUTCDay();
+    if (wd === c.abreWd) take(startTs(d, c.abreH));
+    if (wd === c.lembraWd) take(startTs(d, c.lembraH));
+    if ((wd + 1) % 7 === P.weekday) take(startTs(d, "18:00"));
+  }
+  return Math.max(now + 60000, best - 30000);
+}

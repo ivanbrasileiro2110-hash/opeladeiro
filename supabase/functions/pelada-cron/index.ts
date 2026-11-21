@@ -1,6 +1,6 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
-import { tick, type Ev } from "./logic.ts";
+import { tick, nextDue, type Ev } from "./logic.ts";
 
 const PUB = "BKQlIsvlNM_wrJauHrF5M4BsMTB-JdYva50F9gkOtzQJBG0d4J9pVzVwQGQBcvwexvCLKwa4PuJ-VFQYG1ojO70";
 const j = (o: unknown, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { "Content-Type": "application/json" } });
@@ -10,23 +10,29 @@ Deno.serve(async () => {
   const priv = Deno.env.get("VAPID_PRIVATE_KEY");
   if (priv) webpush.setVapidDetails("mailto:contato@obrasileiro.work", PUB, priv);
   const now = Date.now();
-  const { data: rows, error } = await admin.from("peladas").select("id,code,owner,doc,version");
+  const { data: rows, error } = await admin.from("peladas").select("id,code,owner,doc,version,proximo_evento").or(`proximo_evento.is.null,proximo_evento.lte.${new Date(now).toISOString()}`);
   if (error) return j({ error: error.message }, 500);
   let saved = 0, notified = 0;
-  for (const r of rows || []) {
+  const work = async (r: any) => {
     try {
       const doc = structuredClone(r.doc);
       const { changed, events } = tick(doc, now);
+      const due = new Date(nextDue(doc, now)).toISOString();
       if (changed) {
-        const { data: ok, error: ue } = await admin.from("peladas").update({ doc, version: r.version + 1 }).eq("id", r.id).eq("version", r.version).select("id");
-        if (ue) { console.error("update", r.code, ue.message); continue; }
-        if (!ok || !ok.length) continue; // alguém salvou no meio: tenta de novo no próximo ciclo
+        const { data: ok, error: ue } = await admin.from("peladas").update({ doc, version: r.version + 1, proximo_evento: due }).eq("id", r.id).eq("version", r.version).select("id");
+        if (ue) { console.error("update", r.code, ue.message); return; }
+        if (!ok || !ok.length) return; // alguém salvou no meio: tenta de novo no próximo ciclo
         saved++;
+      } else {
+        const { error: ue } = await admin.from("peladas").update({ proximo_evento: due }).eq("id", r.id).eq("version", r.version);
+        if (ue) console.error("agenda", r.code, ue.message);
       }
       if (events.length) notified += await send(admin, r, doc, events, !!priv);
     } catch (_) { /* uma pelada com problema não derruba as outras */ }
-  }
-  return j({ peladas: rows?.length || 0, saved, notified });
+  };
+  const all = rows || [];
+  for (let i = 0; i < all.length; i += 10) await Promise.all(all.slice(i, i + 10).map(work));
+  return j({ due: rows?.length || 0, saved, notified });
 });
 
 async function send(admin: any, r: any, doc: any, events: Ev[], push: boolean) {
